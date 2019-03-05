@@ -69,15 +69,6 @@ class SocketManager() {
                 pw.write(data + "\r\n")
                 pw.flush()
                 Logger.d("send data to server: $data\r\n")
-//                var inputStream = mBrainDataSocket?.getInputStream()
-//                var bufferedReader = BufferedReader(InputStreamReader(inputStream))
-//                var result = bufferedReader.readLine()
-//                if (result != null) {
-//                    brainDataCallback.forEach {
-//                        it.invoke(result)
-//                    }
-//                    Logger.d("receive data from server: $result")
-//                }
             } catch (e: IOException) {
                 Logger.d("send error:$e")
                 e.printStackTrace()

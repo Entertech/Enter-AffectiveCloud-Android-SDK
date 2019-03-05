@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+	<android.support.v4.view.ViewPager
+			android:id="@+id/vp_contain"
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			android:layout_weight="1">
+
+	</android.support.v4.view.ViewPager>
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+		<Button
+				android:layout_width="0dp"
+				android:layout_weight="1"
+				android:layout_height="wrap_content"
+				android:text="连接设备"
+				android:onClick="onConnect"/>
+
+		<Button android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="wrap_content"
+		        android:text="断开设备"
+		        android:onClick="onDisconnet"/>
+		<Button android:layout_width="0dp" android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:text="清屏"
+		        android:onClick="onClear"/>
+
+	</LinearLayout>
+
+	<Button android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="准备上传脑波数据"
+	        android:onClick="start"/>
+
+	<Button android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="上传脑波数据"
+	        android:onClick="process"
+	/>
+
+	<Button android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="结束上传脑波数据"
+	        android:onClick="finish"
+	/>
+
+
+</LinearLayout>

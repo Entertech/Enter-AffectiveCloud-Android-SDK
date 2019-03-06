@@ -23,7 +23,7 @@ var mBrainDataSocket = Socket()
 mBrainDataSocket?.connect(InetSocketAddress("api.affectivecloud.com", 8080))
 ```
 
-### 数据接受
+### 数据接收
 
 **说明**
 

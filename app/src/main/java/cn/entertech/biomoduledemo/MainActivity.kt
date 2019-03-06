@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var messageReceiveFragment: MessageReceiveFragment
     private lateinit var messageSendFragment: MessageSendFragment
     lateinit var vpContainer: ViewPager
+    lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -63,7 +64,7 @@ class MainActivity : AppCompatActivity() {
     fun initView() {
         vpContainer = findViewById(R.id.vp_contain)
         socketManager.addBrainDataListener(brainDataCallback)
-
+        pagerSlidingTabStrip = findViewById(R.id.message_tabs)
         val listFragment = mutableListOf<Fragment>()
         messageReceiveFragment = MessageReceiveFragment()
         messageSendFragment = MessageSendFragment()
@@ -73,6 +74,7 @@ class MainActivity : AppCompatActivity() {
         val listTitles = listOf<String>("接受消息", "发送消息")
         var adapter = MessageAdapter(supportFragmentManager, listFragment, listTitles)
         vpContainer.adapter = adapter
+        pagerSlidingTabStrip.setViewPager(vpContainer)
 
     }
 

@@ -6,6 +6,6 @@
 
 打开Demo时，需点击`连接设备`进行设备蓝牙连接，之后可点击`准备上传脑波数据`发送start命令到服务器开启一个会话，开启会话后可点击`上传脑波数据`进行脑波数据上传，点击`结束上传脑波数据`可结束当前会话；发送和接受到的数据会实时显示在屏幕上，可左右滑动进行切换。
 
-<img src="https://github.com/EnterTech/Enter-Biomodule-Demo-Android/blob/master/doc/receive.png" width="50%" height="500px">
+<img src="https://github.com/EnterTech/Enter-Biomodule-Demo-Android/blob/master/doc/receive.png" width="40%" height="500px">
 
-<img src="https://github.com/EnterTech/Enter-Biomodule-Demo-Android/blob/master/doc/send.png" width="50%" height="500px">
+<img src="https://github.com/EnterTech/Enter-Biomodule-Demo-Android/blob/master/doc/send.png" width="40%" height="500px">

@@ -23,12 +23,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var messageSendFragment: MessageSendFragment
     lateinit var vpContainer: ViewPager
     lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
+    lateinit var requestId:String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         flowtimeBleManager = FlowtimeBleManager.getInstance(this)
         socketManager = SocketManager.getInstance()
-        socketManager.connetBrainDataSocket()
+        socketManager.connectBrainDataSocket()
         initPermission()
         initView()
     }
@@ -108,11 +109,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun start(view: View) {
+        requestId = "${System.currentTimeMillis()}"
         if (!flowtimeBleManager.isConnected()) {
             Toast.makeText(this, "请先连接设备", Toast.LENGTH_SHORT).show()
             return
         }
         var dataEntity = DataEntity()
+        dataEntity.request_id = requestId
         dataEntity.command = "start"
         dataEntity.device_id = "A0"
         var json = Gson().toJson(dataEntity)
@@ -138,9 +141,12 @@ class MainActivity : AppCompatActivity() {
         flowtimeBleManager.removeRawDataListener(rawListener)
         var dataEntity = DataEntity()
         dataEntity.command = "finish"
+        dataEntity.request_id = requestId
         var json = Gson().toJson(dataEntity)
         messageSendFragment.appendMessageToScreen(json + "\r\n")
         socketManager.sendMessage(json)
+        socketManager.stopRead()
+        socketManager.connectBrainDataSocket()
     }
 
 
@@ -174,6 +180,7 @@ class MainActivity : AppCompatActivity() {
             if (socketBuffer.size >= 600) {
                 var dataEntity = DataEntity()
                 dataEntity.command = "process"
+                dataEntity.request_id = requestId
                 dataEntity.data = socketBuffer.toIntArray()
                 var json = Gson().toJson(dataEntity)
                 messageSendFragment.appendMessageToScreen(json + "\r\n")

@@ -14,6 +14,8 @@ class SocketManager() {
     val BRAIN_DATA_SOCKET_PORT: Int = 8080
     var handlerThread: HandlerThread
     var handler: Handler
+    var inputStream: InputStream? = null
+    var bufferedReader: BufferedReader? = null
 
     var brainDataCallback = mutableListOf<(String) -> Unit>()
 
@@ -38,20 +40,27 @@ class SocketManager() {
         }
     }
 
-    fun connetBrainDataSocket() {
+    fun connectBrainDataSocket() {
         Thread(Runnable {
+            mBrainDataSocket = Socket()
             mBrainDataSocket?.connect(InetSocketAddress(SOCKET_ADDRESS, BRAIN_DATA_SOCKET_PORT))
             Logger.d("socket connect state: " + mBrainDataSocket?.isConnected)
+            inputStream = mBrainDataSocket?.getInputStream()
+            bufferedReader = BufferedReader(InputStreamReader(inputStream))
+            isRead = true
             readMessageFromServer()
         }).start()
 
     }
 
+    private var isRead = false
+    fun stopRead(){
+        isRead = false
+    }
+
     fun readMessageFromServer() {
-        var inputStream = mBrainDataSocket?.getInputStream()
-        var bufferedReader = BufferedReader(InputStreamReader(inputStream))
-        while (true) {
-            var result = bufferedReader.readLine()
+        while (isRead) {
+            var result = bufferedReader?.readLine()
             if (result != null) {
                 brainDataCallback.forEach {
                     it.invoke(result)

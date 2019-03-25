@@ -3,6 +3,7 @@ package cn.entertech.biomoduledemo;
 import java.util.Arrays;
 
 public class DataEntity {
+    private String request_id;
     private String command;
     private String device_id;
     private int[] data;
@@ -40,5 +41,13 @@ public class DataEntity {
 
     public void setDevice_id(String device_id) {
         this.device_id = device_id;
+    }
+
+    public String getRequest_id() {
+        return request_id;
+    }
+
+    public void setRequest_id(String request_id) {
+        this.request_id = request_id;
     }
 }

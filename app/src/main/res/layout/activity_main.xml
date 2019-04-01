@@ -62,5 +62,12 @@
 	        android:onClick="finish"
 	/>
 
+	<Button android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="模拟会话中断并恢复"
+			android:onClick="restore"
+	/>
+
+
 
 </LinearLayout>

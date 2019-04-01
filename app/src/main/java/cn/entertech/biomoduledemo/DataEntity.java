@@ -6,6 +6,7 @@ public class DataEntity {
     private String request_id;
     private String command;
     private String device_id;
+    private String session_id;
     private int[] data;
 
     public String getCommand() {
@@ -49,5 +50,13 @@ public class DataEntity {
 
     public void setRequest_id(String request_id) {
         this.request_id = request_id;
+    }
+
+    public String getSession_id() {
+        return session_id;
+    }
+
+    public void setSession_id(String session_id) {
+        this.session_id = session_id;
     }
 }

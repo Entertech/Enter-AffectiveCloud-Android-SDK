@@ -10,7 +10,8 @@ import java.net.Socket
 
 class SocketManager() {
     var mBrainDataSocket: Socket? = null
-    val SOCKET_ADDRESS: String = "api.affectivecloud.com"
+//    val SOCKET_ADDRESS: String = "api.affectivecloud.com"
+    val SOCKET_ADDRESS: String = "test.affectivecloud.com"
     val BRAIN_DATA_SOCKET_PORT: Int = 8080
     var handlerThread: HandlerThread
     var handler: Handler
@@ -41,16 +42,22 @@ class SocketManager() {
     }
 
     fun connectBrainDataSocket() {
+        connectBrainDataSocket(null)
+    }
+
+    fun connectBrainDataSocket(connectSuccess:(()->Unit)?) {
         Thread(Runnable {
             mBrainDataSocket = Socket()
             mBrainDataSocket?.connect(InetSocketAddress(SOCKET_ADDRESS, BRAIN_DATA_SOCKET_PORT))
             Logger.d("socket connect state: " + mBrainDataSocket?.isConnected)
+            if (mBrainDataSocket!!.isConnected){
+                connectSuccess?.invoke()
+            }
             inputStream = mBrainDataSocket?.getInputStream()
             bufferedReader = BufferedReader(InputStreamReader(inputStream))
             isRead = true
             readMessageFromServer()
         }).start()
-
     }
 
     private var isRead = false
@@ -59,14 +66,18 @@ class SocketManager() {
     }
 
     fun readMessageFromServer() {
-        while (isRead) {
-            var result = bufferedReader?.readLine()
-            if (result != null) {
-                brainDataCallback.forEach {
-                    it.invoke(result)
+        try {
+            while (isRead) {
+                var result = bufferedReader?.readLine()
+                if (result != null) {
+                    brainDataCallback.forEach {
+                        it.invoke(result)
+                    }
+                    Logger.d("receive data from server: $result")
                 }
-                Logger.d("receive data from server: $result")
             }
+        }catch (e:Exception){
+           e.printStackTrace()
         }
     }
 
@@ -96,7 +107,9 @@ class SocketManager() {
 
 
     fun disconnectBrainSocket() {
+        mBrainDataSocket?.shutdownInput()
         mBrainDataSocket?.close()
+
     }
 
 }

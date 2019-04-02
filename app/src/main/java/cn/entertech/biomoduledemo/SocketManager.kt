@@ -10,8 +10,8 @@ import java.net.Socket
 
 class SocketManager() {
     var mBrainDataSocket: Socket? = null
-//    val SOCKET_ADDRESS: String = "api.affectivecloud.com"
-    val SOCKET_ADDRESS: String = "test.affectivecloud.com"
+    val SOCKET_ADDRESS: String = "api.affectivecloud.com"
+//    val SOCKET_ADDRESS: String = "test.affectivecloud.com"
     val BRAIN_DATA_SOCKET_PORT: Int = 8080
     var handlerThread: HandlerThread
     var handler: Handler

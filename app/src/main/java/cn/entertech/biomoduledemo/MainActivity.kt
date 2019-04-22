@@ -18,7 +18,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var flowtimeBleManager: FlowtimeBleManager
-    private lateinit var socketManager: SocketManager
+    private lateinit var socketManager: WebSocketManager
     private lateinit var messageReceiveFragment: MessageReceiveFragment
     private lateinit var messageSendFragment: MessageSendFragment
     lateinit var vpContainer: ViewPager
@@ -28,8 +28,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         flowtimeBleManager = FlowtimeBleManager.getInstance(this)
-        socketManager = SocketManager.getInstance()
-        socketManager.connectBrainDataSocket()
+        socketManager = WebSocketManager.getInstance()
+        socketManager.connect()
         initPermission()
         initView()
     }
@@ -58,8 +58,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    var brainDataCallback = fun(result: String) {
-        if (result.contains("session_id")){
+    var brainDataCallback = fun(result: String?) {
+        if (result == null){
+            return
+        }
+        if (result!!.contains("session_id")){
             var startResponse = Gson().fromJson<StartResponse>(result,StartResponse::class.java)
             Logger.d("start response is $startResponse")
             if (startResponse.session_id != null){
@@ -150,15 +153,13 @@ class MainActivity : AppCompatActivity() {
         var json = Gson().toJson(dataEntity)
         messageSendFragment.appendMessageToScreen(json + "\r\n")
         socketManager.sendMessage(json)
-        socketManager.stopRead()
-        socketManager.connectBrainDataSocket()
+        socketManager.connect()
     }
 
     fun restore(view:View){
         flowtimeBleManager.stopBrainCollection()
-        socketManager.stopRead()
-        socketManager.disconnectBrainSocket()
-        socketManager.connectBrainDataSocket(fun(){
+        socketManager.close()
+        socketManager.connect {
             var dataEntity = DataEntity()
             dataEntity.request_id = "${System.currentTimeMillis()}"
             dataEntity.command = "restore"
@@ -166,7 +167,7 @@ class MainActivity : AppCompatActivity() {
             var json = Gson().toJson(dataEntity)
             messageSendFragment.appendMessageToScreen(json + "\r\n")
             socketManager.sendMessage(json)
-        })
+        }
     }
 
 
@@ -211,7 +212,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        socketManager.disconnectBrainSocket()
+        socketManager.close()
         flowtimeBleManager.stopBrainCollection()
         flowtimeBleManager.removeRawDataListener(rawListener)
         socketManager.removeBrainDataListener(brainDataCallback)

@@ -35,4 +35,5 @@ dependencies {
     implementation 'com.orhanobut:logger:1.15'
     implementation 'cn.entertech:flowtimeble:1.0.2'
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation "org.java-websocket:Java-WebSocket:1.4.0"
 }

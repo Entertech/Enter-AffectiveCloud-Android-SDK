@@ -28,7 +28,7 @@ class MessageReceiveFragment : Fragment() {
     }
 
 
-    open fun appendMessageToScreen(message: String) {
+    open fun appendMessageToScreen(message: String?) {
         activity?.runOnUiThread {
             screen.append(getCurrentTime() + "<--" + message + "\n")
             container.fullScroll(ScrollView.FOCUS_DOWN)

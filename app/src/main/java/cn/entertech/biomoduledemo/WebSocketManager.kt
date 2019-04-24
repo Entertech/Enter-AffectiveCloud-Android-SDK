@@ -8,10 +8,10 @@ import java.net.URI
 
 class WebSocketManager() {
     var mBrainDataWebSocket: WebSocketClient? = null
-//    测试服
-    var url: URI = URI("ws://test.affectivecloud.com:8080")
-//    正式服
+    //    测试服
 //    var url: URI = URI("ws://api.affectivecloud.com:8080")
+    //    正式服
+    var url: URI = URI("ws://api.affectivecloud.com:8080")
     var brainDataCallback = mutableListOf<(String?) -> Unit>()
 
     companion object {
@@ -32,24 +32,24 @@ class WebSocketManager() {
         try {
             mBrainDataWebSocket = object : WebSocketClient(url, Draft_6455(), null, 100000) {
                 override fun onOpen(handshakedata: ServerHandshake?) {
-                    Log.d("WebSocketManager", "onConnected " + handshakedata.toString())
+                    System.out.print("onConnected " + handshakedata.toString())
                     connectedCallback?.invoke(handshakedata)
                 }
 
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
 
-                    Log.d("WebSocketManager", "onClose :" + code + "::reason is " + reason)
+                    System.out.print("onClose :" + code + "::reason is " + reason)
                 }
 
                 override fun onMessage(message: String?) {
-                    Log.d("WebSocketManager", "receive msg is " + message)
+                    System.out.print("receive msg is " + message+"\n")
                     brainDataCallback.forEach {
                         it.invoke(message)
                     }
                 }
 
                 override fun onError(ex: java.lang.Exception?) {
-                    Log.d("WebSocketManager", "onError " + ex.toString())
+                    System.out.print("onError " + ex.toString())
                 }
             }
             mBrainDataWebSocket!!.connect()

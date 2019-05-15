@@ -2,8 +2,8 @@ package cn.entertech.biomoduledemo.test;
 
 import android.os.Build;
 import androidx.annotation.RequiresApi;
-import cn.entertech.biomoduledemo.DataEntity;
-import cn.entertech.biomoduledemo.WebSocketManager;
+import cn.entertech.biomoduledemo.entity.DataEntity;
+import cn.entertech.biomoduledemo.websocket.WebSocketManager;
 import com.google.gson.Gson;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;

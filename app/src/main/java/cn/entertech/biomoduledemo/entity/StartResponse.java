@@ -1,4 +1,4 @@
-package cn.entertech.biomoduledemo;
+package cn.entertech.biomoduledemo.entity;
 
 public class StartResponse {
     private String request_id;

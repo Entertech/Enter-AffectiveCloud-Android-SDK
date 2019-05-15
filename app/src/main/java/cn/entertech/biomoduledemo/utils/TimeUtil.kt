@@ -1,4 +1,4 @@
-package cn.entertech.biomoduledemo
+package cn.entertech.biomoduledemo.utils
 
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter

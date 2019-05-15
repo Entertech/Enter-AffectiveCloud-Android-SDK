@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+			  xmlns:app="http://schemas.android.com/apk/res-auto">
+	<!--导航条-->
+	<cn.entertech.biomoduledemo.utils.PagerSlidingTabStrip
+			android:id="@+id/message_tabs"
+			android:layout_gravity="center"
+			app:pstsIndicatorHeight="2dp"
+			app:pstsUnderlineHeight="0dp"
+			app:pstsTabUnselectedTextColor="#999999"
+			app:pstsTabSelectedTextColor="@color/colorPrimary"
+			app:pstsIndicatorColor="@color/colorPrimary"
+			android:layout_width="wrap_content"
+			android:layout_height="40dp" />
+
+	<android.support.v4.view.ViewPager
+			android:id="@+id/vp_contain"
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			android:layout_weight="1">
+
+	</android.support.v4.view.ViewPager>
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+		<Button android:layout_width="0dp" android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:text="清屏"
+		        android:onClick="onClear"/>
+
+	</LinearLayout>
+
+	<Button android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="权限验证"
+			android:onClick="login"/>
+	<Button android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="准备上传数据"
+	        android:onClick="start"/>
+
+	<Button android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="上传数据"
+	        android:onClick="process"
+	/>
+
+	<Button android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="结束"
+	        android:onClick="finish"
+	/>
+
+	<Button android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="模拟会话中断并恢复"
+			android:onClick="restore"
+	/>
+
+
+
+</LinearLayout>

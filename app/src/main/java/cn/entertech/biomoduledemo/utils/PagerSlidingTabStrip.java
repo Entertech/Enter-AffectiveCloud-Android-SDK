@@ -1,4 +1,4 @@
-package cn.entertech.biomoduledemo;
+package cn.entertech.biomoduledemo.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -22,6 +22,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import cn.entertech.biomoduledemo.R;
 
 import java.util.Locale;
 

@@ -1,4 +1,4 @@
-package cn.entertech.biomoduledemo;
+package cn.entertech.biomoduledemo.entity;
 
 import java.util.Arrays;
 

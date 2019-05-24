@@ -46,16 +46,13 @@ class WebSocketManager() {
                 }
 
                 override fun onMessage(message: String?) {
-                    Log.d("WebSocketManager","receive msg is " + message+"\n")
-                    brainDataCallback.forEach {
-                        it.invoke(message)
-                    }
                 }
+
                 override fun onMessage(message: ByteBuffer) {
                     val arr = ByteArray(message.remaining())
                     message.get(arr)
-                    Log.d("WebSocketManager","receive msg is " + ConvertUtil.uncompress(arr)+"\n")
-                    var recMsg = ConvertUtil.uncompress(arr)+"\n"
+                    Log.d("WebSocketManager","receive msg is " + ConvertUtil.uncompress(arr))
+                    var recMsg = ConvertUtil.uncompress(arr)
                     brainDataCallback.forEach {
                         it.invoke(recMsg)
                     }

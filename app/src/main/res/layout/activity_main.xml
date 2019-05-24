@@ -6,31 +6,225 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".activity.MainActivity"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
+    <!--导航条-->
+    <cn.entertech.biomoduledemo.utils.PagerSlidingTabStrip
+            android:id="@+id/message_tabs"
+            android:layout_gravity="center"
+            app:pstsIndicatorHeight="2dp"
+            app:pstsUnderlineHeight="0dp"
+            app:pstsTabUnselectedTextColor="#999999"
+            app:pstsTabSelectedTextColor="@color/colorPrimary"
+            app:pstsIndicatorColor="@color/colorPrimary"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            />
 
-    <Button
+    <android.support.v4.view.ViewPager
+            android:id="@+id/vp_contain"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            >
+
+    </android.support.v4.view.ViewPager>
+
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="连接设备"
-            android:onClick="onConnect"/>
+            android:orientation="horizontal"
+            >
 
-    <Button android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="断开设备"
-            android:onClick="onDisconnet"/>
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="连接蓝牙设备"
+                android:onClick="onConnectDevice"
+                />
 
-    <Button android:layout_width="match_parent"
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="断开蓝牙设备"
+                android:onClick="onDisconnetDevice"
+                />
+
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="清屏"
+                android:onClick="onClear"
+                />
+
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="暂停"
+                android:onClick="onPause"
+                />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="注意力"
-            android:onClick="toAttention"/>
-    <Button android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            >
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="连接情感云平台"
+                android:onClick="onConnectSocket"
+                />
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="权限认证"
+                android:onClick="onSessionCreate"
+                />
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="断开情感云平台"
+                android:onClick="onSessionClose"
+                />
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="模拟中断恢复"
+                android:onClick="onSessionRestore"
+                />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="放松度"
-            android:onClick="toRelaxation"/>
-    <Button android:layout_width="match_parent"
+            android:orientation="horizontal"
+            >
+
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="初始化基础服务"
+                android:onClick="onInitBiodataServer"
+                />
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="订阅基础服务"
+                android:onClick="onSubscribeBiodata"
+                />
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="上传生物数据"
+                android:onClick="onUploadBiodata"
+                />
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="获取基础报表"
+                android:onClick="onBiodataReport"
+                />
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="取消订阅基础服务"
+                android:onClick="onUnsubscribeBiodata"
+                />
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="压力值"
-            android:onClick="toPressure"/>
+            android:orientation="horizontal"
+            >
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="启动情感云服务"
+                android:onClick="onStartAffective"
+                />
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="订阅情感服务"
+                android:onClick="onSubscribeAffective"
+                />
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="获取情感数据报表"
+                android:onClick="onAffectiveReport"
+                />
+
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="取消订阅情感服务"
+                android:onClick="onUnsubscribeAffective"
+                />
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="结束情感云服务"
+                android:onClick="onFinishAffective"
+                />
+
+
+    </LinearLayout>
+
+
+    <!--<Button android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="注意力"-->
+    <!--android:onClick="toAttention"/>-->
+    <!--<Button android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="放松度"-->
+    <!--android:onClick="toRelaxation"/>-->
+    <!--<Button android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="压力值"-->
+    <!--android:onClick="toPressure"/>-->
 
 
 </LinearLayout>

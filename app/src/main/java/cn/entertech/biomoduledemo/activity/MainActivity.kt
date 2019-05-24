@@ -29,12 +29,26 @@ class MainActivity : AppCompatActivity() {
     private lateinit var socketManager: WebSocketManager
     private lateinit var flowtimeBleManager: FlowtimeBleManager
 
+    /*需要向情感云平台申请 :APP_KEY、APP_SECRET、USER_NAME*/
     val APP_KEY: String = "6eabf68e-760e-11e9-bd82-0242ac140006"
     val APP_SECRET: String = "68a09cf8e4e06718b037c399f040fb7e"
     val USER_NAME: String = "test1"
+    /*自己的用户ID：邮箱或者手机号码*/
+    val USER_ID: String = "123456789@qq.com"
+
+    /*情感云平台服务分类：session（会话）、biodata（基础数据服务）、affective（情感数据服务）*/
     val SERVER_SESSION = "session"
     val SERVER_BIO_DATA = "biodata"
     val SERVER_AFFECTIVE = "affective"
+
+    /*只上传分析脑波数据*/
+    val TEST_BIODATA_EEG = "eeg"
+    /*只上传分析心率数据*/
+    val TEST_BIODATA_HR = "hr"
+    /*同时上传分析脑波和心率数据*/
+    val TEST_BIODATA_BOTH = "both"
+    /*需要分析的生物数据类型：目前采集到的生物数据包括脑波和心率数据*/
+    var mTestBiodataType = TEST_BIODATA_EEG
 
     lateinit var sessionId: String
     lateinit var sign: String
@@ -48,12 +62,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         flowtimeBleManager = FlowtimeBleManager.getInstance(this)
         flowtimeBleManager.addRawDataListener(rawListener)
+        flowtimeBleManager.addHeartRateListener(heartRateListener)
         socketManager = WebSocketManager.getInstance()
         initPermission()
         initView()
     }
 
-    var brainDataCallback = fun(result: String?) {
+    var receiveDataCallback = fun(result: String?) {
         if (result == null) {
             return
         }
@@ -69,7 +84,7 @@ class MainActivity : AppCompatActivity() {
 
     fun initView() {
         vpContainer = findViewById(R.id.vp_contain)
-        socketManager.addBrainDataListener(brainDataCallback)
+        socketManager.addReceiveDataListener(receiveDataCallback)
         pagerSlidingTabStrip = findViewById(R.id.message_tabs)
         val listFragment = mutableListOf<Fragment>()
         messageReceiveFragment = MessageReceiveFragment()
@@ -159,10 +174,11 @@ class MainActivity : AppCompatActivity() {
 
     fun onClear(view: View) {
         messageSendFragment.clearScreen()
+        messageReceiveFragment.clearScreen()
     }
 
     fun onPause(view: View) {
-        flowtimeBleManager.stopBrainCollection()
+        flowtimeBleManager.stopHeartAndBrainCollection()
     }
 
     fun onConnectSocket(view: View) {
@@ -181,7 +197,7 @@ class MainActivity : AppCompatActivity() {
         var requestBodyMap = HashMap<Any, Any>()
         requestBodyMap["app_key"] = APP_KEY
         requestBodyMap["sign"] = sign
-        requestBodyMap["user_id"] = MD5Encode("123456789@qq.com")
+        requestBodyMap["user_id"] = MD5Encode(USER_ID)
         var requestBody = RequestBody(SERVER_SESSION, "create", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
         messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
@@ -189,6 +205,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onSessionClose(view: View) {
+        if (!isStatusOk()) {
+            return
+        }
         var requestBody = RequestBody(SERVER_SESSION, "close", null)
         var requestJson = Gson().toJson(requestBody)
         messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
@@ -196,8 +215,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onSessionRestore(view: View) {
+        if (!isStatusOk()) {
+            return
+        }
         socketManager.close()
+        messageReceiveFragment.appendMessageToScreen("情感云平台已断开，正在尝试重新连接...")
         socketManager.connect {
+            messageReceiveFragment.appendMessageToScreen("情感云平台重连成功！")
             var requestBodyMap = HashMap<Any, Any>()
             requestBodyMap["session_id"] = sessionId
             requestBodyMap["app_key"] = APP_KEY
@@ -210,8 +234,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onInitBiodataServer(view: View) {
+        if (!isStatusOk()) {
+            return
+        }
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["bio_data_type"] = listOf("eeg")
+        when (mTestBiodataType) {
+            TEST_BIODATA_EEG -> {
+                requestBodyMap["bio_data_type"] = listOf("eeg")
+            }
+            TEST_BIODATA_HR -> {
+                requestBodyMap["bio_data_type"] = listOf("hr")
+            }
+            TEST_BIODATA_BOTH -> {
+                requestBodyMap["bio_data_type"] = listOf("eeg", "hr")
+            }
+        }
         var requestBody = RequestBody(SERVER_BIO_DATA, "init", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
         messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
@@ -219,34 +256,79 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    var socketBuffer = ArrayList<Int>()
+    var brainDataBuffer = ArrayList<Int>()
     var rawListener = fun(bytes: ByteArray) {
         Logger.d("brain data is " + Arrays.toString(bytes))
         for (byte in bytes) {
-            socketBuffer.add(ConvertUtil.converUnchart(byte))
-            if (socketBuffer.size >= 600) {
+            brainDataBuffer.add(ConvertUtil.converUnchart(byte))
+            if (brainDataBuffer.size >= 600) {
                 var dataMap = HashMap<Any, Any>()
-                dataMap["eeg"] = socketBuffer.toIntArray()
+                dataMap["eeg"] = brainDataBuffer.toIntArray()
                 var requestBody =
                     RequestBody(SERVER_BIO_DATA, "upload", dataMap)
                 var requestJson = Gson().toJson(requestBody)
                 messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
                 socketManager.sendMessage(ConvertUtil.compress(requestJson))
-                socketBuffer.clear()
+                brainDataBuffer.clear()
             }
         }
     }
 
+    var heartRateDataBuffer = ArrayList<Int>()
+    var heartRateListener = fun(heartRate: Int) {
+        heartRateDataBuffer.add(heartRate)
+        if (heartRateDataBuffer.size >= 2) {
+            var dataMap = HashMap<Any, Any>()
+            dataMap["hr"] = heartRateDataBuffer.toIntArray()
+            var requestBody =
+                RequestBody(SERVER_BIO_DATA, "upload", dataMap)
+            var requestJson = Gson().toJson(requestBody)
+            messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
+            socketManager.sendMessage(ConvertUtil.compress(requestJson))
+            heartRateDataBuffer.clear()
+        }
+    }
+
     fun onUploadBiodata(view: View) {
-        flowtimeBleManager.startBrainCollection()
+        if (!isStatusOk()) {
+            return
+        }
+        when (mTestBiodataType) {
+            TEST_BIODATA_EEG -> {
+                flowtimeBleManager.startBrainCollection()
+            }
+            TEST_BIODATA_HR -> {
+                flowtimeBleManager.startHeartRateCollection()
+            }
+            TEST_BIODATA_BOTH -> {
+                flowtimeBleManager.startHeartAndBrainCollection()
+            }
+        }
     }
 
     fun onSubscribeBiodata(view: View) {
+        if (!isStatusOk()) {
+            return
+        }
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["eeg"] = listOf(
-            "eegl_wave", "eegr_wave", "eeg_alpha_power", "eeg_beta_power",
-            "eeg_theta_power", "eeg_delta_power", "eeg_gamma_power", "eeg_progress"
-        )
+        when (mTestBiodataType) {
+            TEST_BIODATA_EEG -> {
+                requestBodyMap["eeg"] = listOf(
+                    "eegl_wave", "eegr_wave", "eeg_alpha_power", "eeg_beta_power",
+                    "eeg_theta_power", "eeg_delta_power", "eeg_gamma_power", "eeg_progress"
+                )
+            }
+            TEST_BIODATA_HR -> {
+                requestBodyMap["hr"] = listOf("hr", "hrv")
+            }
+            TEST_BIODATA_BOTH -> {
+                requestBodyMap["hr"] = listOf("hr", "hrv")
+                requestBodyMap["eeg"] = listOf(
+                    "eegl_wave", "eegr_wave", "eeg_alpha_power", "eeg_beta_power",
+                    "eeg_theta_power", "eeg_delta_power", "eeg_gamma_power", "eeg_progress"
+                )
+            }
+        }
         var requestBody =
             RequestBody(SERVER_BIO_DATA, "subscribe", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
@@ -255,8 +337,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onBiodataReport(view: View) {
+        if (!isStatusOk()) {
+            return
+        }
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["bio_data_type"] = listOf("eeg")
+        when (mTestBiodataType) {
+            TEST_BIODATA_EEG -> {
+                requestBodyMap["bio_data_type"] = listOf("eeg")
+            }
+            TEST_BIODATA_HR -> {
+                requestBodyMap["bio_data_type"] = listOf("hr")
+            }
+            TEST_BIODATA_BOTH -> {
+                requestBodyMap["bio_data_type"] = listOf("hr","eeg")
+            }
+        }
         var requestBody =
             RequestBody(SERVER_BIO_DATA, "report", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
@@ -265,11 +360,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onUnsubscribeBiodata(view: View) {
+        if (!isStatusOk()) {
+            return
+        }
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["eeg"] = listOf(
-            "eegl_wave", "eegr_wave", "eeg_alpha_power", "eeg_beta_power",
-            "eeg_theta_power", "eeg_delta_power", "eeg_gamma_power", "eeg_progress"
-        )
+        when (mTestBiodataType) {
+            TEST_BIODATA_EEG -> {
+                requestBodyMap["eeg"] = listOf(
+                    "eegl_wave", "eegr_wave", "eeg_alpha_power", "eeg_beta_power",
+                    "eeg_theta_power", "eeg_delta_power", "eeg_gamma_power", "eeg_progress"
+                )
+            }
+            TEST_BIODATA_HR -> {
+                requestBodyMap["hr"] = listOf("hr", "hrv")
+            }
+            TEST_BIODATA_BOTH -> {
+                requestBodyMap["hr"] = listOf("hr", "hrv")
+                requestBodyMap["eeg"] = listOf(
+                    "eegl_wave", "eegr_wave", "eeg_alpha_power", "eeg_beta_power",
+                    "eeg_theta_power", "eeg_delta_power", "eeg_gamma_power", "eeg_progress"
+                )
+            }
+        }
         var requestBody =
             RequestBody(SERVER_BIO_DATA, "unsubscribe", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
@@ -278,8 +390,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onStartAffective(view: View) {
+        if (!isStatusOk()) {
+            return
+        }
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["cloud_services"] = listOf("attention")
+        when (mTestBiodataType) {
+            TEST_BIODATA_EEG -> {
+                requestBodyMap["cloud_services"] = listOf("attention")
+            }
+            TEST_BIODATA_HR -> {
+                requestBodyMap["cloud_services"] = listOf("pressure")
+            }
+            TEST_BIODATA_BOTH -> {
+                requestBodyMap["cloud_services"] = listOf("attention","pressure")
+            }
+        }
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "start", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
@@ -289,8 +414,22 @@ class MainActivity : AppCompatActivity() {
 
 
     fun onSubscribeAffective(view: View) {
+        if (!isStatusOk()) {
+            return
+        }
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["attention"] = listOf("attention")
+        when (mTestBiodataType) {
+            TEST_BIODATA_EEG -> {
+                requestBodyMap["attention"] = listOf("attention")
+            }
+            TEST_BIODATA_HR -> {
+                requestBodyMap["pressure"] = listOf("pressure")
+            }
+            TEST_BIODATA_BOTH -> {
+                requestBodyMap["attention"] = listOf("attention")
+                requestBodyMap["pressure"] = listOf("pressure")
+            }
+        }
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "subscribe", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
@@ -300,8 +439,21 @@ class MainActivity : AppCompatActivity() {
 
 
     fun onAffectiveReport(view: View) {
+        if (!isStatusOk()) {
+            return
+        }
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["attention"] = listOf("attention")
+        when (mTestBiodataType) {
+            TEST_BIODATA_EEG -> {
+                requestBodyMap["cloud_services"] = listOf("attention")
+            }
+            TEST_BIODATA_HR -> {
+                requestBodyMap["cloud_services"] = listOf("pressure")
+            }
+            TEST_BIODATA_BOTH -> {
+                requestBodyMap["cloud_services"] = listOf("attention","pressure")
+            }
+        }
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "report", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
@@ -311,8 +463,22 @@ class MainActivity : AppCompatActivity() {
 
 
     fun onUnsubscribeAffective(view: View) {
+        if (!isStatusOk()) {
+            return
+        }
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["attention"] = listOf("attention")
+        when (mTestBiodataType) {
+            TEST_BIODATA_EEG -> {
+                requestBodyMap["attention"] = listOf("attention")
+            }
+            TEST_BIODATA_HR -> {
+                requestBodyMap["pressure"] = listOf("pressure")
+            }
+            TEST_BIODATA_BOTH -> {
+                requestBodyMap["attention"] = listOf("attention")
+                requestBodyMap["pressure"] = listOf("pressure")
+            }
+        }
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "unsubscribe", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
@@ -321,8 +487,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onFinishAffective(view: View) {
+        if (!isStatusOk()) {
+            return
+        }
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["attention"] = listOf("attention")
+        when (mTestBiodataType) {
+            TEST_BIODATA_EEG -> {
+                requestBodyMap["cloud_services"] = listOf("attention")
+            }
+            TEST_BIODATA_HR -> {
+                requestBodyMap["cloud_services"] = listOf("pressure")
+            }
+            TEST_BIODATA_BOTH -> {
+                requestBodyMap["cloud_services"] = listOf("pressure","attention")
+            }
+        }
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "finish", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)

@@ -16,7 +16,7 @@ public class TestCase {
     public static void main(String[] args) {
         String testFile = "/Users/Enter/Code/BiomoduleDemo/app/src/main/java/cn/entertech/biomoduledemo/test/flowtime_eegdata.txt";
         final WebSocketManager webSocketManager = WebSocketManager.Companion.getInstance();
-        webSocketManager.addBrainDataListener(new Function1<String, Unit>() {
+        webSocketManager.addReceiveDataListener(new Function1<String, Unit>() {
             @Override
             public Unit invoke(String s) {
                 return null;

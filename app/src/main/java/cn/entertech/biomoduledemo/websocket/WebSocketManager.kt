@@ -7,6 +7,7 @@ import org.java_websocket.drafts.Draft_6455
 import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
 import java.nio.ByteBuffer
+import java.util.concurrent.CopyOnWriteArrayList
 
 class WebSocketManager() {
     var mBrainDataWebSocket: WebSocketClient? = null
@@ -15,7 +16,7 @@ class WebSocketManager() {
     //    正式服
 //    var url: URI = URI("ws://api.affectivecloud.com:8080")
     var url: URI = URI("ws://47.103.77.211:8000/ws/algorithm/v0.1/")
-    var brainDataCallback = mutableListOf<(String?) -> Unit>()
+    var receiveDataCallback = CopyOnWriteArrayList<(String?) -> Unit>()
 
     companion object {
         private var socketManager: WebSocketManager? = null
@@ -53,7 +54,7 @@ class WebSocketManager() {
                     message.get(arr)
                     Log.d("WebSocketManager","receive msg is " + ConvertUtil.uncompress(arr))
                     var recMsg = ConvertUtil.uncompress(arr)
-                    brainDataCallback.forEach {
+                    receiveDataCallback.forEach {
                         it.invoke(recMsg)
                     }
                 }
@@ -90,12 +91,12 @@ class WebSocketManager() {
     }
 
 
-    fun addBrainDataListener(callback: ((String?) -> Unit)) {
-        brainDataCallback.add(callback)
+    fun addReceiveDataListener(callback: ((String?) -> Unit)) {
+        receiveDataCallback.add(callback)
     }
 
-    fun removeBrainDataListener(callback: ((String) -> Unit)) {
-        brainDataCallback.remove(callback)
+    fun removeReceiveDataListener(callback: ((String) -> Unit)) {
+        receiveDataCallback.remove(callback)
     }
 
 

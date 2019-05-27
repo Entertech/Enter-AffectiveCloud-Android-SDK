@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import cn.entertech.biomoduledemo.R
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         messageSendFragment = MessageSendFragment()
         listFragment.add(messageReceiveFragment)
         listFragment.add(messageSendFragment)
-        val listTitles = listOf<String>("接受消息", "发送消息")
+        val listTitles = listOf("接受消息", "发送消息")
         var adapter = MessageAdapter(
             supportFragmentManager,
             listFragment,

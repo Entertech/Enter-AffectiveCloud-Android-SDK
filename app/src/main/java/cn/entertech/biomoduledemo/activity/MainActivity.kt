@@ -215,9 +215,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onSessionCreate(view: View) {
-//        if (!isStatusOk()) {
-//            return
-//        }
+        if (!isStatusOk()) {
+            return
+        }
         var md5Params = "app_key=$APP_KEY&username=$USER_NAME&app_secret=$APP_SECRET"
         sign = MD5Encode(md5Params).toUpperCase()
         var requestBodyMap = HashMap<Any, Any>()

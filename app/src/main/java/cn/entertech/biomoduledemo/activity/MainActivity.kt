@@ -194,7 +194,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         var md5Params = "app_key=$APP_KEY&username=$USER_NAME&app_secret=$APP_SECRET"
-        sign = MD5Encode(md5Params)
+        sign = MD5Encode(md5Params).toUpperCase()
         var requestBodyMap = HashMap<Any, Any>()
         requestBodyMap["app_key"] = APP_KEY
         requestBodyMap["sign"] = sign

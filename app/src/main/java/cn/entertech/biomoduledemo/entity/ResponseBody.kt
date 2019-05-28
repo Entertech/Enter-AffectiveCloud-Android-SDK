@@ -177,9 +177,9 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
     fun getEEGAlphaCurve(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("eeg")) {
-                var hrData = data["eeg"] as Map<Any, Any>
-                if (hrData.containsKey("eeg_alpha_curve")) {
-                    return hrData["eeg_alpha_curve"] as ArrayList<Double>
+                var eegData = data["eeg"] as Map<Any, Any>
+                if (eegData.containsKey("eeg_alpha_curve")) {
+                    return eegData["eeg_alpha_curve"] as ArrayList<Double>
                 }
             }
         }
@@ -192,9 +192,9 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
     fun getEEGBetaCurve(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("eeg")) {
-                var hrData = data["eeg"] as Map<Any, Any>
-                if (hrData.containsKey("eeg_beta_curve")) {
-                    return hrData["eeg_beta_curve"] as ArrayList<Double>
+                var eegData = data["eeg"] as Map<Any, Any>
+                if (eegData.containsKey("eeg_beta_curve")) {
+                    return eegData["eeg_beta_curve"] as ArrayList<Double>
                 }
             }
         }
@@ -207,9 +207,9 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
     fun getEEGThetaCurve(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("eeg")) {
-                var hrData = data["eeg"] as Map<Any, Any>
-                if (hrData.containsKey("eeg_theta_curve")) {
-                    return hrData["eeg_theta_curve"] as ArrayList<Double>
+                var eegData = data["eeg"] as Map<Any, Any>
+                if (eegData.containsKey("eeg_theta_curve")) {
+                    return eegData["eeg_theta_curve"] as ArrayList<Double>
                 }
             }
         }
@@ -222,9 +222,9 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
     fun getEEGDeltaCurve(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("eeg")) {
-                var hrData = data["eeg"] as Map<Any, Any>
-                if (hrData.containsKey("eeg_delta_curve")) {
-                    return hrData["eeg_delta_curve"] as ArrayList<Double>
+                var eegData = data["eeg"] as Map<Any, Any>
+                if (eegData.containsKey("eeg_delta_curve")) {
+                    return eegData["eeg_delta_curve"] as ArrayList<Double>
                 }
             }
         }
@@ -237,9 +237,9 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
     fun getEEGGammaCurve(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("eeg")) {
-                var hrData = data["eeg"] as Map<Any, Any>
-                if (hrData.containsKey("eeg_gamma_curve")) {
-                    return hrData["eeg_gamma_curve"] as ArrayList<Double>
+                var eegData = data["eeg"] as Map<Any, Any>
+                if (eegData.containsKey("eeg_gamma_curve")) {
+                    return eegData["eeg_gamma_curve"] as ArrayList<Double>
                 }
             }
         }
@@ -343,9 +343,9 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
     fun getRelaxation(): Double? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("relaxation")) {
-                var attentionMap = data["relaxation"] as Map<Any, Any>
-                if (attentionMap.containsKey("relaxation")) {
-                    return attentionMap["relaxation"] as Double
+                var relaxationMap = data["relaxation"] as Map<Any, Any>
+                if (relaxationMap.containsKey("relaxation")) {
+                    return relaxationMap["relaxation"] as Double
                 }
             }
         }
@@ -358,9 +358,9 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
     fun getPressure(): Double? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("pressure")) {
-                var attentionMap = data["pressure"] as Map<Any, Any>
-                if (attentionMap.containsKey("pressure")) {
-                    return attentionMap["pressure"] as Double
+                var pressureMap = data["pressure"] as Map<Any, Any>
+                if (pressureMap.containsKey("pressure")) {
+                    return pressureMap["pressure"] as Double
                 }
             }
         }
@@ -403,9 +403,9 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
     fun getRelaxationAvg(): Double? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_AFFECTIVE_REPORT) {
             if (data.containsKey("relaxation")) {
-                var attentionMap = data["relaxation"] as Map<Any, Any>
-                if (attentionMap.containsKey("relaxation_avg")) {
-                    return attentionMap["relaxation_avg"] as Double
+                var relaxationMap = data["relaxation"] as Map<Any, Any>
+                if (relaxationMap.containsKey("relaxation_avg")) {
+                    return relaxationMap["relaxation_avg"] as Double
                 }
             }
         }
@@ -418,9 +418,9 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
     fun getRelaxationRec(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_AFFECTIVE_REPORT) {
             if (data.containsKey("relaxation")) {
-                var attentionMap = data["relaxation"] as Map<Any, Any>
-                if (attentionMap.containsKey("relaxation_rec")) {
-                    return attentionMap["relaxation_rec"] as ArrayList<Double>
+                var relaxationMap = data["relaxation"] as Map<Any, Any>
+                if (relaxationMap.containsKey("relaxation_rec")) {
+                    return relaxationMap["relaxation_rec"] as ArrayList<Double>
                 }
             }
         }
@@ -433,9 +433,9 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
     fun getPressureAvg(): Double? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_AFFECTIVE_REPORT) {
             if (data.containsKey("pressure")) {
-                var attentionMap = data["pressure"] as Map<Any, Any>
-                if (attentionMap.containsKey("pressure_avg")) {
-                    return attentionMap["pressure_avg"] as Double
+                var pressureMap = data["pressure"] as Map<Any, Any>
+                if (pressureMap.containsKey("pressure_avg")) {
+                    return pressureMap["pressure_avg"] as Double
                 }
             }
         }
@@ -448,9 +448,9 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
     fun getPressureRec(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_AFFECTIVE_REPORT) {
             if (data.containsKey("pressure")) {
-                var attentionMap = data["pressure"] as Map<Any, Any>
-                if (attentionMap.containsKey("pressure_rec")) {
-                    return attentionMap["pressure_rec"] as ArrayList<Double>
+                var pressureMap = data["pressure"] as Map<Any, Any>
+                if (pressureMap.containsKey("pressure_rec")) {
+                    return pressureMap["pressure_rec"] as ArrayList<Double>
                 }
             }
         }

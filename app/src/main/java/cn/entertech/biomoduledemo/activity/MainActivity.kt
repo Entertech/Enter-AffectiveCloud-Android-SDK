@@ -540,10 +540,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun isStatusOk(): Boolean {
-//        if (!flowtimeBleManager.isConnected() || !socketManager.isOpen()) {
-//            Toast.makeText(this, "Ble or Socket Disconnected!", Toast.LENGTH_SHORT).show()
-//            return false
-//        }
+        if (!flowtimeBleManager.isConnected() || !socketManager.isOpen()) {
+            Toast.makeText(this, "Ble or Socket Disconnected!", Toast.LENGTH_SHORT).show()
+            return false
+        }
         return true
     }
 

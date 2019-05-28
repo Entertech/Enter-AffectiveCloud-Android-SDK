@@ -13,8 +13,8 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import cn.entertech.biomoduledemo.R
-import cn.entertech.biomoduledemo.entity.AuthResponseBody
 import cn.entertech.biomoduledemo.entity.RequestBody
+import cn.entertech.biomoduledemo.entity.ResponseBody
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.ConvertUtil
@@ -49,9 +49,9 @@ class MainActivity : AppCompatActivity() {
     /*同时上传分析脑波和心率数据*/
     val TEST_BIODATA_BOTH = "both"
     /*需要分析的生物数据类型：目前采集到的生物数据包括脑波和心率数据*/
-    var mTestBiodataType = TEST_BIODATA_EEG
+    var mTestBiodataType = TEST_BIODATA_BOTH
 
-    lateinit var sessionId: String
+    var sessionId: String? = null
     lateinit var sign: String
     private lateinit var messageReceiveFragment: MessageReceiveFragment
     private lateinit var messageSendFragment: MessageSendFragment
@@ -73,14 +73,39 @@ class MainActivity : AppCompatActivity() {
         if (result == null) {
             return
         }
-        if (result!!.contains("session_id")) {
-            var startResponse = Gson().fromJson<AuthResponseBody>(result, AuthResponseBody::class.java)
-            Logger.d("start response is $startResponse")
-            if (startResponse != null && startResponse.data != null) {
-                sessionId = startResponse.data.session_id
-            }
-        }
+
+        var response = Gson().fromJson<ResponseBody>(result, ResponseBody::class.java)
+        sessionId = response.getSessionId()
         messageReceiveFragment.appendMessageToScreen(result)
+//        Log.d("####", "left wave is " + response.getLeftBrainwave())
+//        Log.d("####", "right wave is " + response.getRightBrainwave())
+//        Log.d("####", "alpha power is " + response.getEEGAlphaPower())
+//        Log.d("####", "beta power is " + response.getEEGBetaPower())
+//        Log.d("####", "theta power is " + response.getEEGThetaPower())
+//        Log.d("####", "delta power is " + response.getEEGDeltaPower())
+//        Log.d("####", "gamma power is " + response.getEEGGammaPower())
+//        Log.d("####", "eeg progress is " + response.getEEGProgress())
+//        Log.d("####", "hr is " + response.getHeartRate())
+//        Log.d("####", "hrv is " + response.getHeartRateVariability())
+//        Log.d("####", "getEEGAlphaCurve is " + response.getEEGAlphaCurve())
+//        Log.d("####", "getEEGBetaCurve is " + response.getEEGBetaCurve())
+//        Log.d("####", "getEEGThetaCurve is " + response.getEEGThetaCurve())
+//        Log.d("####", "getEEGDeltaCurve is " + response.getEEGDeltaCurve())
+//        Log.d("####", "getEEGGammaCurve is " + response.getEEGGammaCurve())
+//        Log.d("####", "getHeartRateAvg is " + response.getHeartRateAvg())
+//        Log.d("####", "getHeartRateMax is " + response.getHeartRateMax())
+//        Log.d("####", "getHeartRateMin is " + response.getHeartRateMin())
+//        Log.d("####", "getHeartRateRec is " + response.getHeartRateRec())
+//        Log.d("####", "getHeartRateVariabilityRec is " + response.getHeartRateVariabilityRec())
+//        Log.d("####", "getAttention is " + response.getAttention())
+//        Log.d("####", "getRelaxation is " + response.getRelaxation())
+//        Log.d("####", "getPressure is " + response.getPressure())
+//        Log.d("####", "getAttentionAvg is " + response.getAttentionAvg())
+//        Log.d("####", "getAttentionRec is " + response.getAttentionRec())
+//        Log.d("####", "getRelaxationAvg is " + response.getRelaxationAvg())
+//        Log.d("####", "getRelaxationRec is " + response.getRelaxationRec())
+//        Log.d("####", "getPressureAvg is " + response.getPressureAvg())
+//        Log.d("####", "getPressureRec is " + response.getPressureRec())
     }
 
     fun initView() {
@@ -190,9 +215,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onSessionCreate(view: View) {
-        if (!isStatusOk()) {
-            return
-        }
+//        if (!isStatusOk()) {
+//            return
+//        }
         var md5Params = "app_key=$APP_KEY&username=$USER_NAME&app_secret=$APP_SECRET"
         sign = MD5Encode(md5Params).toUpperCase()
         var requestBodyMap = HashMap<Any, Any>()
@@ -219,12 +244,16 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
+        if (sessionId == null) {
+            Toast.makeText(this, "session id is null!", Toast.LENGTH_SHORT).show()
+            return
+        }
         socketManager.close()
         messageReceiveFragment.appendMessageToScreen("情感云平台已断开，正在尝试重新连接...")
         socketManager.connect {
             messageReceiveFragment.appendMessageToScreen("情感云平台重连成功！")
             var requestBodyMap = HashMap<Any, Any>()
-            requestBodyMap["session_id"] = sessionId
+            requestBodyMap["session_id"] = sessionId!!
             requestBodyMap["app_key"] = APP_KEY
             requestBodyMap["sign"] = sign
             var requestBody = RequestBody(SERVER_SESSION, "restore", requestBodyMap)
@@ -350,7 +379,7 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["bio_data_type"] = listOf("hr")
             }
             TEST_BIODATA_BOTH -> {
-                requestBodyMap["bio_data_type"] = listOf("hr","eeg")
+                requestBodyMap["bio_data_type"] = listOf("hr", "eeg")
             }
         }
         var requestBody =
@@ -403,7 +432,7 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["cloud_services"] = listOf("pressure")
             }
             TEST_BIODATA_BOTH -> {
-                requestBodyMap["cloud_services"] = listOf("attention","pressure")
+                requestBodyMap["cloud_services"] = listOf("attention", "pressure")
             }
         }
         var requestBody =
@@ -452,7 +481,7 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["cloud_services"] = listOf("pressure")
             }
             TEST_BIODATA_BOTH -> {
-                requestBodyMap["cloud_services"] = listOf("attention","pressure")
+                requestBodyMap["cloud_services"] = listOf("attention", "pressure")
             }
         }
         var requestBody =
@@ -500,7 +529,7 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["cloud_services"] = listOf("pressure")
             }
             TEST_BIODATA_BOTH -> {
-                requestBodyMap["cloud_services"] = listOf("pressure","attention")
+                requestBodyMap["cloud_services"] = listOf("pressure", "attention")
             }
         }
         var requestBody =
@@ -511,10 +540,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun isStatusOk(): Boolean {
-        if (!flowtimeBleManager.isConnected() || !socketManager.isOpen()) {
-            Toast.makeText(this, "Ble or Socket Disconnected!", Toast.LENGTH_SHORT).show()
-            return false
-        }
+//        if (!flowtimeBleManager.isConnected() || !socketManager.isOpen()) {
+//            Toast.makeText(this, "Ble or Socket Disconnected!", Toast.LENGTH_SHORT).show()
+//            return false
+//        }
         return true
     }
 

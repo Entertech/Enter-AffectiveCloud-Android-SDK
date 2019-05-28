@@ -23,7 +23,7 @@ fun MD5Encode(text:String):String{
             buf.append(Integer.toHexString(i))
         }
 
-        re_md5 = buf.toString().toUpperCase()
+        re_md5 = buf.toString()
 
     } catch (e: NoSuchAlgorithmException) {
         e.printStackTrace()

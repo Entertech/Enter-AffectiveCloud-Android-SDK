@@ -3,6 +3,8 @@ package cn.entertech.biomoduledemo.activity
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -17,18 +19,17 @@ import cn.entertech.biomoduledemo.entity.RequestBody
 import cn.entertech.biomoduledemo.entity.ResponseBody
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
-import cn.entertech.biomoduledemo.utils.ConvertUtil
-import cn.entertech.biomoduledemo.utils.MD5Encode
-import cn.entertech.biomoduledemo.utils.PagerSlidingTabStrip
+import cn.entertech.biomoduledemo.utils.*
 import cn.entertech.biomoduledemo.websocket.WebSocketManager
-import cn.entertech.ble.FlowtimeBleManager
+import cn.entertech.ble.BiomoduleBleManager
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
+import java.io.File
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var socketManager: WebSocketManager
-    private lateinit var flowtimeBleManager: FlowtimeBleManager
+    private lateinit var biomoduleBleManager: BiomoduleBleManager
 
     /*需要向情感云平台申请 :APP_KEY、APP_SECRET、USER_NAME*/
     val APP_KEY: String = "6eabf68e-760e-11e9-bd82-0242ac140006"
@@ -57,16 +58,38 @@ class MainActivity : AppCompatActivity() {
     private lateinit var messageSendFragment: MessageSendFragment
     lateinit var vpContainer: ViewPager
     lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
-
+    var saveRootPath: String = Environment.getExternalStorageDirectory().path + File.separator + "biorawdata"
+    var saveEEGPath: String =
+        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "eeg" + File.separator
+    var saveHRPath: String =
+        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
+    var fileName: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        flowtimeBleManager = FlowtimeBleManager.getInstance(this)
-        flowtimeBleManager.addRawDataListener(rawListener)
-        flowtimeBleManager.addHeartRateListener(heartRateListener)
+        biomoduleBleManager = BiomoduleBleManager.getInstance(this)
+        biomoduleBleManager.addRawDataListener(rawListener)
+        biomoduleBleManager.addHeartRateListener(heartRateListener)
         socketManager = WebSocketManager.getInstance()
         initPermission()
         initView()
+        initSaveFiledir()
+    }
+
+
+    fun initSaveFiledir() {
+        var file = File(saveRootPath)
+        var eegDir = File(saveEEGPath)
+        var hrDir = File(saveHRPath)
+        if (!file.exists()) {
+            file.mkdirs()
+        }
+        if (!eegDir.exists()) {
+            eegDir.mkdirs()
+        }
+        if (!hrDir.exists()) {
+            hrDir.mkdirs()
+        }
     }
 
     var receiveDataCallback = fun(result: String?) {
@@ -75,9 +98,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         var response = Gson().fromJson<ResponseBody>(result, ResponseBody::class.java)
-        sessionId = response.getSessionId()
+        if (response.getSessionId() != null) {
+            sessionId = response.getSessionId()
+        }
+        Log.d("####", "session id is " + sessionId)
         messageReceiveFragment.appendMessageToScreen(result)
-//        Log.d("####", "left wave is " + response.getLeftBrainwave())
+        Log.d("####", "left wave is " + response.getLeftBrainwave())
 //        Log.d("####", "right wave is " + response.getRightBrainwave())
 //        Log.d("####", "alpha power is " + response.getEEGAlphaPower())
 //        Log.d("####", "beta power is " + response.getEEGBetaPower())
@@ -156,7 +182,8 @@ class MainActivity : AppCompatActivity() {
      */
     fun initPermission() {
         val needPermission = arrayOf(
-            Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
         val needRequestPermissions = ArrayList<String>()
         for (i in needPermission.indices) {
@@ -176,7 +203,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onConnectDevice(view: View) {
         messageReceiveFragment.appendMessageToScreen("正在扫描设备...")
-        flowtimeBleManager.scanNearDeviceAndConnect(fun() {
+        biomoduleBleManager.scanNearDeviceAndConnect(fun() {
             messageReceiveFragment.appendMessageToScreen("扫描成功，正在连接设备...")
             Logger.d("扫描设备成功")
         }, fun(mac: String) {
@@ -195,7 +222,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onDisconnetDevice(view: View) {
-        flowtimeBleManager.disConnect()
+        biomoduleBleManager.disConnect()
     }
 
     fun onClear(view: View) {
@@ -204,7 +231,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onPause(view: View) {
-        flowtimeBleManager.stopHeartAndBrainCollection()
+        biomoduleBleManager.stopHeartAndBrainCollection()
     }
 
     fun onConnectSocket(view: View) {
@@ -218,7 +245,7 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        var md5Params = "app_key=$APP_KEY&username=$USER_NAME&app_secret=$APP_SECRET"
+        var md5Params = "app_key=$APP_KEY&app_secret=$APP_SECRET&username=$USER_NAME"
         sign = MD5Encode(md5Params).toUpperCase()
         var requestBodyMap = HashMap<Any, Any>()
         requestBodyMap["app_key"] = APP_KEY
@@ -287,11 +314,24 @@ class MainActivity : AppCompatActivity() {
 
 
     var brainDataBuffer = ArrayList<Int>()
+    var writeFileDataBuffer = ArrayList<Int>()
     var rawListener = fun(bytes: ByteArray) {
-        Logger.d("brain data is " + Arrays.toString(bytes))
+        Logger.d("brain data is " + HexDump.toHexString(bytes))
         for (byte in bytes) {
-            brainDataBuffer.add(ConvertUtil.converUnchart(byte))
+            var brainData = ConvertUtil.converUnchart(byte)
+            brainDataBuffer.add(brainData)
+            writeFileDataBuffer.add((brainData))
+            if (writeFileDataBuffer.size >=20){
+                var writeString = "${Arrays.toString(writeFileDataBuffer.toArray())}"
+                writeString = writeString.replace("[","").replace("]","")
+                FileHelper.getInstance().writeEEG(writeString+ ",")
+//                Log.d("######", "raw brain data:" + writeString)
+                writeFileDataBuffer.clear()
+            }
             if (brainDataBuffer.size >= 600) {
+//                Log.d("######", "raw brain data:" + brainDataBuffer.toString())
+//                var writeString = "${Arrays.toString(brainDataBuffer.toArray())},\r\n".replace("[","").replace("]","")
+
                 var dataMap = HashMap<Any, Any>()
                 dataMap["eeg"] = brainDataBuffer.toIntArray()
                 var requestBody =
@@ -306,9 +346,11 @@ class MainActivity : AppCompatActivity() {
 
     var heartRateDataBuffer = ArrayList<Int>()
     var heartRateListener = fun(heartRate: Int) {
+//        FileHelper.getInstance().writeHr("$heartRate,")
         heartRateDataBuffer.add(heartRate)
         if (heartRateDataBuffer.size >= 2) {
             var dataMap = HashMap<Any, Any>()
+
             dataMap["hr"] = heartRateDataBuffer.toIntArray()
             var requestBody =
                 RequestBody(SERVER_BIO_DATA, "upload", dataMap)
@@ -325,15 +367,26 @@ class MainActivity : AppCompatActivity() {
         }
         when (mTestBiodataType) {
             TEST_BIODATA_EEG -> {
-                flowtimeBleManager.startBrainCollection()
+                biomoduleBleManager.startBrainCollection()
             }
             TEST_BIODATA_HR -> {
-                flowtimeBleManager.startHeartRateCollection()
+                biomoduleBleManager.startHeartRateCollection()
             }
             TEST_BIODATA_BOTH -> {
-                flowtimeBleManager.startHeartAndBrainCollection()
+                fileName = "${System.currentTimeMillis()}.txt"
+                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
+                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
+                biomoduleBleManager.startHeartAndBrainCollection()
             }
         }
+    }
+
+    fun onStartContact(view: View){
+        biomoduleBleManager.startContact()
+    }
+
+    fun onStopContact(view: View){
+        biomoduleBleManager.stopContact()
     }
 
     fun onSubscribeBiodata(view: View) {
@@ -432,7 +485,7 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["cloud_services"] = listOf("pressure")
             }
             TEST_BIODATA_BOTH -> {
-                requestBodyMap["cloud_services"] = listOf("attention", "pressure")
+                requestBodyMap["cloud_services"] = listOf("attention", "pressure", "arousal")
             }
         }
         var requestBody =
@@ -458,6 +511,7 @@ class MainActivity : AppCompatActivity() {
             TEST_BIODATA_BOTH -> {
                 requestBodyMap["attention"] = listOf("attention")
                 requestBodyMap["pressure"] = listOf("pressure")
+                requestBodyMap["arousal"] = listOf("arousal")
             }
         }
         var requestBody =
@@ -481,7 +535,7 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["cloud_services"] = listOf("pressure")
             }
             TEST_BIODATA_BOTH -> {
-                requestBodyMap["cloud_services"] = listOf("attention", "pressure")
+                requestBodyMap["cloud_services"] = listOf("attention", "pressure", "arousal")
             }
         }
         var requestBody =
@@ -507,6 +561,7 @@ class MainActivity : AppCompatActivity() {
             TEST_BIODATA_BOTH -> {
                 requestBodyMap["attention"] = listOf("attention")
                 requestBodyMap["pressure"] = listOf("pressure")
+                requestBodyMap["arousal"] = listOf("arousal")
             }
         }
         var requestBody =
@@ -529,7 +584,7 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["cloud_services"] = listOf("pressure")
             }
             TEST_BIODATA_BOTH -> {
-                requestBodyMap["cloud_services"] = listOf("pressure", "attention")
+                requestBodyMap["cloud_services"] = listOf("pressure", "attention", "arousal")
             }
         }
         var requestBody =
@@ -540,7 +595,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun isStatusOk(): Boolean {
-        if (!flowtimeBleManager.isConnected() || !socketManager.isOpen()) {
+        if (!biomoduleBleManager.isConnected() || !socketManager.isOpen()) {
             Toast.makeText(this, "Ble or Socket Disconnected!", Toast.LENGTH_SHORT).show()
             return false
         }

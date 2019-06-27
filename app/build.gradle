@@ -5,6 +5,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'entertech'
+            keyPassword '123456'
+            storeFile file('../entertech.jks')
+            storePassword '123456'
+        }
+    }
     compileSdkVersion 28
     defaultConfig {
         applicationId "cn.entertech.biomoduledemo"
@@ -17,7 +25,9 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
     compileOptions {
@@ -38,7 +48,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation "com.polidea.rxandroidble2:rxandroidble:1.8.0"
     implementation 'com.orhanobut:logger:1.15'
-    implementation 'cn.entertech:flowtimeble:1.0.2'
+    implementation 'cn.entertech:biomoduleble:1.0.5'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation "org.java-websocket:Java-WebSocket:1.4.0"
 }

@@ -5,6 +5,6 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 fun getCurrentTime():String{
-    var simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    var simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS")
     return simpleDateFormat.format(Date())
 }

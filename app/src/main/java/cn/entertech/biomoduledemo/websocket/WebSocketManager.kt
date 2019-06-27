@@ -9,14 +9,10 @@ import java.net.URI
 import java.nio.ByteBuffer
 import java.util.concurrent.CopyOnWriteArrayList
 
-class WebSocketManager() {
+class WebSocketManager{
     var mBrainDataWebSocket: WebSocketClient? = null
     //    测试服
-//    var url: URI = URI("ws://test.affectivecloud.com:8080")
-    //    正式服
-//    var url: URI = URI("ws://api.affectivecloud.com:8080")
-//    var url: URI = URI("ws://47.103.77.211:8000/ws/algorithm/v0.1/")
-    var url: URI = URI("ws://10.0.0.72:8000/ws/algorithm/v0.1/")
+    var url: URI = URI("wss://server-test.affectivecloud.com/ws/algorithm/v0.1/")
     var receiveDataCallback = CopyOnWriteArrayList<(String?) -> Unit>()
 
     companion object {

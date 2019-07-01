@@ -320,10 +320,10 @@ class MainActivity : AppCompatActivity() {
             var brainData = ConvertUtil.converUnchart(byte)
             brainDataBuffer.add(brainData.toChar())
             writeFileDataBuffer.add((brainData))
-            if (writeFileDataBuffer.size >=20){
+            if (writeFileDataBuffer.size >= 20) {
                 var writeString = "${Arrays.toString(writeFileDataBuffer.toArray())}"
-                writeString = writeString.replace("[","").replace("]","")
-                FileHelper.getInstance().writeEEG(writeString+ ",")
+                writeString = writeString.replace("[", "").replace("]", "")
+                FileHelper.getInstance().writeEEG(writeString + ",")
                 writeFileDataBuffer.clear()
             }
             if (brainDataBuffer.size >= 600) {
@@ -376,11 +376,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onStartContact(view: View){
+    fun onStartContact(view: View) {
         biomoduleBleManager.startContact()
     }
 
-    fun onStopContact(view: View){
+    fun onStopContact(view: View) {
         biomoduleBleManager.stopContact()
     }
 
@@ -480,7 +480,7 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["cloud_services"] = listOf("pressure")
             }
             TEST_BIODATA_BOTH -> {
-                requestBodyMap["cloud_services"] = listOf("attention", "pressure", "arousal")
+                requestBodyMap["cloud_services"] = listOf("attention", "pressure", "arousal", "sleep")
             }
         }
         var requestBody =
@@ -507,6 +507,7 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["attention"] = listOf("attention")
                 requestBodyMap["pressure"] = listOf("pressure")
                 requestBodyMap["arousal"] = listOf("arousal")
+                requestBodyMap["sleep"] = listOf("sleep_degree", "sleep_state")
             }
         }
         var requestBody =
@@ -530,7 +531,7 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["cloud_services"] = listOf("pressure")
             }
             TEST_BIODATA_BOTH -> {
-                requestBodyMap["cloud_services"] = listOf("attention", "pressure", "arousal")
+                requestBodyMap["cloud_services"] = listOf("attention", "pressure", "arousal", "sleep")
             }
         }
         var requestBody =
@@ -557,6 +558,7 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["attention"] = listOf("attention")
                 requestBodyMap["pressure"] = listOf("pressure")
                 requestBodyMap["arousal"] = listOf("arousal")
+                requestBodyMap["sleep"] = listOf("sleep_degree", "sleep_state")
             }
         }
         var requestBody =
@@ -579,7 +581,7 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["cloud_services"] = listOf("pressure")
             }
             TEST_BIODATA_BOTH -> {
-                requestBodyMap["cloud_services"] = listOf("pressure", "attention", "arousal")
+                requestBodyMap["cloud_services"] = listOf("pressure", "attention", "arousal", "sleep")
             }
         }
         var requestBody =

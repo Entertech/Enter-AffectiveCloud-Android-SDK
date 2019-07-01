@@ -313,27 +313,22 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    var brainDataBuffer = ArrayList<Int>()
+    var brainDataBuffer = ArrayList<Char>()
     var writeFileDataBuffer = ArrayList<Int>()
     var rawListener = fun(bytes: ByteArray) {
-        Logger.d("brain data is " + HexDump.toHexString(bytes))
         for (byte in bytes) {
             var brainData = ConvertUtil.converUnchart(byte)
-            brainDataBuffer.add(brainData)
+            brainDataBuffer.add(brainData.toChar())
             writeFileDataBuffer.add((brainData))
             if (writeFileDataBuffer.size >=20){
                 var writeString = "${Arrays.toString(writeFileDataBuffer.toArray())}"
                 writeString = writeString.replace("[","").replace("]","")
                 FileHelper.getInstance().writeEEG(writeString+ ",")
-//                Log.d("######", "raw brain data:" + writeString)
                 writeFileDataBuffer.clear()
             }
             if (brainDataBuffer.size >= 600) {
-//                Log.d("######", "raw brain data:" + brainDataBuffer.toString())
-//                var writeString = "${Arrays.toString(brainDataBuffer.toArray())},\r\n".replace("[","").replace("]","")
-
                 var dataMap = HashMap<Any, Any>()
-                dataMap["eeg"] = brainDataBuffer.toIntArray()
+                dataMap["eeg"] = brainDataBuffer.toArray()
                 var requestBody =
                     RequestBody(SERVER_BIO_DATA, "upload", dataMap)
                 var requestJson = Gson().toJson(requestBody)
@@ -344,14 +339,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    var heartRateDataBuffer = ArrayList<Int>()
+    var heartRateDataBuffer = ArrayList<Char>()
     var heartRateListener = fun(heartRate: Int) {
 //        FileHelper.getInstance().writeHr("$heartRate,")
-        heartRateDataBuffer.add(heartRate)
+        heartRateDataBuffer.add(heartRate.toChar())
         if (heartRateDataBuffer.size >= 2) {
             var dataMap = HashMap<Any, Any>()
 
-            dataMap["hr"] = heartRateDataBuffer.toIntArray()
+            dataMap["hr"] = heartRateDataBuffer.toArray()
             var requestBody =
                 RequestBody(SERVER_BIO_DATA, "upload", dataMap)
             var requestJson = Gson().toJson(requestBody)

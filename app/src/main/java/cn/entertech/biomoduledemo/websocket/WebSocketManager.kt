@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 class WebSocketManager{
     var mBrainDataWebSocket: WebSocketClient? = null
     //    测试服
-    var url: URI = URI("wss://server-test.affectivecloud.com/ws/algorithm/v0.1/")
+    var url: URI = URI("wss://server.affectivecloud.com/ws/algorithm/v0.1/")
     var receiveDataCallback = CopyOnWriteArrayList<(String?) -> Unit>()
 
     companion object {
@@ -84,6 +84,8 @@ class WebSocketManager{
     }
 
     fun sendMessage(data: ByteArray) {
+
+        com.orhanobut.logger.Logger.d("web socket send is "+data.toString())
         mBrainDataWebSocket?.send(data)
     }
 

@@ -313,12 +313,12 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    var brainDataBuffer = ArrayList<Char>()
+    var brainDataBuffer = ArrayList<Int>()
     var writeFileDataBuffer = ArrayList<Int>()
     var rawListener = fun(bytes: ByteArray) {
         for (byte in bytes) {
             var brainData = ConvertUtil.converUnchart(byte)
-            brainDataBuffer.add(brainData.toChar())
+            brainDataBuffer.add(brainData)
             writeFileDataBuffer.add((brainData))
             if (writeFileDataBuffer.size >= 20) {
                 var writeString = "${Arrays.toString(writeFileDataBuffer.toArray())}"
@@ -328,7 +328,7 @@ class MainActivity : AppCompatActivity() {
             }
             if (brainDataBuffer.size >= 600) {
                 var dataMap = HashMap<Any, Any>()
-                dataMap["eeg"] = brainDataBuffer.toArray()
+                dataMap["eeg"] = brainDataBuffer.toIntArray()
                 var requestBody =
                     RequestBody(SERVER_BIO_DATA, "upload", dataMap)
                 var requestJson = Gson().toJson(requestBody)
@@ -339,14 +339,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    var heartRateDataBuffer = ArrayList<Char>()
+    var heartRateDataBuffer = ArrayList<Int>()
     var heartRateListener = fun(heartRate: Int) {
 //        FileHelper.getInstance().writeHr("$heartRate,")
-        heartRateDataBuffer.add(heartRate.toChar())
+        heartRateDataBuffer.add(heartRate)
         if (heartRateDataBuffer.size >= 2) {
             var dataMap = HashMap<Any, Any>()
 
-            dataMap["hr"] = heartRateDataBuffer.toArray()
+            dataMap["hr"] = heartRateDataBuffer.toIntArray()
             var requestBody =
                 RequestBody(SERVER_BIO_DATA, "upload", dataMap)
             var requestJson = Gson().toJson(requestBody)

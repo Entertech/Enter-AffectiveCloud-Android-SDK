@@ -283,6 +283,7 @@ class MainActivity : AppCompatActivity() {
             requestBodyMap["session_id"] = sessionId!!
             requestBodyMap["app_key"] = APP_KEY
             requestBodyMap["sign"] = sign
+            requestBodyMap["user_id"] = MD5Encode(USER_ID)
             var requestBody = RequestBody(SERVER_SESSION, "restore", requestBodyMap)
             var requestJson = Gson().toJson(requestBody)
             messageSendFragment.appendMessageToScreen(requestJson + "\r\n")

@@ -13,6 +13,7 @@ class WebSocketManager{
     var mBrainDataWebSocket: WebSocketClient? = null
     //    测试服
     var url: URI = URI("wss://server.affectivecloud.com/ws/algorithm/v0.1/")
+//    var url: URI = URI("wss://server.affectivecloud.cn/ws/algorithm/v0.1/")
     var receiveDataCallback = CopyOnWriteArrayList<(String?) -> Unit>()
 
     companion object {
@@ -32,7 +33,7 @@ class WebSocketManager{
 
     fun connect(connectedCallback: ((ServerHandshake?) -> Unit)?) {
         try {
-            mBrainDataWebSocket = object : WebSocketClient(url, Draft_6455(), null, 100000) {
+            mBrainDataWebSocket = object : WebSocketClient(url, Draft_6455(), null, 10000) {
                 override fun onOpen(handshakedata: ServerHandshake?) {
                     Log.d("WebSocketManager","onConnected " + handshakedata.toString())
                     connectedCallback?.invoke(handshakedata)

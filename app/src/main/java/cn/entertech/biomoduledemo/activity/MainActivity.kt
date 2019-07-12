@@ -311,6 +311,9 @@ class MainActivity : AppCompatActivity() {
         var requestJson = Gson().toJson(requestBody)
         messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
         socketManager.sendMessage(ConvertUtil.compress(requestJson))
+        fileName = "${System.currentTimeMillis()}.txt"
+        FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
+        FileHelper.getInstance().setHRPath(saveHRPath + fileName)
     }
 
 
@@ -369,9 +372,6 @@ class MainActivity : AppCompatActivity() {
                 biomoduleBleManager.startHeartRateCollection()
             }
             TEST_BIODATA_BOTH -> {
-                fileName = "${System.currentTimeMillis()}.txt"
-                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
-                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
                 biomoduleBleManager.startHeartAndBrainCollection()
             }
         }

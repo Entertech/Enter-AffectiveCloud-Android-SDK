@@ -53,7 +53,7 @@ interface BaseApi {
      * @param serviceList List<String>
      * @param callback Callback
      */
-    fun initBiodataServices(serviceList: List<String>, callback: Callback)
+    fun initBiodataServices(serviceList: List<Service>, callback: Callback)
 
     /**
      * start affective services before use.
@@ -61,7 +61,7 @@ interface BaseApi {
      * @param serviceList List<String>
      * @param callback Callback
      */
-    fun startAffectiveServices(serviceList: List<String>, callback: Callback)
+    fun startAffectiveServices(serviceList: List<Service>, callback: Callback)
 
     /**
      * Send brain data to affective cloud platform.
@@ -104,14 +104,14 @@ interface BaseApi {
      * @param services List<String>
      * @param callback Callback2<HashMap<Any, Any?>>
      */
-    fun reportBiodata(services: List<String>, callback: Callback2<HashMap<Any, Any?>>)
+    fun reportBiodata(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>)
 
     /**
      * Report affecitve data
      * @param services List<String>
      * @param callback Callback2<HashMap<Any, Any?>>
      */
-    fun reportAffective(services: List<String>, callback: Callback2<HashMap<Any, Any?>>)
+    fun reportAffective(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>)
 
     /**
      * Unsubscribe biodata.
@@ -136,7 +136,7 @@ interface BaseApi {
      * @param serviceList List<String>
      * @param callback Callback
      */
-    fun finishAffectiveServices(serviceList: List<String>, callback: Callback)
+    fun finishAffectiveServices(serviceList: List<Service>, callback: Callback)
 
     /**
      * Finish all affective services started before.

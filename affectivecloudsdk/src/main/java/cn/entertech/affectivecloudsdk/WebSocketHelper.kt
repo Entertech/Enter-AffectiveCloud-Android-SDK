@@ -44,7 +44,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
                     message.get(arr)
                     Log.d("WebSocketManager", "receive msg is " + ConvertUtil.uncompress(arr))
                     var msg = ConvertUtil.uncompress(arr)
-                    messageResponseListeners?.forEach {
+                    rawJsonResponseListeners?.forEach {
                         it.invoke(msg)
                     }
                 }
@@ -108,6 +108,6 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
     }
 
     fun addRawJsonResponseListener(listener: (String) -> Unit) {
-        rawJsonResponseListeners.add(listener)
+        this.rawJsonResponseListeners.add(listener)
     }
 }

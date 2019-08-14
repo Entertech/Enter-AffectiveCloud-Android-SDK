@@ -17,42 +17,43 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
 
     var mOpenCallback: WebSocketCallback? = null
     var messageResponseListeners = CopyOnWriteArrayList<(String) -> Unit>()
+    var rawJsonRequestListeners = CopyOnWriteArrayList<(String) -> Unit>()
+    var rawJsonResponseListeners = CopyOnWriteArrayList<(String) -> Unit>()
     var connectListeners = CopyOnWriteArrayList<() -> Unit>()
     var disconnectListeners = CopyOnWriteArrayList<() -> Unit>()
-
-    init {
-        mBrainDataWebSocket = object : WebSocketClient(URI(address), Draft_6455(), null, timeout) {
-            override fun onOpen(handshakedata: ServerHandshake?) {
-                Log.d("WebSocketManager", "onConnected " + handshakedata.toString())
-                mOpenCallback?.onOpen(handshakedata)
-            }
-
-            override fun onClose(code: Int, reason: String?, remote: Boolean) {
-                mOpenCallback?.onClose(code,reason,remote)
-                Log.d("WebSocketManager", "onClose :$code::reason is $reason")
-            }
-            override fun onMessage(message: String?) {
-            }
-            override fun onMessage(message: ByteBuffer) {
-                val arr = ByteArray(message.remaining())
-                message.get(arr)
-                Log.d("WebSocketManager", "receive msg is " + ConvertUtil.uncompress(arr))
-                var msg = ConvertUtil.uncompress(arr)
-                messageResponseListeners?.forEach {
-                    it.invoke(msg)
-                }
-            }
-
-            override fun onError(ex: java.lang.Exception?) {
-                mOpenCallback?.onError(ex)
-                Log.d("WebSocketManager", "onError " + ex.toString())
-            }
-        }
-    }
 
     override fun open(webSocketCallback: WebSocketCallback) {
         try {
             this.mOpenCallback = webSocketCallback
+            mBrainDataWebSocket = object : WebSocketClient(URI(address), Draft_6455(), null, timeout) {
+                override fun onOpen(handshakedata: ServerHandshake?) {
+                    Log.d("WebSocketManager", "onConnected " + handshakedata.toString())
+                    mOpenCallback?.onOpen(handshakedata)
+                }
+
+                override fun onClose(code: Int, reason: String?, remote: Boolean) {
+                    mOpenCallback?.onClose(code, reason, remote)
+                    Log.d("WebSocketManager", "onClose :$code::reason is $reason")
+                }
+
+                override fun onMessage(message: String?) {
+                }
+
+                override fun onMessage(message: ByteBuffer) {
+                    val arr = ByteArray(message.remaining())
+                    message.get(arr)
+                    Log.d("WebSocketManager", "receive msg is " + ConvertUtil.uncompress(arr))
+                    var msg = ConvertUtil.uncompress(arr)
+                    messageResponseListeners?.forEach {
+                        it.invoke(msg)
+                    }
+                }
+
+                override fun onError(ex: java.lang.Exception?) {
+                    mOpenCallback?.onError(ex)
+                    Log.d("WebSocketManager", "onError " + ex.toString())
+                }
+            }
             mBrainDataWebSocket!!.connect()
         } catch (e: Exception) {
             mOpenCallback?.onError(e)
@@ -80,6 +81,13 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
         disconnectListeners.remove(listener)
     }
 
+    fun sendMessage(jsonData: String) {
+        rawJsonRequestListeners.forEach {
+            it.invoke(jsonData)
+        }
+        sendMessage(ConvertUtil.compress(jsonData))
+    }
+
     override fun sendMessage(data: ByteArray) {
         mBrainDataWebSocket?.send(data)
     }
@@ -95,4 +103,11 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
         mBrainDataWebSocket?.close()
     }
 
+    fun addRawJsonRequestListener(listener: (String) -> Unit) {
+        this.rawJsonRequestListeners.add(listener)
+    }
+
+    fun addRawJsonResponseListener(listener: (String) -> Unit) {
+        rawJsonResponseListeners.add(listener)
+    }
 }

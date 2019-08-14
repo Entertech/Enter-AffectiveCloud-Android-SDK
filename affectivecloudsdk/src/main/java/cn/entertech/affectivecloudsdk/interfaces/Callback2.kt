@@ -1,6 +1,8 @@
 package cn.entertech.affectivecloudsdk.interfaces
 
-interface Callback2<T,K>{
+import cn.entertech.affectivecloudsdk.entity.Error
+
+interface Callback2<T>{
     fun onSuccess(t:T?)
-    fun onError(error:K?)
+    fun onError(error:Error?)
 }

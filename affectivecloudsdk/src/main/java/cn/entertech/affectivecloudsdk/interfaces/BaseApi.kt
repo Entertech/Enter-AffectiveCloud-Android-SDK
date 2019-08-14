@@ -1,8 +1,6 @@
 package cn.entertech.affectivecloudsdk.interfaces
 
 import cn.entertech.affectivecloudsdk.entity.*
-import org.java_websocket.handshake.ServerHandshake
-import java.lang.Exception
 
 /**
  * Entertech
@@ -22,10 +20,9 @@ interface BaseApi {
 
     /**
      * After web socket connected, should call this method to create a session
-     * @param success Callback2<String>
-     * @param error Callback
+     * @param callback2 Callback2<String, Error>
      */
-    fun createSession(callback2: Callback2<String, Error>)
+    fun createSession(callback2: Callback2<String>)
 
     /**
      * Return if session is created
@@ -42,28 +39,27 @@ interface BaseApi {
     /**
      * Restore the session. If web socket disconnected unexpected,you can
      * call this method to restore the session. Timeout is 10 minutes.
-     * @param success Callback
-     * @param error Callback
+     * @param callback Callback
      */
     fun restore(callback: Callback)
 
     /**
      * Init biodata services.
+     *
      * There are two type services include basic biodata service and affective service, every services
      * should be init or start (biodata service need init ,and affective service is start)before use.
      * Affective services is base of the biodata services,so this method must be
      * called after a sessino create.
      * @param serviceList List<String>
-     * @param success Callback
-     * @param error Callback
+     * @param callback Callback
      */
     fun initBiodataServices(serviceList: List<String>, callback: Callback)
 
     /**
-     * start affective services before use
+     * start affective services before use.
+     *
      * @param serviceList List<String>
-     * @param success Callback
-     * @param error Callback
+     * @param callback Callback
      */
     fun startAffectiveServices(serviceList: List<String>, callback: Callback)
 
@@ -81,73 +77,91 @@ interface BaseApi {
 
     /**
      * Subscribe biodata. After subscribing, can receive real time analysed biodata from affective cloud platform.
-     * @param dataTypeList List<String>
-     * @param response Callback3<RealtimeBioData>
-     * @param success Callback
-     * @param error Callback
+     * @param data HashMap<Any, Any>
+     * @param response Callback2<RealtimeBioData>
+     * @param callback Callback2<SubBiodataFields>
      */
     fun subscribeBioData(
         data: HashMap<Any, Any>,
-        response: Callback2<RealtimeBioData, Error>,
-        callback: Callback2<SubBiodataFields, Error>
+        response: Callback2<RealtimeBioData>,
+        callback: Callback2<SubBiodataFields>
     )
 
     /**
      * Subscribe affective data, which is similar to subscribeBioData method.
-     *
-     * @param dataTypeList List<String>
-     * @param response Callback3<RealtimeAffectiveData>
-     * @param success Callback
-     * @param error Callback
+     * @param data HashMap<Any, Any>
+     * @param response Callback2<RealtimeAffectiveData>
+     * @param callback Callback2<SubAffectiveDataFields>
      */
     fun subscribeAffectiveData(
         data: HashMap<Any, Any>,
-        response: Callback2<RealtimeAffectiveData, Error>,
-        callback: Callback2<SubAffectiveDataFields, Error>
+        response: Callback2<RealtimeAffectiveData>,
+        callback: Callback2<SubAffectiveDataFields>
     )
 
     /**
-     * Report biodata
+     * Report biodata.
      * @param services List<String>
-     * @param callback Callback2<HashMap<Any, Any?>, Error>
+     * @param callback Callback2<HashMap<Any, Any?>>
      */
-    fun reportBiodata(services: List<String>, callback: Callback2<HashMap<Any, Any?>, Error>)
+    fun reportBiodata(services: List<String>, callback: Callback2<HashMap<Any, Any?>>)
 
     /**
      * Report affecitve data
      * @param services List<String>
-     * @param callback Callback2<HashMap<Any, Any?>, Error>
+     * @param callback Callback2<HashMap<Any, Any?>>
      */
-    fun reportAffective(services: List<String>, callback: Callback2<HashMap<Any, Any?>, Error>)
+    fun reportAffective(services: List<String>, callback: Callback2<HashMap<Any, Any?>>)
 
     /**
-     * Unsubscribe biodata
-     * @param dataTypeList List<String>
-     * @param success Callback
-     * @param error Callback
+     * Unsubscribe biodata.
+     * @param data HashMap<Any, Any>
+     * @param callback Callback2<SubBiodataFields>
      */
-    fun unsubscribeBioData(dataTypeList: List<String>, callback: Callback2<SubBiodataFields, Error>)
+    fun unsubscribeBioData(
+        data: HashMap<Any, Any>, callback: Callback2<SubBiodataFields>
+    )
 
     /**
      * Unsubscribe affective data
-     * @param dataTypeList List<String>
-     * @param success Callback
-     * @param error Callback
+     * @param data HashMap<Any, Any>
+     * @param callback Callback2<SubAffectiveDataFields>
      */
-    fun unsubscribeAffectiveData(dataTypeList: List<String>, callback: Callback2<SubAffectiveDataFields, Error>)
+    fun unsubscribeAffectiveData(
+        data: HashMap<Any, Any>, callback: Callback2<SubAffectiveDataFields>
+    )
 
     /**
      * Warning!:Don't forget to call this method to finish affective services after you have used it.
-     * @param success Callback
-     * @param error Callback
+     * @param serviceList List<String>
+     * @param callback Callback
      */
-    fun finishAffectiveServices(callback: Callback)
+    fun finishAffectiveServices(serviceList: List<String>, callback: Callback)
+
+    /**
+     * Finish all affective services started before.
+     * @param callback Callback
+     */
+    fun finishAllAffectiveServices(callback: Callback)
 
     /**
      * Warning!:Don't forget to call this method to close session if you want to disconnected from platform.
-     * @param success Callback
-     * @param error Callback
+     * @param callback Callback
      */
-    fun closeWebSocketAndDestroySession(callback: Callback)
+    fun destroySessionAndCloseWebSocket(callback: Callback)
+
+
+    /**
+     * Add raw json request listener.
+     *
+     * @param listener Function1<String, Unit>
+     */
+    fun addRawJsonRequestListener(listener: ((String) -> (Unit)))
+
+    /**
+     * Add raw json response listener
+     * @param listener Function1<String, Unit>
+     */
+    fun addRawJsonResponseListener(listener: ((String) -> (Unit)))
 
 }

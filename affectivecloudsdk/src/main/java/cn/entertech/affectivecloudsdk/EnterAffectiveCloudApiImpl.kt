@@ -43,7 +43,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     private var mCreateSessionCallback: Callback2<String>? = null
     private var mSubscribeAffectiveData: HashMap<Any, Any>? = null
     private var mSubscribeBioData: HashMap<Any, Any>? = null
-    private var mStartedAffectiveServices: List<String>? = null
+    private var mStartedAffectiveServices: List<Service>? = null
     private var mSign: String? = null
     /*情感云平台服务分类：session（会话）、biodata（基础数据服务）、affective（情感数据服务）*/
     val SERVER_SESSION = "session"
@@ -71,7 +71,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
                 if (response.code == 0) {
                     mRestoreCallback?.onSuccess()
                 } else {
-                    mCreateSessionCallback?.onError(Error(response.code, response.msg))
+                    mRestoreCallback?.onError(Error(response.code, response.msg))
                 }
             }
 
@@ -245,20 +245,20 @@ class EnterAffectiveCloudApiImpl internal constructor(
         }
     }
 
-    override fun initBiodataServices(serviceList: List<String>, callback: Callback) {
+    override fun initBiodataServices(services: List<Service>, callback: Callback) {
         this.mBiodataInitCallback = callback
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["bio_data_type"] = serviceList
+        requestBodyMap["bio_data_type"] = services.map { it.value }
         var requestBody = RequestBody(SERVER_BIO_DATA, "init", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun startAffectiveServices(serviceList: List<String>, callback: Callback) {
+    override fun startAffectiveServices(services: List<Service>, callback: Callback) {
         this.mAffectiveStartCallback = callback
-        this.mStartedAffectiveServices = serviceList
+        this.mStartedAffectiveServices = services
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["cloud_services"] = serviceList
+        requestBodyMap["cloud_services"] = services.map { it.value }
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "start", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
@@ -325,24 +325,24 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
 
-    override fun reportBiodata(services: List<String>, callback: Callback2<HashMap<Any, Any?>>) {
+    override fun reportBiodata(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>) {
         this.mBiodataReportCallback = callback
         mBiodataReprotGenerator = ReportGenerator()
         mBiodataReprotGenerator!!.init(services)
         var requestBodyMap = java.util.HashMap<Any, Any>()
-        requestBodyMap["bio_data_type"] = services
+        requestBodyMap["bio_data_type"] = services.map { it.value }
         var requestBody =
             RequestBody(SERVER_BIO_DATA, "report", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun reportAffective(services: List<String>, callback: Callback2<HashMap<Any, Any?>>) {
+    override fun reportAffective(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>) {
         this.mAffectiveReportCallback = callback
         this.mAffectiveReportGenerator = ReportGenerator()
         mAffectiveReportGenerator!!.init(services)
         var requestBodyMap = java.util.HashMap<Any, Any>()
-        requestBodyMap["cloud_services"] = services
+        requestBodyMap["cloud_services"] = services.map { it.value }
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "report", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
@@ -380,22 +380,22 @@ class EnterAffectiveCloudApiImpl internal constructor(
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun finishAffectiveServices(serviceList: List<String>, callback: Callback) {
+    override fun finishAffectiveServices(services: List<Service>, callback: Callback) {
         this.mAffectiveFinishCallback = callback
         if (mStartedAffectiveServices == null) {
             throw IllegalStateException(
                 "there is no affective services started!!"
             )
         }
-        for (service in serviceList) {
-            if (!mStartedAffectiveServices!!.contains(service)) {
+        services.forEach {
+            if (!mStartedAffectiveServices!!.contains(it)) {
                 throw IllegalStateException(
-                    "service '$service' was not started or not exit"
+                    "service '${it.value}' was not started or not exit"
                 )
             }
         }
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["cloud_services"] = serviceList
+        requestBodyMap["cloud_services"] = services.map { it.value }
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "finish", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)

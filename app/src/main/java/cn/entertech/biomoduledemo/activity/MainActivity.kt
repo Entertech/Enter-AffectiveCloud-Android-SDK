@@ -10,22 +10,19 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.View
 import android.widget.Toast
+import cn.entertech.affectivecloudsdk.AffectiveObservable
+import cn.entertech.affectivecloudsdk.BiodataObservable
 import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiFactory
 import cn.entertech.affectivecloudsdk.entity.*
-import cn.entertech.affectivecloudsdk.interfaces.BaseApi
-import cn.entertech.affectivecloudsdk.interfaces.Callback
-import cn.entertech.affectivecloudsdk.interfaces.Callback2
-import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
+import cn.entertech.affectivecloudsdk.interfaces.*
+import cn.entertech.affectivecloudsdk.interfaces.Observer
 import cn.entertech.biomoduledemo.R
-import cn.entertech.biomoduledemo.entity.ResponseBody
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.*
 import cn.entertech.ble.BiomoduleBleManager
-import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import org.java_websocket.handshake.ServerHandshake
 import java.io.File
@@ -34,6 +31,8 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() {
+    private var affectiveObservable: AffectiveObservable? = null
+    private var biodataObservable: BiodataObservable? = null
     private var mEnterAffectiveCloudApi: BaseApi? = null
     private lateinit var biomoduleBleManager: BiomoduleBleManager
 
@@ -71,6 +70,8 @@ class MainActivity : AppCompatActivity() {
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
     var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v0.1/"
+    var availableAffectiveServices = listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.SLEEP)
+    var availableBioServices = listOf(Service.EEG, Service.HR)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -100,6 +101,7 @@ class MainActivity : AppCompatActivity() {
             hrDir.mkdirs()
         }
     }
+
     fun initView() {
         vpContainer = findViewById(R.id.vp_contain)
 //        socketManager.addReceiveDataListener(receiveDataCallback)
@@ -246,7 +248,7 @@ class MainActivity : AppCompatActivity() {
                 messageReceiveFragment.appendMessageToScreen("情感云会话已关闭")
             }
 
-            override fun onError(error: Error) {
+            override fun onError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen("情感云会话失败：${error.toString()}")
             }
         })
@@ -258,7 +260,7 @@ class MainActivity : AppCompatActivity() {
                 messageReceiveFragment.appendMessageToScreen("情感云会话已重连")
             }
 
-            override fun onError(error: Error) {
+            override fun onError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen("情感云会话重连失败：${error.toString()}")
             }
 
@@ -269,12 +271,12 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.initBiodataServices(listOf("eeg", "hr"), object : Callback {
+        mEnterAffectiveCloudApi?.initBiodataServices(availableBioServices, object : Callback {
             override fun onSuccess() {
                 messageReceiveFragment.appendMessageToScreen("情感云基础服务已初始化成功")
             }
 
-            override fun onError(error: Error) {
+            override fun onError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen("情感云基础服务初始化失败：${error.toString()}")
             }
 
@@ -337,43 +339,26 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        var requestBodyMap = HashMap<Any, Any>()
-        when (mTestBiodataType) {
-            TEST_BIODATA_EEG -> {
-                requestBodyMap["eeg"] = listOf(
-                    "eegl_wave", "eegr_wave", "eeg_alpha_power", "eeg_beta_power",
-                    "eeg_theta_power", "eeg_delta_power", "eeg_gamma_power", "eeg_progress"
-                )
-            }
-            TEST_BIODATA_HR -> {
-                requestBodyMap["hr"] = listOf("hr", "hrv")
-            }
-            TEST_BIODATA_BOTH -> {
-                requestBodyMap["hr"] = listOf("hr", "hrv")
-                requestBodyMap["eeg"] = listOf(
-                    "eegl_wave", "eegr_wave", "eeg_alpha_power", "eeg_beta_power",
-                    "eeg_theta_power", "eeg_delta_power", "eeg_gamma_power", "eeg_progress"
-                )
-            }
-        }
-
-        mEnterAffectiveCloudApi?.subscribeBioData(requestBodyMap, object : Callback2<RealtimeBioData> {
-            override fun onSuccess(t: RealtimeBioData?) {
-                messageReceiveFragment.appendMessageToScreen("基础服务实时数据：${t.toString()}")
+        biodataObservable = BiodataObservable.Builder(mEnterAffectiveCloudApi!!)
+            .requestAllEEGData()
+            .requestAllHrData()
+            .build()
+        biodataObservable?.subscribe(object : Observer<RealtimeBioData, SubBiodataFields> {
+            override fun onRealtimeDataResponseSuccess(data: RealtimeBioData?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务实时数据：${data.toString()}")
             }
 
-            override fun onError(error: Error?) {
+            override fun onRealtimeDataResponseError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen("实时数据返回异常：${error.toString()}")
             }
-        }, object : Callback2<SubBiodataFields> {
-            override fun onSuccess(t: SubBiodataFields?) {
-                messageReceiveFragment.appendMessageToScreen("基础服务订阅成功，当前已订阅内容：${t.toString()}")
+
+            override fun onSubscribeSuccess(subField: SubBiodataFields?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务订阅成功，当前已订阅内容：${subField.toString()}")
             }
 
-            override fun onError(error: Error?) {
+            override fun onSubscribeError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen("基础服务订阅失败：${error.toString()}")
             }
-
         })
     }
 
@@ -381,7 +366,7 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.reportBiodata(listOf("hr", "eeg"), object : Callback2<HashMap<Any, Any?>> {
+        mEnterAffectiveCloudApi?.reportBiodata(availableBioServices, object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
                 messageReceiveFragment.appendMessageToScreen("基础服务报表：${t.toString()}")
             }
@@ -397,27 +382,7 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        var requestBodyMap = HashMap<Any, Any>()
-        when (mTestBiodataType) {
-            TEST_BIODATA_EEG -> {
-                requestBodyMap["eeg"] = listOf(
-                    "eegl_wave", "eegr_wave", "eeg_alpha_power", "eeg_beta_power",
-                    "eeg_theta_power", "eeg_delta_power", "eeg_gamma_power", "eeg_progress"
-                )
-            }
-            TEST_BIODATA_HR -> {
-                requestBodyMap["hr"] = listOf("hr", "hrv")
-            }
-            TEST_BIODATA_BOTH -> {
-                requestBodyMap["hr"] = listOf("hr", "hrv")
-                requestBodyMap["eeg"] = listOf(
-                    "eegl_wave", "eegr_wave", "eeg_alpha_power", "eeg_beta_power",
-                    "eeg_theta_power", "eeg_delta_power", "eeg_gamma_power", "eeg_progress"
-                )
-            }
-        }
-
-        mEnterAffectiveCloudApi?.unsubscribeBioData(requestBodyMap, object : Callback2<SubBiodataFields> {
+        biodataObservable?.unsubscribe(object : Callback2<SubBiodataFields> {
             override fun onSuccess(t: SubBiodataFields?) {
                 messageReceiveFragment.appendMessageToScreen("基础服务取消订阅成功，当前已订阅内容：${t.toString()}")
             }
@@ -425,7 +390,6 @@ class MainActivity : AppCompatActivity() {
             override fun onError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen("基础服务取消订阅失败：${error.toString()}")
             }
-
         })
     }
 
@@ -433,13 +397,13 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.startAffectiveServices(listOf("attention", "pressure", "arousal", "sleep"),
+        mEnterAffectiveCloudApi?.startAffectiveServices(availableAffectiveServices,
             object : Callback {
                 override fun onSuccess() {
                     messageReceiveFragment.appendMessageToScreen("情感服务已开启")
                 }
 
-                override fun onError(error: Error) {
+                override fun onError(error: Error?) {
                     messageReceiveFragment.appendMessageToScreen("情感服务开启失败：$error")
                 }
 
@@ -451,40 +415,33 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        var requestBodyMap = HashMap<Any, Any>()
-        when (mTestBiodataType) {
-            TEST_BIODATA_EEG -> {
-                requestBodyMap["attention"] = listOf("attention")
-            }
-            TEST_BIODATA_HR -> {
-                requestBodyMap["pressure"] = listOf("pressure")
-            }
-            TEST_BIODATA_BOTH -> {
-                requestBodyMap["attention"] = listOf("attention")
-                requestBodyMap["pressure"] = listOf("pressure")
-                requestBodyMap["arousal"] = listOf("arousal")
-                requestBodyMap["sleep"] = listOf("sleep_degree", "sleep_state")
-            }
-        }
-        mEnterAffectiveCloudApi?.subscribeAffectiveData(requestBodyMap,
-            object : Callback2<RealtimeAffectiveData> {
-                override fun onSuccess(t: RealtimeAffectiveData?) {
-                    messageReceiveFragment.appendMessageToScreen("实时情感数据：${t.toString()}")
-                }
+        affectiveObservable = AffectiveObservable.Builder(mEnterAffectiveCloudApi!!)
+            .requestAllSleepData()
+            .requestArousal()
+            .requestAttention()
+            .requestPleasure()
+            .requestPressure()
+            .requestRelaxation()
+            .build()
 
-                override fun onError(error: Error?) {
-                }
 
-            },
-            object : Callback2<SubAffectiveDataFields> {
-                override fun onSuccess(t: SubAffectiveDataFields?) {
-                    messageReceiveFragment.appendMessageToScreen("情感服务订阅成功，当前已订阅内容：${t.toString()}")
-                }
+        affectiveObservable?.subscribe(object : Observer<RealtimeAffectiveData, SubAffectiveDataFields> {
+            override fun onRealtimeDataResponseSuccess(data: RealtimeAffectiveData?) {
+                messageReceiveFragment.appendMessageToScreen("实时情感数据：${data.toString()}")
+            }
 
-                override fun onError(error: Error?) {
-                    messageReceiveFragment.appendMessageToScreen("情感服务订阅失败：${error.toString()}")
-                }
-            })
+            override fun onRealtimeDataResponseError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("情感数据返回异常：${error.toString()}")
+            }
+
+            override fun onSubscribeSuccess(subField: SubAffectiveDataFields?) {
+                messageReceiveFragment.appendMessageToScreen("情感服务订阅成功，当前已订阅内容：${subField.toString()}")
+            }
+
+            override fun onSubscribeError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("情感服务订阅失败：${error.toString()}")
+            }
+        })
     }
 
 
@@ -492,7 +449,7 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.reportAffective(listOf("attention", "pressure", "arousal", "sleep"),
+        mEnterAffectiveCloudApi?.reportAffective(availableAffectiveServices,
             object : Callback2<HashMap<Any, Any?>> {
                 override fun onSuccess(t: HashMap<Any, Any?>?) {
                     messageReceiveFragment.appendMessageToScreen("情感报表数据：${t.toString()}")
@@ -510,32 +467,15 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        var requestBodyMap = HashMap<Any, Any>()
-        when (mTestBiodataType) {
-            TEST_BIODATA_EEG -> {
-                requestBodyMap["attention"] = listOf("attention")
+        affectiveObservable?.unsubscribe(object : Callback2<SubAffectiveDataFields> {
+            override fun onSuccess(t: SubAffectiveDataFields?) {
+                messageReceiveFragment.appendMessageToScreen("情感服务取消订阅成功，当前已订阅内容：${t.toString()}")
             }
-            TEST_BIODATA_HR -> {
-                requestBodyMap["pressure"] = listOf("pressure")
-            }
-            TEST_BIODATA_BOTH -> {
-                requestBodyMap["attention"] = listOf("attention")
-                requestBodyMap["pressure"] = listOf("pressure")
-                requestBodyMap["arousal"] = listOf("arousal")
-                requestBodyMap["sleep"] = listOf("sleep_degree", "sleep_state")
-            }
-        }
-        mEnterAffectiveCloudApi?.unsubscribeAffectiveData(requestBodyMap,
-            object : Callback2<SubAffectiveDataFields> {
-                override fun onSuccess(t: SubAffectiveDataFields?) {
-                    messageReceiveFragment.appendMessageToScreen("情感服务取消订阅成功，当前已订阅内容：${t.toString()}")
-                }
 
-                override fun onError(error: Error?) {
-                    messageReceiveFragment.appendMessageToScreen("情感服务取消订阅失败：${error.toString()}")
-                }
-
-            })
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("情感服务取消订阅失败：${error.toString()}")
+            }
+        })
     }
 
     fun onFinishAffective(view: View) {
@@ -547,7 +487,7 @@ class MainActivity : AppCompatActivity() {
                 messageReceiveFragment.appendMessageToScreen("情感服务已结束")
             }
 
-            override fun onError(error: Error) {
+            override fun onError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen("情感服务结束失败")
             }
 

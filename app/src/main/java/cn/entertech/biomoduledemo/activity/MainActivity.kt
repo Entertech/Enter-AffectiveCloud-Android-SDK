@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -14,21 +13,28 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiFactory
+import cn.entertech.affectivecloudsdk.entity.*
+import cn.entertech.affectivecloudsdk.interfaces.BaseApi
+import cn.entertech.affectivecloudsdk.interfaces.Callback
+import cn.entertech.affectivecloudsdk.interfaces.Callback2
+import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import cn.entertech.biomoduledemo.R
-import cn.entertech.biomoduledemo.entity.RequestBody
 import cn.entertech.biomoduledemo.entity.ResponseBody
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.*
-import cn.entertech.biomoduledemo.websocket.WebSocketManager
 import cn.entertech.ble.BiomoduleBleManager
 import com.google.gson.Gson
 import com.orhanobut.logger.Logger
+import org.java_websocket.handshake.ServerHandshake
 import java.io.File
+import java.lang.Exception
 import java.util.*
+import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var socketManager: WebSocketManager
+    private var mEnterAffectiveCloudApi: BaseApi? = null
     private lateinit var biomoduleBleManager: BiomoduleBleManager
 
     /*需要向情感云平台申请 :APP_KEY、APP_SECRET、USER_NAME*/
@@ -64,13 +70,16 @@ class MainActivity : AppCompatActivity() {
     var saveHRPath: String =
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
+    var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v0.1/"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         biomoduleBleManager = BiomoduleBleManager.getInstance(this)
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
-        socketManager = WebSocketManager.getInstance()
+        mEnterAffectiveCloudApi =
+            EnterAffectiveCloudApiFactory.createApi(websocketAddress, APP_KEY, APP_SECRET, USER_NAME, USER_ID)
+
         initPermission()
         initView()
         initSaveFiledir()
@@ -91,52 +100,9 @@ class MainActivity : AppCompatActivity() {
             hrDir.mkdirs()
         }
     }
-
-    var receiveDataCallback = fun(result: String?) {
-        if (result == null) {
-            return
-        }
-
-        var response = Gson().fromJson<ResponseBody>(result, ResponseBody::class.java)
-        if (response.getSessionId() != null) {
-            sessionId = response.getSessionId()
-        }
-        Log.d("####", "session id is " + sessionId)
-        messageReceiveFragment.appendMessageToScreen(result)
-        Log.d("####", "left wave is " + response.getLeftBrainwave())
-//        Log.d("####", "right wave is " + response.getRightBrainwave())
-//        Log.d("####", "alpha power is " + response.getEEGAlphaPower())
-//        Log.d("####", "beta power is " + response.getEEGBetaPower())
-//        Log.d("####", "theta power is " + response.getEEGThetaPower())
-//        Log.d("####", "delta power is " + response.getEEGDeltaPower())
-//        Log.d("####", "gamma power is " + response.getEEGGammaPower())
-//        Log.d("####", "eeg progress is " + response.getEEGProgress())
-//        Log.d("####", "hr is " + response.getHeartRate())
-//        Log.d("####", "hrv is " + response.getHeartRateVariability())
-//        Log.d("####", "getEEGAlphaCurve is " + response.getEEGAlphaCurve())
-//        Log.d("####", "getEEGBetaCurve is " + response.getEEGBetaCurve())
-//        Log.d("####", "getEEGThetaCurve is " + response.getEEGThetaCurve())
-//        Log.d("####", "getEEGDeltaCurve is " + response.getEEGDeltaCurve())
-//        Log.d("####", "getEEGGammaCurve is " + response.getEEGGammaCurve())
-//        Log.d("####", "getHeartRateAvg is " + response.getHeartRateAvg())
-//        Log.d("####", "getHeartRateMax is " + response.getHeartRateMax())
-//        Log.d("####", "getHeartRateMin is " + response.getHeartRateMin())
-//        Log.d("####", "getHeartRateRec is " + response.getHeartRateRec())
-//        Log.d("####", "getHeartRateVariabilityRec is " + response.getHeartRateVariabilityRec())
-//        Log.d("####", "getAttention is " + response.getAttention())
-//        Log.d("####", "getRelaxation is " + response.getRelaxation())
-//        Log.d("####", "getPressure is " + response.getPressure())
-//        Log.d("####", "getAttentionAvg is " + response.getAttentionAvg())
-//        Log.d("####", "getAttentionRec is " + response.getAttentionRec())
-//        Log.d("####", "getRelaxationAvg is " + response.getRelaxationAvg())
-//        Log.d("####", "getRelaxationRec is " + response.getRelaxationRec())
-//        Log.d("####", "getPressureAvg is " + response.getPressureAvg())
-//        Log.d("####", "getPressureRec is " + response.getPressureRec())
-    }
-
     fun initView() {
         vpContainer = findViewById(R.id.vp_contain)
-        socketManager.addReceiveDataListener(receiveDataCallback)
+//        socketManager.addReceiveDataListener(receiveDataCallback)
         pagerSlidingTabStrip = findViewById(R.id.message_tabs)
         val listFragment = mutableListOf<Fragment>()
         messageReceiveFragment = MessageReceiveFragment()
@@ -151,6 +117,9 @@ class MainActivity : AppCompatActivity() {
         )
         vpContainer.adapter = adapter
         pagerSlidingTabStrip.setViewPager(vpContainer)
+        mEnterAffectiveCloudApi?.addRawJsonRequestListener {
+            messageSendFragment.appendMessageToScreen(it)
+        }
     }
 
     class MessageAdapter(fragmentManager: FragmentManager, fragments: List<Fragment>, titles: List<String>) :
@@ -236,86 +205,86 @@ class MainActivity : AppCompatActivity() {
 
     fun onConnectSocket(view: View) {
         messageReceiveFragment.appendMessageToScreen("正在连接情感云平台...")
-        socketManager.connect {
-            messageReceiveFragment.appendMessageToScreen("情感云平台连接成功!")
-        }
+        mEnterAffectiveCloudApi?.openWebSocket(object : WebSocketCallback {
+            override fun onOpen(serverHandshake: ServerHandshake?) {
+                messageReceiveFragment.appendMessageToScreen("情感云平台连接成功!")
+            }
+
+            override fun onClose(code: Int, reason: String?, remote: Boolean) {
+                messageReceiveFragment.appendMessageToScreen("情感云已断开连接：$reason")
+            }
+
+            override fun onError(e: Exception?) {
+                e?.printStackTrace()
+                messageReceiveFragment.appendMessageToScreen("情感云连接异常：${e.toString()}")
+            }
+
+        })
     }
 
     fun onSessionCreate(view: View) {
         if (!isStatusOk()) {
             return
         }
-        var md5Params = "app_key=$APP_KEY&app_secret=$APP_SECRET&username=$USER_NAME"
-        sign = MD5Encode(md5Params).toUpperCase()
-        var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["app_key"] = APP_KEY
-        requestBodyMap["sign"] = sign
-        requestBodyMap["user_id"] = MD5Encode(USER_ID)
-        var requestBody = RequestBody(SERVER_SESSION, "create", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-        socketManager.sendMessage(ConvertUtil.compress(requestJson))
+        mEnterAffectiveCloudApi?.createSession(object : Callback2<String> {
+            override fun onSuccess(t: String?) {
+                messageReceiveFragment.appendMessageToScreen("情感云Session已创建，session id:$t")
+            }
+
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("情感云Session创建异常:${error.toString()}")
+            }
+        })
     }
 
     fun onSessionClose(view: View) {
         if (!isStatusOk()) {
             return
         }
-        var requestBody = RequestBody(SERVER_SESSION, "close", null)
-        var requestJson = Gson().toJson(requestBody)
-        messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-        socketManager.sendMessage(ConvertUtil.compress(requestJson))
+        mEnterAffectiveCloudApi?.destroySessionAndCloseWebSocket(object : Callback {
+            override fun onSuccess() {
+                messageReceiveFragment.appendMessageToScreen("情感云会话已关闭")
+            }
+
+            override fun onError(error: Error) {
+                messageReceiveFragment.appendMessageToScreen("情感云会话失败：${error.toString()}")
+            }
+        })
     }
 
     fun onSessionRestore(view: View) {
-        if (!isStatusOk()) {
-            return
-        }
-        if (sessionId == null) {
-            Toast.makeText(this, "session id is null!", Toast.LENGTH_SHORT).show()
-            return
-        }
-        socketManager.close()
-        messageReceiveFragment.appendMessageToScreen("情感云平台已断开，正在尝试重新连接...")
-        socketManager.connect {
-            messageReceiveFragment.appendMessageToScreen("情感云平台重连成功！")
-            var requestBodyMap = HashMap<Any, Any>()
-            requestBodyMap["session_id"] = sessionId!!
-            requestBodyMap["app_key"] = APP_KEY
-            requestBodyMap["sign"] = sign
-            var requestBody = RequestBody(SERVER_SESSION, "restore", requestBodyMap)
-            var requestJson = Gson().toJson(requestBody)
-            messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-            socketManager.sendMessage(ConvertUtil.compress(requestJson))
-        }
+        mEnterAffectiveCloudApi?.restore(object : Callback {
+            override fun onSuccess() {
+                messageReceiveFragment.appendMessageToScreen("情感云会话已重连")
+            }
+
+            override fun onError(error: Error) {
+                messageReceiveFragment.appendMessageToScreen("情感云会话重连失败：${error.toString()}")
+            }
+
+        })
     }
 
     fun onInitBiodataServer(view: View) {
         if (!isStatusOk()) {
             return
         }
-        var requestBodyMap = HashMap<Any, Any>()
-        when (mTestBiodataType) {
-            TEST_BIODATA_EEG -> {
-                requestBodyMap["bio_data_type"] = listOf("eeg")
+        mEnterAffectiveCloudApi?.initBiodataServices(listOf("eeg", "hr"), object : Callback {
+            override fun onSuccess() {
+                messageReceiveFragment.appendMessageToScreen("情感云基础服务已初始化成功")
             }
-            TEST_BIODATA_HR -> {
-                requestBodyMap["bio_data_type"] = listOf("hr")
-            }
-            TEST_BIODATA_BOTH -> {
-                requestBodyMap["bio_data_type"] = listOf("eeg", "hr")
-            }
-        }
-        var requestBody = RequestBody(SERVER_BIO_DATA, "init", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-        socketManager.sendMessage(ConvertUtil.compress(requestJson))
-    }
 
+            override fun onError(error: Error) {
+                messageReceiveFragment.appendMessageToScreen("情感云基础服务初始化失败：${error.toString()}")
+            }
+
+        })
+    }
 
     var brainDataBuffer = ArrayList<Int>()
     var writeFileDataBuffer = ArrayList<Int>()
     var rawListener = fun(bytes: ByteArray) {
+        mEnterAffectiveCloudApi?.appendBrainData(bytes)
         for (byte in bytes) {
             var brainData = ConvertUtil.converUnchart(byte)
             brainDataBuffer.add(brainData)
@@ -326,16 +295,6 @@ class MainActivity : AppCompatActivity() {
                 FileHelper.getInstance().writeEEG(writeString + ",")
                 writeFileDataBuffer.clear()
             }
-            if (brainDataBuffer.size >= 600) {
-                var dataMap = HashMap<Any, Any>()
-                dataMap["eeg"] = brainDataBuffer.toIntArray()
-                var requestBody =
-                    RequestBody(SERVER_BIO_DATA, "upload", dataMap)
-                var requestJson = Gson().toJson(requestBody)
-                messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-                socketManager.sendMessage(ConvertUtil.compress(requestJson))
-                brainDataBuffer.clear()
-            }
         }
     }
 
@@ -343,17 +302,7 @@ class MainActivity : AppCompatActivity() {
     var heartRateListener = fun(heartRate: Int) {
 //        FileHelper.getInstance().writeHr("$heartRate,")
         heartRateDataBuffer.add(heartRate)
-        if (heartRateDataBuffer.size >= 2) {
-            var dataMap = HashMap<Any, Any>()
-
-            dataMap["hr"] = heartRateDataBuffer.toIntArray()
-            var requestBody =
-                RequestBody(SERVER_BIO_DATA, "upload", dataMap)
-            var requestJson = Gson().toJson(requestBody)
-            messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-            socketManager.sendMessage(ConvertUtil.compress(requestJson))
-            heartRateDataBuffer.clear()
-        }
+        mEnterAffectiveCloudApi?.appendHeartData(heartRate)
     }
 
     fun onUploadBiodata(view: View) {
@@ -407,34 +356,41 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-        var requestBody =
-            RequestBody(SERVER_BIO_DATA, "subscribe", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-        socketManager.sendMessage(ConvertUtil.compress(requestJson))
+
+        mEnterAffectiveCloudApi?.subscribeBioData(requestBodyMap, object : Callback2<RealtimeBioData> {
+            override fun onSuccess(t: RealtimeBioData?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务实时数据：${t.toString()}")
+            }
+
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("实时数据返回异常：${error.toString()}")
+            }
+        }, object : Callback2<SubBiodataFields> {
+            override fun onSuccess(t: SubBiodataFields?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务订阅成功，当前已订阅内容：${t.toString()}")
+            }
+
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务订阅失败：${error.toString()}")
+            }
+
+        })
     }
 
     fun onBiodataReport(view: View) {
         if (!isStatusOk()) {
             return
         }
-        var requestBodyMap = HashMap<Any, Any>()
-        when (mTestBiodataType) {
-            TEST_BIODATA_EEG -> {
-                requestBodyMap["bio_data_type"] = listOf("eeg")
+        mEnterAffectiveCloudApi?.reportBiodata(listOf("hr", "eeg"), object : Callback2<HashMap<Any, Any?>> {
+            override fun onSuccess(t: HashMap<Any, Any?>?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务报表：${t.toString()}")
             }
-            TEST_BIODATA_HR -> {
-                requestBodyMap["bio_data_type"] = listOf("hr")
+
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("获取基础服务报表：${error.toString()}")
             }
-            TEST_BIODATA_BOTH -> {
-                requestBodyMap["bio_data_type"] = listOf("hr", "eeg")
-            }
-        }
-        var requestBody =
-            RequestBody(SERVER_BIO_DATA, "report", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-        socketManager.sendMessage(ConvertUtil.compress(requestJson))
+
+        })
     }
 
     fun onUnsubscribeBiodata(view: View) {
@@ -460,34 +416,34 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-        var requestBody =
-            RequestBody(SERVER_BIO_DATA, "unsubscribe", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-        socketManager.sendMessage(ConvertUtil.compress(requestJson))
+
+        mEnterAffectiveCloudApi?.unsubscribeBioData(requestBodyMap, object : Callback2<SubBiodataFields> {
+            override fun onSuccess(t: SubBiodataFields?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务取消订阅成功，当前已订阅内容：${t.toString()}")
+            }
+
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务取消订阅失败：${error.toString()}")
+            }
+
+        })
     }
 
     fun onStartAffective(view: View) {
         if (!isStatusOk()) {
             return
         }
-        var requestBodyMap = HashMap<Any, Any>()
-        when (mTestBiodataType) {
-            TEST_BIODATA_EEG -> {
-                requestBodyMap["cloud_services"] = listOf("attention")
-            }
-            TEST_BIODATA_HR -> {
-                requestBodyMap["cloud_services"] = listOf("pressure")
-            }
-            TEST_BIODATA_BOTH -> {
-                requestBodyMap["cloud_services"] = listOf("attention", "pressure", "arousal", "sleep")
-            }
-        }
-        var requestBody =
-            RequestBody(SERVER_AFFECTIVE, "start", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-        socketManager.sendMessage(ConvertUtil.compress(requestJson))
+        mEnterAffectiveCloudApi?.startAffectiveServices(listOf("attention", "pressure", "arousal", "sleep"),
+            object : Callback {
+                override fun onSuccess() {
+                    messageReceiveFragment.appendMessageToScreen("情感服务已开启")
+                }
+
+                override fun onError(error: Error) {
+                    messageReceiveFragment.appendMessageToScreen("情感服务开启失败：$error")
+                }
+
+            })
     }
 
 
@@ -510,11 +466,25 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["sleep"] = listOf("sleep_degree", "sleep_state")
             }
         }
-        var requestBody =
-            RequestBody(SERVER_AFFECTIVE, "subscribe", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-        socketManager.sendMessage(ConvertUtil.compress(requestJson))
+        mEnterAffectiveCloudApi?.subscribeAffectiveData(requestBodyMap,
+            object : Callback2<RealtimeAffectiveData> {
+                override fun onSuccess(t: RealtimeAffectiveData?) {
+                    messageReceiveFragment.appendMessageToScreen("实时情感数据：${t.toString()}")
+                }
+
+                override fun onError(error: Error?) {
+                }
+
+            },
+            object : Callback2<SubAffectiveDataFields> {
+                override fun onSuccess(t: SubAffectiveDataFields?) {
+                    messageReceiveFragment.appendMessageToScreen("情感服务订阅成功，当前已订阅内容：${t.toString()}")
+                }
+
+                override fun onError(error: Error?) {
+                    messageReceiveFragment.appendMessageToScreen("情感服务订阅失败：${error.toString()}")
+                }
+            })
     }
 
 
@@ -522,23 +492,17 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        var requestBodyMap = HashMap<Any, Any>()
-        when (mTestBiodataType) {
-            TEST_BIODATA_EEG -> {
-                requestBodyMap["cloud_services"] = listOf("attention")
-            }
-            TEST_BIODATA_HR -> {
-                requestBodyMap["cloud_services"] = listOf("pressure")
-            }
-            TEST_BIODATA_BOTH -> {
-                requestBodyMap["cloud_services"] = listOf("attention", "pressure", "arousal", "sleep")
-            }
-        }
-        var requestBody =
-            RequestBody(SERVER_AFFECTIVE, "report", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-        socketManager.sendMessage(ConvertUtil.compress(requestJson))
+        mEnterAffectiveCloudApi?.reportAffective(listOf("attention", "pressure", "arousal", "sleep"),
+            object : Callback2<HashMap<Any, Any?>> {
+                override fun onSuccess(t: HashMap<Any, Any?>?) {
+                    messageReceiveFragment.appendMessageToScreen("情感报表数据：${t.toString()}")
+                }
+
+                override fun onError(error: Error?) {
+                    messageReceiveFragment.appendMessageToScreen("获取情感报表数据失败：${error.toString()}")
+                }
+
+            })
     }
 
 
@@ -561,38 +525,37 @@ class MainActivity : AppCompatActivity() {
                 requestBodyMap["sleep"] = listOf("sleep_degree", "sleep_state")
             }
         }
-        var requestBody =
-            RequestBody(SERVER_AFFECTIVE, "unsubscribe", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-        socketManager.sendMessage(ConvertUtil.compress(requestJson))
+        mEnterAffectiveCloudApi?.unsubscribeAffectiveData(requestBodyMap,
+            object : Callback2<SubAffectiveDataFields> {
+                override fun onSuccess(t: SubAffectiveDataFields?) {
+                    messageReceiveFragment.appendMessageToScreen("情感服务取消订阅成功，当前已订阅内容：${t.toString()}")
+                }
+
+                override fun onError(error: Error?) {
+                    messageReceiveFragment.appendMessageToScreen("情感服务取消订阅失败：${error.toString()}")
+                }
+
+            })
     }
 
     fun onFinishAffective(view: View) {
         if (!isStatusOk()) {
             return
         }
-        var requestBodyMap = HashMap<Any, Any>()
-        when (mTestBiodataType) {
-            TEST_BIODATA_EEG -> {
-                requestBodyMap["cloud_services"] = listOf("attention")
+        mEnterAffectiveCloudApi?.finishAllAffectiveServices(object : Callback {
+            override fun onSuccess() {
+                messageReceiveFragment.appendMessageToScreen("情感服务已结束")
             }
-            TEST_BIODATA_HR -> {
-                requestBodyMap["cloud_services"] = listOf("pressure")
+
+            override fun onError(error: Error) {
+                messageReceiveFragment.appendMessageToScreen("情感服务结束失败")
             }
-            TEST_BIODATA_BOTH -> {
-                requestBodyMap["cloud_services"] = listOf("pressure", "attention", "arousal", "sleep")
-            }
-        }
-        var requestBody =
-            RequestBody(SERVER_AFFECTIVE, "finish", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        messageSendFragment.appendMessageToScreen(requestJson + "\r\n")
-        socketManager.sendMessage(ConvertUtil.compress(requestJson))
+
+        })
     }
 
     fun isStatusOk(): Boolean {
-        if (!biomoduleBleManager.isConnected() || !socketManager.isOpen()) {
+        if (!biomoduleBleManager.isConnected() || !mEnterAffectiveCloudApi!!.isWebSocketOpen()) {
             Toast.makeText(this, "Ble or Socket Disconnected!", Toast.LENGTH_SHORT).show()
             return false
         }

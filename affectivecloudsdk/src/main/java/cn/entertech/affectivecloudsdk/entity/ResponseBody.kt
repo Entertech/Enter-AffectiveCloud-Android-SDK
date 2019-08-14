@@ -165,8 +165,8 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
         if (data.containsKey("eeg")) {
             var realtimeEEGData = RealtimeEEGData()
             var eegData = data["eeg"] as Map<Any, Any>
-            if (eegData.containsKey("eeg_progress")) {
-                realtimeEEGData.progress = eegData["eeg_progress"] as Double
+            if (eegData.containsKey("eeg_quality")) {
+                realtimeEEGData.quality = eegData["eeg_quality"] as Double
             }
             if (eegData.containsKey("eegr_wave")) {
                 realtimeEEGData.rightwave = eegData["eegr_wave"] as ArrayList<Double>

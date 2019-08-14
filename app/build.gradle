@@ -51,4 +51,5 @@ dependencies {
     implementation 'cn.entertech:biomoduleble:1.0.5'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation "org.java-websocket:Java-WebSocket:1.4.0"
+    implementation project(":affectivecloudsdk")
 }

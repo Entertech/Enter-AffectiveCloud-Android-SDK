@@ -15,11 +15,10 @@ import com.google.gson.Gson
 import org.java_websocket.handshake.ServerHandshake
 import java.lang.Exception
 import java.lang.IllegalStateException
-import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.HashMap
 
-class EnterAffectiveCloudApiImpl(
+class EnterAffectiveCloudApiImpl internal constructor(
     websocketAddress: String,
     var appKey: String,
     var appSecret: String,
@@ -27,21 +26,21 @@ class EnterAffectiveCloudApiImpl(
     var userId: String
 ) : BaseApi {
     private var mAffectiveReportGenerator: ReportGenerator? = null
-    private var mAffectiveReportCallback: Callback2<java.util.HashMap<Any, Any?>, Error>? = null
+    private var mAffectiveReportCallback: Callback2<java.util.HashMap<Any, Any?>>? = null
     private var mBiodataReprotGenerator: ReportGenerator? = null
-    private var mBiodataReportCallback: Callback2<java.util.HashMap<Any, Any?>, Error>? = null
-    private var mAffectiveDataResponseCallback: Callback2<RealtimeAffectiveData, Error>? = null
-    private var mBiodataResponseCallback: Callback2<RealtimeBioData, Error>? = null
+    private var mBiodataReportCallback: Callback2<java.util.HashMap<Any, Any?>>? = null
+    private var mAffectiveDataResponseCallback: Callback2<RealtimeAffectiveData>? = null
+    private var mBiodataResponseCallback: Callback2<RealtimeBioData>? = null
     private var mAffectiveStartCallback: Callback? = null
     private var mWebSocketCloseCallback: Callback? = null
     private var mAffectiveFinishCallback: Callback? = null
-    private var mAffectiveUnsubscribeCallback: Callback2<SubAffectiveDataFields, Error>? = null
-    private var mBiodataUnsubscribeCallback: Callback2<SubBiodataFields, Error>? = null
-    private var mAffectiveSubscribeCallback: Callback2<SubAffectiveDataFields, Error>? = null
-    private var mBiodataSubscribeCallback: Callback2<SubBiodataFields, Error>? = null
+    private var mAffectiveUnsubscribeCallback: Callback2<SubAffectiveDataFields>? = null
+    private var mBiodataUnsubscribeCallback: Callback2<SubBiodataFields>? = null
+    private var mAffectiveSubscribeCallback: Callback2<SubAffectiveDataFields>? = null
+    private var mBiodataSubscribeCallback: Callback2<SubBiodataFields>? = null
     private var mBiodataInitCallback: Callback? = null
     private var mRestoreCallback: Callback? = null
-    private var mCreateSessionCallback: Callback2<String, Error>? = null
+    private var mCreateSessionCallback: Callback2<String>? = null
     private var mSubscribeAffectiveData: HashMap<Any, Any>? = null
     private var mSubscribeBioData: HashMap<Any, Any>? = null
     private var mStartedAffectiveServices: List<String>? = null
@@ -57,7 +56,7 @@ class EnterAffectiveCloudApiImpl(
 
     init {
         mWebSocketHelper = WebSocketHelper(websocketAddress)
-        mWebSocketHelper?.addMessageResponseListener {
+        mWebSocketHelper?.addRawJsonResponseListener {
             Log.d(TAG, "receive msg from web socket:$it")
             var response = Gson().fromJson(it, ResponseBody::class.java)
             if (response.isCreateOp()) {
@@ -135,33 +134,41 @@ class EnterAffectiveCloudApiImpl(
                 }
             }
             if (response.isReportBiodata()) {
-                var report = mBiodataReprotGenerator?.appendResponse(response)
-                if (report != null) {
-                    mBiodataReportCallback?.onSuccess(report)
+                if (response.code == 0) {
+                    var report = mBiodataReprotGenerator?.appendResponse(response)
+                    if (report != null) {
+                        mBiodataReportCallback?.onSuccess(report)
+                    }
                 } else {
                     mBiodataReportCallback?.onError(Error(response.code, response.msg))
                 }
             }
 
             if (response.isReportAffective()) {
-                var report = mAffectiveReportGenerator?.appendResponse(response)
-                if (report != null) {
-                    mAffectiveReportCallback?.onSuccess(report)
+                if (response.code == 0) {
+                    var report = mAffectiveReportGenerator?.appendResponse(response)
+                    if (report != null) {
+                        mAffectiveReportCallback?.onSuccess(report)
+                    }
                 } else {
                     mAffectiveReportCallback?.onError(Error(response.code, response.msg))
                 }
             }
 
             if (response.isAffectiveFinish()) {
-                mAffectiveFinishCallback?.onSuccess()
-            } else {
-                mAffectiveFinishCallback?.onError(Error(response.code, response.msg))
+                if (response.code == 0) {
+                    mAffectiveFinishCallback?.onSuccess()
+                } else {
+                    mAffectiveFinishCallback?.onError(Error(response.code, response.msg))
+                }
             }
 
             if (response.isSessionClose()) {
-                mWebSocketCloseCallback?.onSuccess()
-            } else {
-                mWebSocketCloseCallback?.onError(Error(response.code, response.msg))
+                if (response.code == 0) {
+                    mWebSocketCloseCallback?.onSuccess()
+                } else {
+                    mWebSocketCloseCallback?.onError(Error(response.code, response.msg))
+                }
             }
         }
     }
@@ -177,7 +184,7 @@ class EnterAffectiveCloudApiImpl(
         return mWebSocketHelper!!.isOpen()
     }
 
-    override fun createSession(callback2: Callback2<String, Error>) {
+    override fun createSession(callback2: Callback2<String>) {
         this.mCreateSessionCallback = callback2
         var md5Params = "app_key=$appKey&app_secret=$appSecret&username=$userName"
         mSign = MD5Encode(md5Params).toUpperCase()
@@ -187,7 +194,7 @@ class EnterAffectiveCloudApiImpl(
         requestBodyMap["user_id"] = MD5Encode(userId)
         var requestBody = RequestBody(SERVER_SESSION, "create", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+        mWebSocketHelper?.sendMessage(requestJson)
     }
 
     override fun isSessionCreated(): Boolean {
@@ -206,7 +213,7 @@ class EnterAffectiveCloudApiImpl(
         requestBodyMap["user_id"] = MD5Encode(userId)
         var requestBody = RequestBody(SERVER_SESSION, "restore", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+        mWebSocketHelper?.sendMessage(requestJson)
     }
 
     override fun restore(callback: Callback) {
@@ -244,7 +251,7 @@ class EnterAffectiveCloudApiImpl(
         requestBodyMap["bio_data_type"] = serviceList
         var requestBody = RequestBody(SERVER_BIO_DATA, "init", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+        mWebSocketHelper?.sendMessage(requestJson)
     }
 
     override fun startAffectiveServices(serviceList: List<String>, callback: Callback) {
@@ -255,7 +262,7 @@ class EnterAffectiveCloudApiImpl(
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "start", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+        mWebSocketHelper?.sendMessage(requestJson)
     }
 
     var brainDataBuffer = CopyOnWriteArrayList<Int>()
@@ -269,7 +276,7 @@ class EnterAffectiveCloudApiImpl(
                 var requestBody =
                     RequestBody(SERVER_BIO_DATA, "upload", dataMap)
                 var requestJson = Gson().toJson(requestBody)
-                mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+                mWebSocketHelper?.sendMessage(requestJson)
                 brainDataBuffer.clear()
             }
         }
@@ -280,20 +287,19 @@ class EnterAffectiveCloudApiImpl(
         heartRateDataBuffer.add(heartRateData)
         if (heartRateDataBuffer.size >= triggerCount) {
             var dataMap = HashMap<Any, Any>()
-
             dataMap["hr"] = heartRateDataBuffer.toIntArray()
             var requestBody =
                 RequestBody(SERVER_BIO_DATA, "upload", dataMap)
             var requestJson = Gson().toJson(requestBody)
-            mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+            mWebSocketHelper?.sendMessage(requestJson)
             heartRateDataBuffer.clear()
         }
     }
 
     override fun subscribeBioData(
         data: HashMap<Any, Any>,
-        response: Callback2<RealtimeBioData, Error>,
-        callback: Callback2<SubBiodataFields, Error>
+        response: Callback2<RealtimeBioData>,
+        callback: Callback2<SubBiodataFields>
     ) {
         this.mBiodataResponseCallback = response
         this.mBiodataSubscribeCallback = callback
@@ -301,13 +307,13 @@ class EnterAffectiveCloudApiImpl(
         var requestBody =
             RequestBody(SERVER_BIO_DATA, "subscribe", data)
         var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+        mWebSocketHelper?.sendMessage(requestJson)
     }
 
     override fun subscribeAffectiveData(
         data: HashMap<Any, Any>,
-        response: Callback2<RealtimeAffectiveData, Error>,
-        callback: Callback2<SubAffectiveDataFields, Error>
+        response: Callback2<RealtimeAffectiveData>,
+        callback: Callback2<SubAffectiveDataFields>
     ) {
         this.mAffectiveDataResponseCallback = response
         this.mAffectiveSubscribeCallback = callback
@@ -315,11 +321,11 @@ class EnterAffectiveCloudApiImpl(
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "subscribe", data)
         var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+        mWebSocketHelper?.sendMessage(requestJson)
     }
 
 
-    override fun reportBiodata(services: List<String>, callback: Callback2<HashMap<Any, Any?>, Error>) {
+    override fun reportBiodata(services: List<String>, callback: Callback2<HashMap<Any, Any?>>) {
         this.mBiodataReportCallback = callback
         mBiodataReprotGenerator = ReportGenerator()
         mBiodataReprotGenerator!!.init(services)
@@ -328,10 +334,10 @@ class EnterAffectiveCloudApiImpl(
         var requestBody =
             RequestBody(SERVER_BIO_DATA, "report", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+        mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun reportAffective(services: List<String>, callback: Callback2<HashMap<Any, Any?>, Error>) {
+    override fun reportAffective(services: List<String>, callback: Callback2<HashMap<Any, Any?>>) {
         this.mAffectiveReportCallback = callback
         this.mAffectiveReportGenerator = ReportGenerator()
         mAffectiveReportGenerator!!.init(services)
@@ -340,10 +346,12 @@ class EnterAffectiveCloudApiImpl(
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "report", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+        mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun unsubscribeBioData(dataTypeList: List<String>, callback: Callback2<SubBiodataFields, Error>) {
+    override fun unsubscribeBioData(
+        data: HashMap<Any, Any>, callback: Callback2<SubBiodataFields>
+    ) {
         this.mBiodataUnsubscribeCallback = callback
         if (mSubscribeBioData == null) {
             throw IllegalStateException(
@@ -351,14 +359,14 @@ class EnterAffectiveCloudApiImpl(
             )
         }
         var requestBody =
-            RequestBody(SERVER_BIO_DATA, "unsubscribe", mSubscribeBioData)
+            RequestBody(SERVER_BIO_DATA, "unsubscribe", data)
         var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+        mWebSocketHelper?.sendMessage(requestJson)
     }
 
     override fun unsubscribeAffectiveData(
-        dataTypeList: List<String>,
-        callback: Callback2<SubAffectiveDataFields, Error>
+        data: HashMap<Any, Any>,
+        callback: Callback2<SubAffectiveDataFields>
     ) {
         this.mAffectiveUnsubscribeCallback = callback
         if (mSubscribeAffectiveData == null) {
@@ -367,30 +375,56 @@ class EnterAffectiveCloudApiImpl(
             )
         }
         var requestBody =
-            RequestBody(SERVER_AFFECTIVE, "unsubscribe", mSubscribeAffectiveData)
+            RequestBody(SERVER_AFFECTIVE, "unsubscribe", data)
         var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+        mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun finishAffectiveServices(callback: Callback) {
+    override fun finishAffectiveServices(serviceList: List<String>, callback: Callback) {
         this.mAffectiveFinishCallback = callback
         if (mStartedAffectiveServices == null) {
             throw IllegalStateException(
                 "there is no affective services started!!"
             )
         }
+        for (service in serviceList) {
+            if (!mStartedAffectiveServices!!.contains(service)) {
+                throw IllegalStateException(
+                    "service '$service' was not started or not exit"
+                )
+            }
+        }
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["cloud_services"] = mStartedAffectiveServices!!
+        requestBodyMap["cloud_services"] = serviceList
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "finish", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+        mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun closeWebSocketAndDestroySession(callback: Callback) {
+
+    override fun finishAllAffectiveServices(callback: Callback) {
+        if (mStartedAffectiveServices == null) {
+            throw IllegalStateException(
+                "there is no affective services started!!"
+            )
+        }
+        finishAffectiveServices(mStartedAffectiveServices!!, callback)
+    }
+
+    override fun destroySessionAndCloseWebSocket(callback: Callback) {
         this.mWebSocketCloseCallback = callback
         var requestBody = RequestBody(SERVER_SESSION, "close", null)
         var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(ConvertUtil.compress(requestJson))
+        mWebSocketHelper?.sendMessage(requestJson)
     }
+
+    override fun addRawJsonRequestListener(listener: (String) -> Unit) {
+        mWebSocketHelper?.addRawJsonRequestListener(listener)
+    }
+
+    override fun addRawJsonResponseListener(listener: (String) -> Unit) {
+        mWebSocketHelper?.addRawJsonResponseListener(listener)
+    }
+
 }

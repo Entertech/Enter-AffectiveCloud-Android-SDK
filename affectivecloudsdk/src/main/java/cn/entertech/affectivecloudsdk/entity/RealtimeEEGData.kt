@@ -8,9 +8,9 @@ class RealtimeEEGData {
     var thetaPower: Double? = null
     var deltaPower: Double? = null
     var gammaPower: Double? = null
-    var progress: Double? = null
+    var quality: Double? = null
     override fun toString(): String {
-        return "RealtimeEEGDataEntity(leftwave=$leftwave, rightwave=$rightwave, alphaPower=$alphaPower, betaPower=$betaPower, thetaPower=$thetaPower, deltaPower=$deltaPower, gammaPower=$gammaPower, progress=$progress)"
+        return "RealtimeEEGDataEntity(leftwave=$leftwave, rightwave=$rightwave, alphaPower=$alphaPower, betaPower=$betaPower, thetaPower=$thetaPower, deltaPower=$deltaPower, gammaPower=$gammaPower, quality=$quality)"
     }
 
 

@@ -2,10 +2,7 @@ package cn.entertech.affectivecloudsdk
 
 import android.util.Log
 import cn.entertech.affectivecloudsdk.entity.*
-import cn.entertech.affectivecloudsdk.interfaces.BaseApi
-import cn.entertech.affectivecloudsdk.interfaces.Callback
-import cn.entertech.affectivecloudsdk.interfaces.Callback2
-import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
+import cn.entertech.affectivecloudsdk.interfaces.*
 import cn.entertech.affectivecloudsdk.utils.ConvertUtil
 import cn.entertech.affectivecloudsdk.utils.MD5Encode
 import cn.entertech.affectivecloudsdk.utils.ReportGenerator
@@ -19,7 +16,8 @@ import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.HashMap
 
 class EnterAffectiveCloudApiImpl internal constructor(
-    websocketAddress: String,
+    var websocketAddress: String,
+    var timeout: Int = 10000,
     var appKey: String,
     var appSecret: String,
     var userName: String,
@@ -53,6 +51,13 @@ class EnterAffectiveCloudApiImpl internal constructor(
     var mSessionId: String? = null
 
     private val TAG = "EnterAffectiveCloudApi"
+
+    constructor(
+        websocketAddress: String,
+        appKey: String, appSecret: String,
+        userName: String,
+        userId: String
+    ) : this(websocketAddress, 10000, appKey, appSecret, userName, userId)
 
     init {
         mWebSocketHelper = WebSocketHelper(websocketAddress)
@@ -297,29 +302,29 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     override fun subscribeBioData(
-        data: HashMap<Any, Any>,
+        subscribeParams: SubscribeParams,
         response: Callback2<RealtimeBioData>,
         callback: Callback2<SubBiodataFields>
     ) {
         this.mBiodataResponseCallback = response
         this.mBiodataSubscribeCallback = callback
-        this.mSubscribeBioData = data
+        this.mSubscribeBioData = subscribeParams.body()
         var requestBody =
-            RequestBody(SERVER_BIO_DATA, "subscribe", data)
+            RequestBody(SERVER_BIO_DATA, "subscribe", mSubscribeBioData)
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
     override fun subscribeAffectiveData(
-        data: HashMap<Any, Any>,
+        subscribeParams: SubscribeParams,
         response: Callback2<RealtimeAffectiveData>,
         callback: Callback2<SubAffectiveDataFields>
     ) {
         this.mAffectiveDataResponseCallback = response
         this.mAffectiveSubscribeCallback = callback
-        this.mSubscribeAffectiveData = data
+        this.mSubscribeAffectiveData = subscribeParams.body()
         var requestBody =
-            RequestBody(SERVER_AFFECTIVE, "subscribe", data)
+            RequestBody(SERVER_AFFECTIVE, "subscribe", mSubscribeAffectiveData)
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
@@ -350,7 +355,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     override fun unsubscribeBioData(
-        data: HashMap<Any, Any>, callback: Callback2<SubBiodataFields>
+        subscribeParams: SubscribeParams, callback: Callback2<SubBiodataFields>
     ) {
         this.mBiodataUnsubscribeCallback = callback
         if (mSubscribeBioData == null) {
@@ -359,13 +364,13 @@ class EnterAffectiveCloudApiImpl internal constructor(
             )
         }
         var requestBody =
-            RequestBody(SERVER_BIO_DATA, "unsubscribe", data)
+            RequestBody(SERVER_BIO_DATA, "unsubscribe", subscribeParams.body())
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
     override fun unsubscribeAffectiveData(
-        data: HashMap<Any, Any>,
+        subscribeParams: SubscribeParams,
         callback: Callback2<SubAffectiveDataFields>
     ) {
         this.mAffectiveUnsubscribeCallback = callback
@@ -375,7 +380,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
             )
         }
         var requestBody =
-            RequestBody(SERVER_AFFECTIVE, "unsubscribe", data)
+            RequestBody(SERVER_AFFECTIVE, "unsubscribe", subscribeParams.body())
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
@@ -426,5 +431,23 @@ class EnterAffectiveCloudApiImpl internal constructor(
     override fun addRawJsonResponseListener(listener: (String) -> Unit) {
         mWebSocketHelper?.addRawJsonResponseListener(listener)
     }
+
+
+    override fun addConnectListener(listener: () -> Unit) {
+        mWebSocketHelper?.addConnectListener(listener)
+    }
+
+    override fun addDisconnectListener(listener: () -> Unit) {
+        mWebSocketHelper?.addDisconnectListener(listener)
+    }
+
+    override fun removeConnectListener(listener: () -> Unit) {
+        mWebSocketHelper?.removeConnectListener(listener)
+    }
+
+    override fun removeDisconnectListener(listener: () -> Unit) {
+        mWebSocketHelper?.removeDisconnectListener(listener)
+    }
+
 
 }

@@ -27,13 +27,19 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
             this.mOpenCallback = webSocketCallback
             mBrainDataWebSocket = object : WebSocketClient(URI(address), Draft_6455(), null, timeout) {
                 override fun onOpen(handshakedata: ServerHandshake?) {
-                    Log.d("WebSocketManager", "onConnected " + handshakedata.toString())
+                    Log.d("WebSocketHelper", "onConnected " + handshakedata.toString())
                     mOpenCallback?.onOpen(handshakedata)
+                    connectListeners?.forEach {
+                        it.invoke()
+                    }
                 }
 
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
                     mOpenCallback?.onClose(code, reason, remote)
-                    Log.d("WebSocketManager", "onClose :$code::reason is $reason")
+                    disconnectListeners.forEach {
+                        it.invoke()
+                    }
+                    Log.d("WebSocketHelper", "onClose :$code::reason is $reason")
                 }
 
                 override fun onMessage(message: String?) {
@@ -42,7 +48,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
                 override fun onMessage(message: ByteBuffer) {
                     val arr = ByteArray(message.remaining())
                     message.get(arr)
-                    Log.d("WebSocketManager", "receive msg is " + ConvertUtil.uncompress(arr))
+                    Log.d("WebSocketHelper", "receive msg is " + ConvertUtil.uncompress(arr))
                     var msg = ConvertUtil.uncompress(arr)
                     rawJsonResponseListeners?.forEach {
                         it.invoke(msg)
@@ -51,7 +57,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
 
                 override fun onError(ex: java.lang.Exception?) {
                     mOpenCallback?.onError(ex)
-                    Log.d("WebSocketManager", "onError " + ex.toString())
+                    Log.d("WebSocketHelper", "onError " + ex.toString())
                 }
             }
             mBrainDataWebSocket!!.connect()

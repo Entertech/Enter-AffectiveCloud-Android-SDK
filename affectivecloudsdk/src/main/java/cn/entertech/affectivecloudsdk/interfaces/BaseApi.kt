@@ -82,7 +82,7 @@ interface BaseApi {
      * @param callback Callback2<SubBiodataFields>
      */
     fun subscribeBioData(
-        data: HashMap<Any, Any>,
+        subscribeParams: SubscribeParams,
         response: Callback2<RealtimeBioData>,
         callback: Callback2<SubBiodataFields>
     )
@@ -94,7 +94,7 @@ interface BaseApi {
      * @param callback Callback2<SubAffectiveDataFields>
      */
     fun subscribeAffectiveData(
-        data: HashMap<Any, Any>,
+        subscribeParams: SubscribeParams,
         response: Callback2<RealtimeAffectiveData>,
         callback: Callback2<SubAffectiveDataFields>
     )
@@ -119,7 +119,7 @@ interface BaseApi {
      * @param callback Callback2<SubBiodataFields>
      */
     fun unsubscribeBioData(
-        data: HashMap<Any, Any>, callback: Callback2<SubBiodataFields>
+        subscribeParams: SubscribeParams, callback: Callback2<SubBiodataFields>
     )
 
     /**
@@ -128,7 +128,7 @@ interface BaseApi {
      * @param callback Callback2<SubAffectiveDataFields>
      */
     fun unsubscribeAffectiveData(
-        data: HashMap<Any, Any>, callback: Callback2<SubAffectiveDataFields>
+        subscribeParams: SubscribeParams, callback: Callback2<SubAffectiveDataFields>
     )
 
     /**
@@ -150,7 +150,6 @@ interface BaseApi {
      */
     fun destroySessionAndCloseWebSocket(callback: Callback)
 
-
     /**
      * Add raw json request listener.
      *
@@ -163,5 +162,29 @@ interface BaseApi {
      * @param listener Function1<String, Unit>
      */
     fun addRawJsonResponseListener(listener: ((String) -> (Unit)))
+
+    /**
+     * Add web socket connect listener
+     * @param listener Function0<Unit>
+     */
+    fun addConnectListener(listener: () -> Unit)
+
+    /**
+     * Add web socket disconnect listener
+     * @param listener Function0<Unit>
+     */
+    fun addDisconnectListener(listener: () -> Unit)
+
+    /**
+     * Remove web socket connect listener
+     * @param listener Function0<Unit>
+     */
+    fun removeConnectListener(listener: () -> Unit)
+
+    /**
+     * Remove web socket disconnect listener
+     * @param listener Function0<Unit>
+     */
+    fun removeDisconnectListener(listener: () -> Unit)
 
 }

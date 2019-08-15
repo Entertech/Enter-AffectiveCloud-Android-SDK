@@ -1,8 +1,5 @@
 package cn.entertech.affectivecloudsdk.interfaces
 
-import org.java_websocket.handshake.ServerHandshake
-import java.lang.Exception
-
 interface IWebSocketHelper {
     fun open(webSocketCallback: WebSocketCallback)
     fun addMessageResponseListener(listener: ((String) -> Unit))

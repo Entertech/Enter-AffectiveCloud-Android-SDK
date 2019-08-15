@@ -12,9 +12,7 @@ import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
-import cn.entertech.affectivecloudsdk.AffectiveObservable
-import cn.entertech.affectivecloudsdk.BiodataObservable
-import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiFactory
+import cn.entertech.affectivecloudsdk.*
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import cn.entertech.affectivecloudsdk.interfaces.Observer
@@ -31,7 +29,10 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() {
-    private var affectiveObservable: AffectiveObservable? = null
+    private var enterAffectiveCloudManager: EnterAffectiveCloudManager? = null
+    private var affectiveSubscribeParams: AffectiveSubscribeParams? = null
+    private var biodataSubscribeParams: BiodataSubscribeParams? = null
+    private var affectiveObservable: AffectiveSubscribeParams? = null
     private var mEnterAffectiveCloudApi: BaseApi? = null
     private lateinit var biomoduleBleManager: BiomoduleBleManager
 
@@ -79,10 +80,40 @@ class MainActivity : AppCompatActivity() {
         biomoduleBleManager.addHeartRateListener(heartRateListener)
         mEnterAffectiveCloudApi =
             EnterAffectiveCloudApiFactory.createApi(websocketAddress, APP_KEY, APP_SECRET, USER_NAME, USER_ID)
-
+        initEnterAffectiveCloudManager()
         initPermission()
         initView()
         initSaveFiledir()
+    }
+
+    fun initEnterAffectiveCloudManager() {
+        biodataSubscribeParams = BiodataSubscribeParams.Builder()
+            .requestAllEEGData()
+            .requestAllHrData()
+            .build()
+
+        affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
+            .requestAllSleepData()
+            .requestAttention()
+            .requestRelaxation()
+            .requestPressure()
+            .requestPleasure()
+            .build()
+        var enterAffectiveCloudConfig = EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_NAME, USER_ID)
+            .url(websocketAddress)
+            .timeout(10000)
+            .availableBiodataServices(availableBioServices)
+            .availableAffectiveServices(availableAffectiveServices)
+            .biodataSubscribeParams(biodataSubscribeParams!!)
+            .affectiveSubscribeParams(affectiveSubscribeParams!!)
+            .build()
+        enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
+        enterAffectiveCloudManager!!.addBiodataRealtimeListener {
+            messageReceiveFragment.appendMessageToScreen("基础服务实时数据：${it.toString()}")
+        }
+        enterAffectiveCloudManager!!.addAffectiveRealtimeListener {
+            messageReceiveFragment.appendMessageToScreen("情感服务实时数据：${it.toString()}")
+        }
     }
 
 
@@ -286,6 +317,8 @@ class MainActivity : AppCompatActivity() {
     var writeFileDataBuffer = ArrayList<Int>()
     var rawListener = fun(bytes: ByteArray) {
         mEnterAffectiveCloudApi?.appendBrainData(bytes)
+        enterAffectiveCloudManager?.appendBrainData(bytes)
+        //以下是原始脑波文件保存逻辑，如无需该功能可忽略
         for (byte in bytes) {
             var brainData = ConvertUtil.converUnchart(byte)
             brainDataBuffer.add(brainData)
@@ -304,6 +337,7 @@ class MainActivity : AppCompatActivity() {
 //        FileHelper.getInstance().writeHr("$heartRate,")
         heartRateDataBuffer.add(heartRate)
         mEnterAffectiveCloudApi?.appendHeartData(heartRate)
+        enterAffectiveCloudManager?.appendHeartRateData(heartRate)
     }
 
     fun onUploadBiodata(view: View) {
@@ -338,26 +372,25 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        BiodataObservable.create(mEnterAffectiveCloudApi!!)
-            .requestAllEEGData()
-            .requestAllHrData()
-            .subscribe(object : Observer<RealtimeBioData, SubBiodataFields> {
-                override fun onRealtimeDataResponseSuccess(data: RealtimeBioData?) {
-                    messageReceiveFragment.appendMessageToScreen("基础服务实时数据：${data.toString()}")
-                }
+        mEnterAffectiveCloudApi?.subscribeBioData(biodataSubscribeParams!!, object : Callback2<RealtimeBioData> {
+            override fun onSuccess(t: RealtimeBioData?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务实时数据：${t.toString()}")
+            }
 
-                override fun onRealtimeDataResponseError(error: Error?) {
-                    messageReceiveFragment.appendMessageToScreen("实时数据返回异常：${error.toString()}")
-                }
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("实时数据返回异常：${error.toString()}")
+            }
 
-                override fun onSubscribeSuccess(subField: SubBiodataFields?) {
-                    messageReceiveFragment.appendMessageToScreen("基础服务订阅成功，当前已订阅内容：${subField.toString()}")
-                }
+        }, object : Callback2<SubBiodataFields> {
+            override fun onSuccess(t: SubBiodataFields?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务订阅成功，当前已订阅内容：${t.toString()}")
+            }
 
-                override fun onSubscribeError(error: Error?) {
-                    messageReceiveFragment.appendMessageToScreen("基础服务订阅失败：${error.toString()}")
-                }
-            })
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务订阅失败：${error.toString()}")
+            }
+
+        })
     }
 
     fun onBiodataReport(view: View) {
@@ -377,21 +410,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onUnsubscribeBiodata(view: View) {
-        if (!isStatusOk()) {
+        if (!isStatusOk() || biodataSubscribeParams == null) {
             return
         }
-        BiodataObservable.create(mEnterAffectiveCloudApi!!)
-            .requestAllEEGData()
-            .requestAllHrData()
-            .unsubscribe(object : Callback2<SubBiodataFields> {
-                override fun onSuccess(t: SubBiodataFields?) {
-                    messageReceiveFragment.appendMessageToScreen("基础服务取消订阅成功，当前已订阅内容：${t.toString()}")
-                }
+        mEnterAffectiveCloudApi?.unsubscribeBioData(biodataSubscribeParams!!, object : Callback2<SubBiodataFields> {
+            override fun onSuccess(t: SubBiodataFields?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务取消订阅成功，当前已订阅内容：${t.toString()}")
+            }
 
-                override fun onError(error: Error?) {
-                    messageReceiveFragment.appendMessageToScreen("基础服务取消订阅失败：${error.toString()}")
-                }
-            })
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("基础服务取消订阅失败：${error.toString()}")
+            }
+        })
     }
 
     fun onStartAffective(view: View) {
@@ -416,29 +446,26 @@ class MainActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        AffectiveObservable.create(mEnterAffectiveCloudApi!!)
-            .requestAllSleepData()
-            .requestArousal()
-            .requestAttention()
-            .requestPleasure()
-            .requestPressure()
-            .requestRelaxation()
-            .subscribe(object : Observer<RealtimeAffectiveData, SubAffectiveDataFields> {
-                override fun onRealtimeDataResponseSuccess(data: RealtimeAffectiveData?) {
-                    messageReceiveFragment.appendMessageToScreen("实时情感数据：${data.toString()}")
+        mEnterAffectiveCloudApi?.subscribeAffectiveData(affectiveSubscribeParams!!,
+            object : Callback2<RealtimeAffectiveData> {
+                override fun onSuccess(t: RealtimeAffectiveData?) {
+                    messageReceiveFragment.appendMessageToScreen("实时情感数据：${t.toString()}")
                 }
 
-                override fun onRealtimeDataResponseError(error: Error?) {
+                override fun onError(error: Error?) {
                     messageReceiveFragment.appendMessageToScreen("情感数据返回异常：${error.toString()}")
                 }
 
-                override fun onSubscribeSuccess(subField: SubAffectiveDataFields?) {
-                    messageReceiveFragment.appendMessageToScreen("情感服务订阅成功，当前已订阅内容：${subField.toString()}")
+            },
+            object : Callback2<SubAffectiveDataFields> {
+                override fun onSuccess(t: SubAffectiveDataFields?) {
+                    messageReceiveFragment.appendMessageToScreen("情感服务订阅成功，当前已订阅内容：${t.toString()}")
                 }
 
-                override fun onSubscribeError(error: Error?) {
+                override fun onError(error: Error?) {
                     messageReceiveFragment.appendMessageToScreen("情感服务订阅失败：${error.toString()}")
                 }
+
             })
     }
 
@@ -462,17 +489,11 @@ class MainActivity : AppCompatActivity() {
 
 
     fun onUnsubscribeAffective(view: View) {
-        if (!isStatusOk()) {
+        if (!isStatusOk() || affectiveSubscribeParams == null) {
             return
         }
-        AffectiveObservable.create(mEnterAffectiveCloudApi!!)
-            .requestAllSleepData()
-            .requestArousal()
-            .requestAttention()
-            .requestPleasure()
-            .requestPressure()
-            .requestRelaxation()
-            .unsubscribe(object : Callback2<SubAffectiveDataFields> {
+        mEnterAffectiveCloudApi?.unsubscribeAffectiveData(affectiveSubscribeParams!!,
+            object : Callback2<SubAffectiveDataFields> {
                 override fun onSuccess(t: SubAffectiveDataFields?) {
                     messageReceiveFragment.appendMessageToScreen("情感服务取消订阅成功，当前已订阅内容：${t.toString()}")
                 }
@@ -494,6 +515,76 @@ class MainActivity : AppCompatActivity() {
 
             override fun onError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen("情感服务结束失败")
+            }
+
+        })
+    }
+
+    fun onConnect(view: View) {
+        enterAffectiveCloudManager?.openWebSocket(object : WebSocketCallback {
+            override fun onOpen(serverHandshake: ServerHandshake?) {
+                messageReceiveFragment.appendMessageToScreen("情感云已连接")
+            }
+
+            override fun onClose(code: Int, reason: String?, remote: Boolean) {
+                messageReceiveFragment.appendMessageToScreen("情感云已断开：$reason")
+            }
+
+            override fun onError(e: Exception?) {
+                messageReceiveFragment.appendMessageToScreen("情感云连接异常：${e.toString()}")
+            }
+
+        })
+    }
+
+    fun onStartUpload(view: View) {
+        enterAffectiveCloudManager?.init(object : Callback {
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("数据上传失败：${error.toString()}")
+            }
+
+            override fun onSuccess() {
+                fileName = "${System.currentTimeMillis()}.txt"
+                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
+                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
+                biomoduleBleManager.startHeartAndBrainCollection()
+                messageReceiveFragment.appendMessageToScreen("初始化成功，正在上传数据...")
+            }
+
+        })
+    }
+
+    fun onReport(view: View) {
+        enterAffectiveCloudManager?.reportBiodata(object : Callback2<HashMap<Any, Any?>> {
+            override fun onSuccess(t: HashMap<Any, Any?>?) {
+                messageReceiveFragment.appendMessageToScreen("基础报表：${t.toString()}")
+            }
+
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("基础报表出错：${error.toString()}")
+            }
+
+        })
+        enterAffectiveCloudManager?.reportAffective(object : Callback2<HashMap<Any, Any?>> {
+            override fun onSuccess(t: HashMap<Any, Any?>?) {
+                messageReceiveFragment.appendMessageToScreen("情感报表：${t.toString()}")
+            }
+
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("情感报表出错：${error.toString()}")
+            }
+
+        })
+    }
+
+    fun onFinish(view: View) {
+        enterAffectiveCloudManager?.release(object : Callback {
+            override fun onSuccess() {
+                messageReceiveFragment.appendMessageToScreen("情感云已成功断开！")
+            }
+
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("情感云断开失败：${error}")
             }
 
         })

@@ -1,9 +1,9 @@
 # 回车生物电采集模块演示 demo
 
 ## 硬件使用
-关于硬件的操作，请参考[回车生物电采集模块操作说明](https://github.com/EnterTech/Enter-Biomodule-Demo-Android/wiki/回车生物电采集模块操作说明)。
+关于硬件的操作，请参考[回车生物电采集模块操作说明](https://docs.affectivecloud.com/📲蓝牙采集模块/回车生物电蓝牙采集模块操作说明.html)。
 
-硬件使用的注意事项，请参考[回车生物电采集模块使用注意事项](https://github.com/EnterTech/Enter-Biomodule-Demo-Android/wiki/回车生物电采集模块使用注意事项)。
+硬件使用的注意事项，请参考[回车生物电采集模块使用注意事项](https://docs.affectivecloud.com/📲蓝牙采集模块/回车蓝牙生物电采集模块使用注意事项.html)。
 
 ## Demo 说明
 

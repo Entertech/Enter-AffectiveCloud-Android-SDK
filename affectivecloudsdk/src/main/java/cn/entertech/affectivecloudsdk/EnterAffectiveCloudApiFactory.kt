@@ -4,8 +4,8 @@ import cn.entertech.affectivecloudsdk.interfaces.BaseApi
 
 class EnterAffectiveCloudApiFactory private constructor() {
     companion object{
-        fun createApi(websocketAddress: String, appKey: String, appSecret: String, userName: String,userId:String): BaseApi {
-            return EnterAffectiveCloudApiImpl(websocketAddress, appKey, appSecret, userName,userId)
+        fun createApi(websocketAddress: String, appKey: String, appSecret: String,userId:String): BaseApi {
+            return EnterAffectiveCloudApiImpl(websocketAddress, appKey, appSecret,userId)
         }
     }
 }

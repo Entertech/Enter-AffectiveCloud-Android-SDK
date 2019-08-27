@@ -20,7 +20,6 @@ class EnterAffectiveCloudApiImpl internal constructor(
     var timeout: Int = 10000,
     var appKey: String,
     var appSecret: String,
-    var userName: String,
     var userId: String
 ) : BaseApi {
     private var mAffectiveReportGenerator: ReportGenerator? = null
@@ -55,9 +54,8 @@ class EnterAffectiveCloudApiImpl internal constructor(
     constructor(
         websocketAddress: String,
         appKey: String, appSecret: String,
-        userName: String,
         userId: String
-    ) : this(websocketAddress, 10000, appKey, appSecret, userName, userId)
+    ) : this(websocketAddress, 10000, appKey, appSecret, userId)
 
     init {
         mWebSocketHelper = WebSocketHelper(websocketAddress)
@@ -191,12 +189,15 @@ class EnterAffectiveCloudApiImpl internal constructor(
 
     override fun createSession(callback2: Callback2<String>) {
         this.mCreateSessionCallback = callback2
-        var md5Params = "app_key=$appKey&app_secret=$appSecret&username=$userName"
+        var timestamp = "${System.currentTimeMillis()}"
+        var userIdEncoded = MD5Encode(userId).toUpperCase()
+        var md5Params = "app_key=$appKey&app_secret=$appSecret&timestamp=$timestamp&user_id=$userIdEncoded"
         mSign = MD5Encode(md5Params).toUpperCase()
         var requestBodyMap = HashMap<Any, Any>()
         requestBodyMap["app_key"] = appKey
         requestBodyMap["sign"] = mSign!!
-        requestBodyMap["user_id"] = MD5Encode(userId)
+        requestBodyMap["user_id"] = userIdEncoded
+        requestBodyMap["timestamp"] = timestamp
         var requestBody = RequestBody(SERVER_SESSION, "create", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
@@ -211,11 +212,16 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     private fun sendRestore() {
+        var userIdEncoded = MD5Encode(userId).toUpperCase()
+        var timestamp = "${System.currentTimeMillis()}"
+        var md5Params = "app_key=$appKey&app_secret=$appSecret&timestamp=$timestamp&user_id=$userIdEncoded"
+        mSign = MD5Encode(md5Params).toUpperCase()
         var requestBodyMap = HashMap<Any, Any>()
         requestBodyMap["session_id"] = mSessionId!!
         requestBodyMap["app_key"] = appKey
         requestBodyMap["sign"] = mSign!!
-        requestBodyMap["user_id"] = MD5Encode(userId)
+        requestBodyMap["timestamp"] = timestamp
+        requestBodyMap["user_id"] = MD5Encode(userId).toUpperCase()
         var requestBody = RequestBody(SERVER_SESSION, "restore", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)

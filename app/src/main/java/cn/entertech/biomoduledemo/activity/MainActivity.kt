@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     var saveHRPath: String =
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
-    var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v0.1/"
+    var websocketAddress = "wss://server-test.affectivecloud.com/ws/algorithm/v1/"
     var availableAffectiveServices = listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.SLEEP)
     var availableBioServices = listOf(Service.EEG, Service.HR)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             .requestPressure()
             .requestPleasure()
             .build()
-        var enterAffectiveCloudConfig = EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_NAME, USER_ID)
+        var enterAffectiveCloudConfig = EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
             .url(websocketAddress)
             .timeout(10000)
             .availableBiodataServices(availableBioServices)

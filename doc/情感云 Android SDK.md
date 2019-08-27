@@ -7,13 +7,22 @@
 ## 集成
 
 ### Gradle 自动集成
-
+在module的build.gradle文件下添加以下依赖
 ```groovy
 implementation 'cn.entertech:affectivecloud:1.0.0-alpha'
 implementation 'com.google.code.gson:gson:2.8.5'
 implementation "org.java-websocket:Java-WebSocket:1.4.0"
 ```
-
+在项目根目录的build.gradle文件下添加一下依赖地址
+```groovy
+allprojects {
+    repositories {
+        maven {
+            url "https://dl.bintray.com/hzentertech/maven"
+        }
+    }
+}
+```
 ### 权限申请
 
 ```xml

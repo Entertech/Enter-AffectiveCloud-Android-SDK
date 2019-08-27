@@ -149,7 +149,6 @@ enterAffectiveCloudManager?.release(object : Callback {
 ```kotlin
 var appKey = "YOUR_APP_KEY"
 var appSecret = "YOUR_APP_SECRET"
-var userName = "YOUR_USER_NAME"
 var websocketAddress = "AFFECTIVE_CLOUD_WEBSOCKET_ADDRESS"
 var enterAffectiveCloudApi = EnterAffectiveCloudApiFactory.createApi(websocketAddress,appKey,appSecret)
 enterAffectiveCloudApi.openWebSocket(fun(){

@@ -9,7 +9,7 @@
 
 本 demo 演示了设备连接和脑波数据的采集，将采集到的数据发送到云端，经过云端算法分析后返回分析结果的整个过程。主要包含两部分：
 * 集成模块的蓝牙 SDK，完成设备连接和数据采集，具体参见此蓝牙 SDK 工程--[Enter-Biomodule-BLE-Android-SDK](https://github.com/EnterTech/Enter-Biomodule-BLE-Android-SDK)；
-* 情感云SDK，将蓝牙采集到的原始数据上传至情感云，具体文档可查看[回车情感云平台长连接通信协议](https://docs.affectivecloud.com/🎙接口协议/1.%20综述.html)。
+* 情感云SDK，将蓝牙采集到的原始数据上传至情感云，具体文档可查看[回车情感云平台SDK(Android)](https://github.com/Entertech/Enter-Biomodule-Demo-Android/blob/master/doc/%E6%83%85%E6%84%9F%E4%BA%91%20Android%20SDK.md)。
 
 ## 操作
 * 打开Demo时，需点击`连接蓝牙设备`进行设备蓝牙连接，此时设备需处于广播状态；

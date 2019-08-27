@@ -2,6 +2,8 @@ package cn.entertech.affectivecloudsdk
 
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
+import org.java_websocket.handshake.ServerHandshake
+import java.lang.Exception
 import java.lang.IllegalStateException
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -105,17 +107,33 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
     }
 
     override fun init(callback: Callback) {
-        mApi.createSession(object : Callback2<String> {
-            override fun onSuccess(t: String?) {
-                initBiodata(callback)
-                if (config.availableAffectiveServices != null) {
-                    initAffective(callback)
+        mApi.openWebSocket(object : WebSocketCallback {
+            override fun onOpen(serverHandshake: ServerHandshake?) {
+                mApi.createSession(object : Callback2<String> {
+                    override fun onSuccess(t: String?) {
+                        initBiodata(callback)
+                        if (config.availableAffectiveServices != null) {
+                            initAffective(callback)
+                        }
+                    }
+
+                    override fun onError(error: Error?) {
+                        callback.onError(error)
+                    }
+                })
+            }
+
+            override fun onClose(code: Int, reason: String?, remote: Boolean) {
+                if (reason != null && reason != ""){
+                    callback.onError(Error(-1, reason.toString()))
                 }
             }
 
-            override fun onError(error: Error?) {
-                callback.onError(error)
+            override fun onError(e: Exception?) {
+                e?.printStackTrace()
+                callback.onError(Error(-1, e.toString()))
             }
+
         })
     }
 
@@ -152,7 +170,49 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
     }
 
     override fun restore(callback: Callback) {
-        mApi.restore(callback)
+        if (mApi.isWebSocketOpen()){
+            mApi.restore(object : Callback {
+                override fun onSuccess() {
+                    initBiodata(callback)
+                    if (config.availableAffectiveServices != null) {
+                        initAffective(callback)
+                    }
+                }
+
+                override fun onError(error: Error?) {
+                    callback.onError(error)
+                }
+            })
+        }else{
+            mApi.openWebSocket(object : WebSocketCallback {
+                override fun onOpen(serverHandshake: ServerHandshake?) {
+                    mApi.restore(object : Callback {
+                        override fun onSuccess() {
+                            initBiodata(callback)
+                            if (config.availableAffectiveServices != null) {
+                                initAffective(callback)
+                            }
+                        }
+
+                        override fun onError(error: Error?) {
+                            callback.onError(error)
+                        }
+                    })
+                }
+
+                override fun onClose(code: Int, reason: String?, remote: Boolean) {
+                    if (reason != null && reason != ""){
+                        callback.onError(Error(-1, reason.toString()))
+                    }
+                }
+
+                override fun onError(e: Exception?) {
+                    e?.printStackTrace()
+                    callback.onError(Error(-1, e.toString()))
+                }
+
+            })
+        }
     }
 
     override fun release(callback: Callback) {
@@ -192,6 +252,22 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
 
     override fun removeWebSocketDisconnectListener(listener: () -> Unit) {
         mApi.removeDisconnectListener(listener)
+    }
+
+    override fun addRawJsonRequestListener(listener: (String) -> Unit) {
+        mApi?.addRawJsonRequestListener(listener)
+    }
+
+    override fun addRawJsonResponseListener(listener: (String) -> Unit) {
+        mApi?.addRawJsonResponseListener(listener)
+    }
+
+    override fun removeRawJsonRequestListener(listener: (String) -> Unit) {
+        mApi?.removeRawJsonRequestListener(listener)
+    }
+
+    override fun removeRawJsonResponseListener(listener: (String) -> Unit) {
+        mApi?.removeRawJsonResponseListener(listener)
     }
 
 }

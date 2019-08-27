@@ -1,7 +1,7 @@
 package cn.entertech.affectivecloudsdk.entity
 
-data class Error(var errorCode:Int,var errorMsg:String){
+data class Error(var code:Int,var msg:String){
     override fun toString(): String {
-        return super.toString()
+        return "Error(code=$code, msg='$msg')"
     }
 }

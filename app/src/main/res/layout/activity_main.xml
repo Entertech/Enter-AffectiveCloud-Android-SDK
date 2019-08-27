@@ -100,15 +100,15 @@
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="CONNECT"
-                android:onClick="onConnect"
+                android:text="初始化"
+                android:onClick="onInit"
                 />
 
         <Button
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="START"
+                android:text="开始上传数据"
                 android:onClick="onStartUpload"
                 />
 
@@ -116,7 +116,7 @@
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="REPORT"
+                android:text="获取报表数据"
                 android:onClick="onReport"
                 />
 
@@ -124,8 +124,16 @@
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="FINISH"
+                android:text="结束"
                 android:onClick="onFinish"
+                />
+
+        <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="Restore"
+                android:onClick="onRestore"
                 />
 
     </LinearLayout>

@@ -1,4 +1,4 @@
-# 回车情感云平台SDK(Android)
+# 回车情感云平台SDK(Android) [![Download](https://api.bintray.com/packages/hzentertech/maven/affectivecloud/images/download.svg?version=1.0.0)](https://bintray.com/hzentertech/maven/affectivecloud/1.0.0/link)
 
 ## 简介
 
@@ -9,7 +9,7 @@
 ### Gradle 自动集成
 在module的build.gradle文件下添加以下依赖
 ```groovy
-implementation 'cn.entertech:affectivecloud:1.0.0-alpha'
+implementation 'cn.entertech:affectivecloud:1.0.0'
 implementation 'com.google.code.gson:gson:2.8.5'
 implementation "org.java-websocket:Java-WebSocket:1.4.0"
 ```

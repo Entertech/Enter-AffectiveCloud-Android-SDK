@@ -1,4 +1,4 @@
-# 回车情感云SDK（Android）
+# 回车情感云平台SDK(Android)
 
 ## 简介
 

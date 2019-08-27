@@ -1,6 +1,6 @@
 # 回车情感云SDK（Android）
 
-##简介
+## 简介
 
 基于原有[情感云通信协议](<https://docs.affectivecloud.com/%F0%9F%8E%99%E6%8E%A5%E5%8F%A3%E5%8D%8F%E8%AE%AE/1.%20%E7%BB%BC%E8%BF%B0.html>)，大大简化了客户端与情感云平台数据交互。
 
@@ -144,7 +144,7 @@ enterAffectiveCloudManager?.release(object : Callback {
 ![时序图](https://github.com/Entertech/Enter-Biomodule-Demo-Android/blob/develop/doc/sequence_diagram.png)
 
 
-###SDK初始化及情感云连接
+### SDK初始化及情感云连接
 
 ```kotlin
 var appKey = "YOUR_APP_KEY"
@@ -166,7 +166,7 @@ var isWebSocketOpen = enterAffectiveCloudApi.isWebSocketOpen()
 Logger.d("情感云是否已连接："+isWebSocketOpen)
 ```
 
-###建立会话
+### 建立会话
 
 ```kotlin
 enterAffectiveCloudApi.createSession(fun(sessionId:String){
@@ -246,7 +246,7 @@ enterAffectiveCloudApi.subscribeBiodata(dataNameList,fun(data：Type){
 })
 ```
 
-####  订阅情感数据
+#### 订阅情感数据
 
 ```
 enterAffectiveCloudApi.subscribeAffectiveData(dataNameList,fun(data:Type){
@@ -260,7 +260,7 @@ enterAffectiveCloudApi.subscribeAffectiveData(dataNameList,fun(data:Type){
 
 ### 取消订阅
 
-####  取消订阅基础数据
+#### 取消订阅基础数据
 
 ```kotlin
 enterAffectiveCloudApi.unsubscribeBiodata(dataNameList,fun(){
@@ -290,7 +290,7 @@ enterAffectiveCloudApi.reportBiodata(dataNameList,fun(data:BioReport)){
 }
 ```
 
-####  生成情感数据报表
+#### 生成情感数据报表
 
 ```
 enterAffectiveCloudApi.reportAffectiveData(dataNameList,fun(data:AffectiveReport)){

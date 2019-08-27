@@ -46,7 +46,7 @@ var affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
             .requestPleasure()//订阅pleasure数据
             .build()
 //配置项
-var enterAffectiveCloudConfig = EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_NAME, USER_ID)
+var enterAffectiveCloudConfig = EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
             .url(websocketAddress)//配置websocket地址
             .timeout(10000)//配置websocket连接超时时间 单位：ms
             .availableBiodataServices(availableBioServices)//可用的基础服务
@@ -151,7 +151,7 @@ var appKey = "YOUR_APP_KEY"
 var appSecret = "YOUR_APP_SECRET"
 var userName = "YOUR_USER_NAME"
 var websocketAddress = "AFFECTIVE_CLOUD_WEBSOCKET_ADDRESS"
-var enterAffectiveCloudApi = EnterAffectiveCloudApiFactory.createApi(websocketAddress,appKey,appSecret,userName)
+var enterAffectiveCloudApi = EnterAffectiveCloudApiFactory.createApi(websocketAddress,appKey,appSecret)
 enterAffectiveCloudApi.openWebSocket(fun(){
     Logger.d("情感云连接成功...")
 },fun(error:String){

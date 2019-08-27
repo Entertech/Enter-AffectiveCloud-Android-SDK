@@ -52,7 +52,7 @@ class ApiDetailActivity : AppCompatActivity() {
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
         mEnterAffectiveCloudApi =
-            EnterAffectiveCloudApiFactory.createApi(websocketAddress, APP_KEY, APP_SECRET, USER_NAME, USER_ID)
+            EnterAffectiveCloudApiFactory.createApi(websocketAddress, APP_KEY, APP_SECRET, USER_ID)
 
         biodataSubscribeParams = BiodataSubscribeParams.Builder()
             .requestAllEEGData()

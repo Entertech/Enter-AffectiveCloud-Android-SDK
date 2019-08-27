@@ -18,7 +18,6 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
             config.websocketTimeout!!,
             config.appKey!!,
             config.appSecret!!,
-            config.userName!!,
             config.userId!!
         )
         if (config.availableBiodataServices == null) {

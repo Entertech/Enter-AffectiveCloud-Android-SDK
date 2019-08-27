@@ -17,7 +17,6 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
     init {
         this.appKey = builder.appKey
         this.appSecret = builder.appSecret
-        this.userName = builder.userName
         this.userId = builder.userId
         this.mBiodataSubscribeParams = builder.mBiodataSubscribeParams
         this.mAffectiveSubscribeParams = builder.mAffectiveSubscribeParams
@@ -27,7 +26,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
         this.availableAffectiveServices = builder.availableAffectiveServices
     }
 
-    class Builder(var appKey: String,var appSecret: String, var userName: String, var userId: String) {
+    class Builder(var appKey: String,var appSecret: String, var userId: String) {
         var mAffectiveSubscribeParams: AffectiveSubscribeParams? = null
         var mBiodataSubscribeParams: BiodataSubscribeParams? = null
         var uri: String? = null

@@ -432,6 +432,13 @@ class EnterAffectiveCloudApiImpl internal constructor(
         mWebSocketHelper?.addRawJsonResponseListener(listener)
     }
 
+    override fun removeRawJsonRequestListener(listener: (String) -> Unit) {
+        mWebSocketHelper?.removeRawJsonRequestListener(listener)
+    }
+
+    override fun removeRawJsonResponseListener(listener: (String) -> Unit) {
+        mWebSocketHelper?.removeRawJsonResponseListener(listener)
+    }
 
     override fun addConnectListener(listener: () -> Unit) {
         mWebSocketHelper?.addConnectListener(listener)

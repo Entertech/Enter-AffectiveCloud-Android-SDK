@@ -95,6 +95,9 @@ class MainActivity : AppCompatActivity() {
         enterAffectiveCloudManager!!.addAffectiveRealtimeListener {
             messageReceiveFragment.appendMessageToScreen("情感服务实时数据：${it.toString()}")
         }
+        enterAffectiveCloudManager!!.addRawJsonRequestListener {
+            messageSendFragment.appendMessageToScreen(it)
+        }
     }
 
 
@@ -252,38 +255,25 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun onConnect(view: View) {
-        enterAffectiveCloudManager?.openWebSocket(object : WebSocketCallback {
-            override fun onOpen(serverHandshake: ServerHandshake?) {
-                messageReceiveFragment.appendMessageToScreen("情感云已连接")
-            }
-
-            override fun onClose(code: Int, reason: String?, remote: Boolean) {
-                messageReceiveFragment.appendMessageToScreen("情感云已断开：$reason")
-            }
-
-            override fun onError(e: Exception?) {
-                messageReceiveFragment.appendMessageToScreen("情感云连接异常：${e.toString()}")
-            }
-
-        })
-    }
-
-    fun onStartUpload(view: View) {
+    fun onInit(view: View) {
         enterAffectiveCloudManager?.init(object : Callback {
             override fun onError(error: Error?) {
-                messageReceiveFragment.appendMessageToScreen("数据上传失败：${error.toString()}")
+                messageReceiveFragment.appendMessageToScreen("SDK初始化失败：${error.toString()}")
             }
 
             override fun onSuccess() {
                 fileName = "${System.currentTimeMillis()}.txt"
                 FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
                 FileHelper.getInstance().setHRPath(saveHRPath + fileName)
-                biomoduleBleManager.startHeartAndBrainCollection()
-                messageReceiveFragment.appendMessageToScreen("初始化成功，正在上传数据...")
+                messageReceiveFragment.appendMessageToScreen("SDK初始化成功，等待数据上传...")
             }
 
         })
+    }
+
+    fun onStartUpload(view: View) {
+        biomoduleBleManager.startHeartAndBrainCollection()
+        messageReceiveFragment.appendMessageToScreen("开始上传数据...")
     }
 
     fun onReport(view: View) {
@@ -303,7 +293,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onError(error: Error?) {
-                messageReceiveFragment.appendMessageToScreen("情感报表出错：${error.toString()}")
+                messageReceiveFragment.appendMessageToScreen("情感报表出错：${error?.msg}")
             }
 
         })
@@ -316,14 +306,28 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onError(error: Error?) {
-                messageReceiveFragment.appendMessageToScreen("情感云断开失败：${error}")
+                messageReceiveFragment.appendMessageToScreen("情感云断开失败：${error?.msg}")
             }
 
         })
     }
 
-    fun toApiDetail(view:View){
-        startActivity(Intent(this,ApiDetailActivity::class.java))
+    fun onRestore(view: View) {
+        enterAffectiveCloudManager?.restore(object : Callback {
+            override fun onSuccess() {
+
+                messageReceiveFragment.appendMessageToScreen("情感云已重连成功，请重新上传数据")
+            }
+
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("情感云重连失败：${error?.msg}")
+            }
+
+        })
+    }
+
+    fun toApiDetail(view: View) {
+        startActivity(Intent(this, ApiDetailActivity::class.java))
     }
 
     fun isStatusOk(): Boolean {

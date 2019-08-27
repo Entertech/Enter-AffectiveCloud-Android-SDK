@@ -35,4 +35,13 @@ interface IEnterAffectiveCloudManager {
     fun removeWebSocketConnectListener(listener: () -> Unit)
 
     fun removeWebSocketDisconnectListener(listener: () -> Unit)
+
+    fun addRawJsonRequestListener(listener: ((String) -> (Unit)))
+
+    fun addRawJsonResponseListener(listener: ((String) -> (Unit)))
+
+    fun removeRawJsonRequestListener(listener: ((String) -> (Unit)))
+
+    fun removeRawJsonResponseListener(listener: ((String) -> (Unit)))
+
 }

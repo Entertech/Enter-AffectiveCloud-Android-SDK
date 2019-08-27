@@ -163,6 +163,20 @@ interface BaseApi {
      */
     fun addRawJsonResponseListener(listener: ((String) -> (Unit)))
 
+
+    /**
+     * Remove raw json request listener.
+     *
+     * @param listener Function1<String, Unit>
+     */
+    fun removeRawJsonRequestListener(listener: ((String) -> (Unit)))
+
+    /**
+     * Remove raw json response listener
+     * @param listener Function1<String, Unit>
+     */
+    fun removeRawJsonResponseListener(listener: ((String) -> (Unit)))
+
     /**
      * Add web socket connect listener
      * @param listener Function0<Unit>

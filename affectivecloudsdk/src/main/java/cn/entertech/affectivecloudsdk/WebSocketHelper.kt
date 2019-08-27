@@ -95,7 +95,9 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
     }
 
     override fun sendMessage(data: ByteArray) {
-        mBrainDataWebSocket?.send(data)
+        if (isOpen()){
+            mBrainDataWebSocket?.send(data)
+        }
     }
 
     override fun isOpen(): Boolean {
@@ -115,5 +117,13 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
 
     fun addRawJsonResponseListener(listener: (String) -> Unit) {
         this.rawJsonResponseListeners.add(listener)
+    }
+
+    fun removeRawJsonRequestListener(listener: (String) -> Unit) {
+        this.rawJsonRequestListeners.remove(listener)
+    }
+
+    fun removeRawJsonResponseListener(listener: (String) -> Unit) {
+        this.rawJsonResponseListeners.remove(listener)
     }
 }

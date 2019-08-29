@@ -6,9 +6,13 @@ import cn.entertech.affectivecloudsdk.entity.RealtimeBioData
 interface IEnterAffectiveCloudManager {
     fun openWebSocket(webSocketCallback: WebSocketCallback)
 
+    fun isWebSocketOpen():Boolean
+
     fun restore(callback: Callback)
 
     fun init(callback: Callback)
+
+    fun isInited():Boolean
 
     fun appendBrainData(brainData: ByteArray, triggerCount: Int = 600)
 

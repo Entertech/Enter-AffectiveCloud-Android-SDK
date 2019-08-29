@@ -104,12 +104,19 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
             }
         })
     }
+    var isInit = false
+
+    override fun isInited(): Boolean {
+        return isInit
+    }
+
 
     override fun init(callback: Callback) {
         mApi.openWebSocket(object : WebSocketCallback {
             override fun onOpen(serverHandshake: ServerHandshake?) {
                 mApi.createSession(object : Callback2<String> {
                     override fun onSuccess(t: String?) {
+                        isInit = true
                         initBiodata(callback)
                         if (config.availableAffectiveServices != null) {
                             initAffective(callback)
@@ -123,7 +130,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
             }
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
-                if (reason != null && reason != ""){
+                if (reason != null && reason != "") {
                     callback.onError(Error(-1, reason.toString()))
                 }
             }
@@ -169,7 +176,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
     }
 
     override fun restore(callback: Callback) {
-        if (mApi.isWebSocketOpen()){
+        if (mApi.isWebSocketOpen()) {
             mApi.restore(object : Callback {
                 override fun onSuccess() {
                     initBiodata(callback)
@@ -182,7 +189,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
                     callback.onError(error)
                 }
             })
-        }else{
+        } else {
             mApi.openWebSocket(object : WebSocketCallback {
                 override fun onOpen(serverHandshake: ServerHandshake?) {
                     mApi.restore(object : Callback {
@@ -200,7 +207,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
                 }
 
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
-                    if (reason != null && reason != ""){
+                    if (reason != null && reason != "") {
                         callback.onError(Error(-1, reason.toString()))
                     }
                 }
@@ -267,6 +274,13 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
 
     override fun removeRawJsonResponseListener(listener: (String) -> Unit) {
         mApi?.removeRawJsonResponseListener(listener)
+    }
+
+    override fun isWebSocketOpen(): Boolean {
+        if (mApi == null) {
+            return false
+        }
+        return mApi!!.isWebSocketOpen()
     }
 
 }

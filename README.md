@@ -4,11 +4,10 @@
 
 <!-- TOC -->
 
-- [Enter-AffectiveCloud-Andriod-SDK](#enter-affectivecloud-andriod-sdk)
 - [简介](#简介)
 - [集成](#集成)
-        - [Gradle 自动集成](#gradle-自动集成)
-        - [权限申请](#权限申请)
+    - [Gradle 自动集成](#gradle-自动集成)
+    - [权限申请](#权限申请)
 - [快速接入](#快速接入)
     - [1.初始化](#1初始化)
     - [2.添加实时数据监听](#2添加实时数据监听)

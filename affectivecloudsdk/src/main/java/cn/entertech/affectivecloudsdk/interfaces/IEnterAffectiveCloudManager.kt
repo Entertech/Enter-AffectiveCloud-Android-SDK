@@ -14,21 +14,21 @@ interface IEnterAffectiveCloudManager {
 
     fun isInited():Boolean
 
-    fun appendBrainData(brainData: ByteArray, triggerCount: Int = 600)
+    fun appendEEGData(brainData: ByteArray, triggerCount: Int = 600)
 
     fun appendHeartRateData(heartRateData: Int, triggerCount: Int = 2)
 
     fun addBiodataRealtimeListener(listener: (RealtimeBioData?) -> (Unit))
 
-    fun addAffectiveRealtimeListener(listener: (RealtimeAffectiveData?) -> (Unit))
+    fun addAffectiveDataRealtimeListener(listener: (RealtimeAffectiveData?) -> (Unit))
 
     fun removeBiodataRealtimeListener(listener: (RealtimeBioData?) -> (Unit))
 
     fun removeAffectiveRealtimeListener(listener: (RealtimeAffectiveData?) -> (Unit))
 
-    fun reportBiodata(callback: Callback2<HashMap<Any, Any?>>)
+    fun getBiodataReport(callback: Callback2<HashMap<Any, Any?>>)
 
-    fun reportAffective(callback: Callback2<HashMap<Any, Any?>>)
+    fun getAffectiveDataReport(callback: Callback2<HashMap<Any, Any?>>)
 
     fun release(callback: Callback)
 

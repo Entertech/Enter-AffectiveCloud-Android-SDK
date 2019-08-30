@@ -70,7 +70,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
     }
 
     private fun initAffective(callback: Callback) {
-        mApi.startAffectiveServices(config.availableAffectiveServices!!, object : Callback {
+        mApi.initAffectiveDataServices(config.availableAffectiveServices!!, object : Callback {
             override fun onSuccess() {
                 if (config.mAffectiveSubscribeParams != null) {
                     mApi.subscribeAffectiveData(config.mAffectiveSubscribeParams!!,
@@ -143,8 +143,8 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
         })
     }
 
-    override fun appendBrainData(bytes: ByteArray, triggerCount: Int) {
-        mApi.appendBrainData(bytes)
+    override fun appendEEGData(bytes: ByteArray, triggerCount: Int) {
+        mApi.appendEEGData(bytes)
     }
 
     override fun appendHeartRateData(heartRateData: Int, triggerCount: Int) {
@@ -155,7 +155,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
         mBiodataRealtimeListener.add(listener)
     }
 
-    override fun addAffectiveRealtimeListener(listener: (RealtimeAffectiveData?) -> Unit) {
+    override fun addAffectiveDataRealtimeListener(listener: (RealtimeAffectiveData?) -> Unit) {
         mAffectiveRealtimeListener.add(listener)
     }
 
@@ -167,12 +167,12 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
         mAffectiveRealtimeListener.remove(listener)
     }
 
-    override fun reportBiodata(callback: Callback2<HashMap<Any, Any?>>) {
-        mApi.reportBiodata(config.availableBiodataServices!!, callback)
+    override fun getBiodataReport(callback: Callback2<HashMap<Any, Any?>>) {
+        mApi.getBiodataReport(config.availableBiodataServices!!, callback)
     }
 
-    override fun reportAffective(callback: Callback2<HashMap<Any, Any?>>) {
-        mApi.reportAffective(config.availableAffectiveServices!!, callback)
+    override fun getAffectiveDataReport(callback: Callback2<HashMap<Any, Any?>>) {
+        mApi.getAffectivedataReport(config.availableAffectiveServices!!, callback)
     }
 
     override fun restore(callback: Callback) {
@@ -223,7 +223,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
 
     override fun release(callback: Callback) {
         if (config.availableAffectiveServices != null) {
-            mApi.finishAffectiveServices(config.availableAffectiveServices!!, object : Callback {
+            mApi.finishAffectiveDataServices(config.availableAffectiveServices!!, object : Callback {
                 override fun onSuccess() {
                     mApi.destroySessionAndCloseWebSocket(object : Callback {
                         override fun onSuccess() {

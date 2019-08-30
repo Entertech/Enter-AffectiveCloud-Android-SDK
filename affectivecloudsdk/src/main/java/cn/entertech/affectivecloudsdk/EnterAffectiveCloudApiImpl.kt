@@ -265,7 +265,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun startAffectiveServices(services: List<Service>, callback: Callback) {
+    override fun initAffectiveDataServices(services: List<Service>, callback: Callback) {
         this.mAffectiveStartCallback = callback
         this.mStartedAffectiveServices = services
         var requestBodyMap = HashMap<Any, Any>()
@@ -277,7 +277,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     var brainDataBuffer = CopyOnWriteArrayList<Int>()
-    override fun appendBrainData(bytes: ByteArray, triggerCount: Int) {
+    override fun appendEEGData(bytes: ByteArray, triggerCount: Int) {
         for (byte in bytes) {
             var brainData = ConvertUtil.converUnchart(byte)
             brainDataBuffer.add(brainData)
@@ -336,7 +336,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
 
-    override fun reportBiodata(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>) {
+    override fun getBiodataReport(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>) {
         this.mBiodataReportCallback = callback
         mBiodataReprotGenerator = ReportGenerator()
         mBiodataReprotGenerator!!.init(services)
@@ -348,7 +348,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun reportAffective(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>) {
+    override fun getAffectivedataReport(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>) {
         this.mAffectiveReportCallback = callback
         this.mAffectiveReportGenerator = ReportGenerator()
         mAffectiveReportGenerator!!.init(services)
@@ -391,7 +391,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun finishAffectiveServices(services: List<Service>, callback: Callback) {
+    override fun finishAffectiveDataServices(services: List<Service>, callback: Callback) {
         this.mAffectiveFinishCallback = callback
         if (mStartedAffectiveServices == null) {
             throw IllegalStateException(
@@ -414,13 +414,13 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
 
-    override fun finishAllAffectiveServices(callback: Callback) {
+    override fun finishAllAffectiveDataServices(callback: Callback) {
         if (mStartedAffectiveServices == null) {
             throw IllegalStateException(
                 "there is no affective services started!!"
             )
         }
-        finishAffectiveServices(mStartedAffectiveServices!!, callback)
+        finishAffectiveDataServices(mStartedAffectiveServices!!, callback)
     }
 
     override fun destroySessionAndCloseWebSocket(callback: Callback) {

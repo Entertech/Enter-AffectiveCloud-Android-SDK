@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         enterAffectiveCloudManager!!.addBiodataRealtimeListener {
             messageReceiveFragment.appendMessageToScreen("基础服务实时数据：${it.toString()}")
         }
-        enterAffectiveCloudManager!!.addAffectiveRealtimeListener {
+        enterAffectiveCloudManager!!.addAffectiveDataRealtimeListener {
             messageReceiveFragment.appendMessageToScreen("情感服务实时数据：${it.toString()}")
         }
         enterAffectiveCloudManager!!.addRawJsonRequestListener {
@@ -217,7 +217,7 @@ class MainActivity : AppCompatActivity() {
     var brainDataBuffer = ArrayList<Int>()
     var writeFileDataBuffer = ArrayList<Int>()
     var rawListener = fun(bytes: ByteArray) {
-        enterAffectiveCloudManager?.appendBrainData(bytes)
+        enterAffectiveCloudManager?.appendEEGData(bytes)
         //以下是原始脑波文件保存逻辑，如无需该功能可忽略
         for (byte in bytes) {
             var brainData = ConvertUtil.converUnchart(byte)
@@ -270,7 +270,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onReport(view: View) {
-        enterAffectiveCloudManager?.reportBiodata(object : Callback2<HashMap<Any, Any?>> {
+        enterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
                 messageReceiveFragment.appendMessageToScreen("基础报表：${t.toString()}")
             }
@@ -280,7 +280,7 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
-        enterAffectiveCloudManager?.reportAffective(object : Callback2<HashMap<Any, Any?>> {
+        enterAffectiveCloudManager?.getAffectiveDataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
                 messageReceiveFragment.appendMessageToScreen("情感报表：${t.toString()}")
             }

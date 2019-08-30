@@ -1,1 +1,1 @@
-include ':app', ':affectivecloudsdk'
+include ':demo', ':affectivecloudsdk'

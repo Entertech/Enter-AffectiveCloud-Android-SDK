@@ -13,13 +13,22 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
     var mAffectiveRealtimeListener = CopyOnWriteArrayList<(RealtimeAffectiveData?) -> Unit>()
 
     init {
-        mApi = EnterAffectiveCloudApiImpl(
-            config.uri!!,
-            config.websocketTimeout!!,
-            config.appKey!!,
-            config.appSecret!!,
-            config.userId!!
-        )
+        if (config.websocketTimeout == null){
+            mApi = EnterAffectiveCloudApiImpl(
+                config.uri!!,
+                config.appKey!!,
+                config.appSecret!!,
+                config.userId!!
+            )
+        }else{
+            mApi = EnterAffectiveCloudApiImpl(
+                config.uri!!,
+                config.websocketTimeout!!,
+                config.appKey!!,
+                config.appSecret!!,
+                config.userId!!
+            )
+        }
         if (config.availableBiodataServices == null) {
             throw IllegalStateException("biodata services must not be null")
         }

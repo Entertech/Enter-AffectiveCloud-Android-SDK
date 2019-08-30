@@ -5,7 +5,6 @@ import cn.entertech.affectivecloudsdk.entity.Service
 class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
     var appKey:String? = null
     var appSecret:String? = null
-    var userName:String? = null
     var userId:String? = null
     var mAffectiveSubscribeParams: AffectiveSubscribeParams? = null
     var mBiodataSubscribeParams: BiodataSubscribeParams? = null

@@ -51,10 +51,10 @@ publish {
     //项目名称
     artifactId = 'affectivecloud'
     //版本号
-    publishVersion = '1.0.2'
+    publishVersion = '1.0.3'
     //描述，不重要
     desc = ''
     //网站，不重要
-    website = 'https://github.com/Entertech/Enter-Biomodule-Demo-Android'
+    website = 'https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK'
     dryRun = false
 }

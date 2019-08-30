@@ -81,7 +81,6 @@ class MainActivity : AppCompatActivity() {
             .build()
         var enterAffectiveCloudConfig = EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
             .url(websocketAddress)
-            .timeout(10000)
             .availableBiodataServices(availableBioServices)
             .availableAffectiveServices(availableAffectiveServices)
             .biodataSubscribeParams(biodataSubscribeParams!!)

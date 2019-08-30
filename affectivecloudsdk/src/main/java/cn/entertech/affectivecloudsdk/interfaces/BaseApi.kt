@@ -61,13 +61,13 @@ interface BaseApi {
      * @param serviceList List<String>
      * @param callback Callback
      */
-    fun startAffectiveServices(serviceList: List<Service>, callback: Callback)
+    fun initAffectiveDataServices(serviceList: List<Service>, callback: Callback)
 
     /**
      * Send brain data to affective cloud platform.
      * @param brainData ByteArray
      */
-    fun appendBrainData(brainData: ByteArray, triggerCount: Int = 600)
+    fun appendEEGData(brainData: ByteArray, triggerCount: Int = 600)
 
     /**
      * Send heart rate data to affective cloud platform
@@ -104,14 +104,14 @@ interface BaseApi {
      * @param services List<String>
      * @param callback Callback2<HashMap<Any, Any?>>
      */
-    fun reportBiodata(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>)
+    fun getBiodataReport(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>)
 
     /**
      * Report affecitve data
      * @param services List<String>
      * @param callback Callback2<HashMap<Any, Any?>>
      */
-    fun reportAffective(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>)
+    fun getAffectivedataReport(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>)
 
     /**
      * Unsubscribe biodata.
@@ -136,13 +136,13 @@ interface BaseApi {
      * @param serviceList List<String>
      * @param callback Callback
      */
-    fun finishAffectiveServices(serviceList: List<Service>, callback: Callback)
+    fun finishAffectiveDataServices(serviceList: List<Service>, callback: Callback)
 
     /**
      * Finish all affective services started before.
      * @param callback Callback
      */
-    fun finishAllAffectiveServices(callback: Callback)
+    fun finishAllAffectiveDataServices(callback: Callback)
 
     /**
      * Warning!:Don't forget to call this method to close session if you want to disconnected from platform.

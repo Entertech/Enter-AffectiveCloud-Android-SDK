@@ -69,7 +69,7 @@ class ApiDetailActivity : AppCompatActivity() {
     }
 
     var rawListener = fun(bytes: ByteArray) {
-        mEnterAffectiveCloudApi?.appendBrainData(bytes)
+        mEnterAffectiveCloudApi?.appendEEGData(bytes)
     }
 
     var heartRateListener = fun(heartRate: Int) {
@@ -203,7 +203,7 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.reportBiodata(availableBioServices, object : Callback2<HashMap<Any, Any?>> {
+        mEnterAffectiveCloudApi?.getBiodataReport(availableBioServices, object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
                 Logger.d("基础服务报表：${t.toString()}")
             }
@@ -234,7 +234,7 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.startAffectiveServices(availableAffectiveServices,
+        mEnterAffectiveCloudApi?.initAffectiveDataServices(availableAffectiveServices,
             object : Callback {
                 override fun onSuccess() {
                     Logger.d("情感服务已开启")
@@ -280,7 +280,7 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.reportAffective(availableAffectiveServices,
+        mEnterAffectiveCloudApi?.getAffectivedataReport(availableAffectiveServices,
             object : Callback2<HashMap<Any, Any?>> {
                 override fun onSuccess(t: HashMap<Any, Any?>?) {
                     Logger.d("情感报表数据：${t.toString()}")
@@ -314,7 +314,7 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.finishAllAffectiveServices(object : Callback {
+        mEnterAffectiveCloudApi?.finishAllAffectiveDataServices(object : Callback {
             override fun onSuccess() {
                 Logger.d("情感服务已结束")
             }

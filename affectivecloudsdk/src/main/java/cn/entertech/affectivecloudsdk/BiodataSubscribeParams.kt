@@ -94,7 +94,7 @@ class BiodataSubscribeParams internal constructor(builder: Builder) : SubscribeP
                 subMap["eeg"] = eegSubList
             }
             if (hrSubList.isNotEmpty()) {
-                subMap["hr"] = eegSubList
+                subMap["hr"] = hrSubList
             }
             if (subMap.isEmpty()) {
                 throw IllegalStateException("no data requested,pls call request..method before build")

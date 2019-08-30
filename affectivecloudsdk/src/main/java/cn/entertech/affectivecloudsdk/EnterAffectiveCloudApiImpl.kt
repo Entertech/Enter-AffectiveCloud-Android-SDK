@@ -58,7 +58,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     ) : this(websocketAddress, 10000, appKey, appSecret, userId)
 
     init {
-        mWebSocketHelper = WebSocketHelper(websocketAddress)
+        mWebSocketHelper = WebSocketHelper(websocketAddress,timeout)
         mWebSocketHelper?.addRawJsonResponseListener {
             Log.d(TAG, "receive msg from web socket:$it")
             var response = Gson().fromJson(it, ResponseBody::class.java)

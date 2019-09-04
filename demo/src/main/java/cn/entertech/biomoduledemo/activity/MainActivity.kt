@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity() {
     /*需要向情感云平台申请 :APP_KEY、APP_SECRET、USER_NAME*/
     val APP_KEY: String = "REDACTED"
     val APP_SECRET: String = "REDACTED"
-    val USER_NAME: String = "test1"
     /*自己的用户ID：邮箱或者手机号码*/
     val USER_ID: String = "REDACTED"
     private lateinit var messageReceiveFragment: MessageReceiveFragment
@@ -51,7 +50,7 @@ class MainActivity : AppCompatActivity() {
     var saveHRPath: String =
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
-    var websocketAddress = "wss://server-test.affectivecloud.com/ws/algorithm/v1/"
+    var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
     var availableAffectiveServices = listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.SLEEP)
     var availableBioServices = listOf(Service.EEG, Service.HR)
     override fun onCreate(savedInstanceState: Bundle?) {

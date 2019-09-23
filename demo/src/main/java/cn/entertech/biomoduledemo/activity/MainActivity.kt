@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import cn.entertech.affectivecloudsdk.*
@@ -51,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
     var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
-    var availableAffectiveServices = listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.SLEEP)
+    var availableAffectiveServices = listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.RELAXATION,Service.PLEASURE)
     var availableBioServices = listOf(Service.EEG, Service.HR)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,11 +73,11 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
-            .requestAllSleepData()
             .requestAttention()
             .requestRelaxation()
             .requestPressure()
             .requestPleasure()
+            .requestArousal()
             .build()
         var enterAffectiveCloudConfig = EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
             .url(websocketAddress)
@@ -184,6 +185,8 @@ class MainActivity : AppCompatActivity() {
         biomoduleBleManager.scanNearDeviceAndConnect(fun() {
             messageReceiveFragment.appendMessageToScreen("扫描成功，正在连接设备...")
             Logger.d("扫描设备成功")
+        },fun(error:Exception){
+
         }, fun(mac: String) {
             messageReceiveFragment.appendMessageToScreen("设备连接成功!")
             Logger.d("连接成功$mac")

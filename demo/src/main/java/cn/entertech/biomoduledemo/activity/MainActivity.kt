@@ -24,6 +24,7 @@ import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.*
 import cn.entertech.ble.BiomoduleBleManager
 import com.orhanobut.logger.Logger
+import kotlinx.android.synthetic.main.activity_main.*
 import org.java_websocket.handshake.ServerHandshake
 import java.io.File
 import java.lang.Exception
@@ -31,6 +32,7 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() {
+    private var currentDataType: String? = "brain"
     private var enterAffectiveCloudManager: EnterAffectiveCloudManager? = null
     private var affectiveSubscribeParams: AffectiveSubscribeParams? = null
     private var biodataSubscribeParams: BiodataSubscribeParams? = null
@@ -52,8 +54,9 @@ class MainActivity : AppCompatActivity() {
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
     var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
-    var availableAffectiveServices = listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.RELAXATION,Service.PLEASURE)
-    var availableBioServices = listOf(Service.EEG, Service.HR)
+    var availableAffectiveServices =
+        listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.RELAXATION, Service.PLEASURE)
+    var availableBioServices = listOf(Service.EEG)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -68,7 +71,6 @@ class MainActivity : AppCompatActivity() {
 
     fun initEnterAffectiveCloudManager() {
         biodataSubscribeParams = BiodataSubscribeParams.Builder()
-            .requestAllEEGData()
             .requestAllHrData()
             .build()
 
@@ -96,6 +98,19 @@ class MainActivity : AppCompatActivity() {
         enterAffectiveCloudManager!!.addRawJsonRequestListener {
             messageSendFragment.appendMessageToScreen(it)
         }
+        enterAffectiveCloudManager?.init(object : Callback {
+            override fun onError(error: Error?) {
+                messageReceiveFragment.appendMessageToScreen("SDK初始化失败：${error.toString()}")
+            }
+
+            override fun onSuccess() {
+                fileName = "${System.currentTimeMillis()}.txt"
+                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
+                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
+                messageReceiveFragment.appendMessageToScreen("SDK初始化成功，等待数据上传...")
+            }
+
+        })
     }
 
 
@@ -130,6 +145,22 @@ class MainActivity : AppCompatActivity() {
         )
         vpContainer.adapter = adapter
         pagerSlidingTabStrip.setViewPager(vpContainer)
+
+        rb_brain.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                currentDataType = "brain"
+                availableBioServices = listOf(Service.EEG)
+                initEnterAffectiveCloudManager()
+            }
+        }
+
+        rb_heart.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                currentDataType = "heart"
+                availableBioServices = listOf(Service.HR)
+                initEnterAffectiveCloudManager()
+            }
+        }
     }
 
     class MessageAdapter(fragmentManager: FragmentManager, fragments: List<Fragment>, titles: List<String>) :
@@ -185,7 +216,7 @@ class MainActivity : AppCompatActivity() {
         biomoduleBleManager.scanNearDeviceAndConnect(fun() {
             messageReceiveFragment.appendMessageToScreen("扫描成功，正在连接设备...")
             Logger.d("扫描设备成功")
-        },fun(error:Exception){
+        }, fun(error: Exception) {
 
         }, fun(mac: String) {
             messageReceiveFragment.appendMessageToScreen("设备连接成功!")
@@ -218,27 +249,31 @@ class MainActivity : AppCompatActivity() {
     var brainDataBuffer = ArrayList<Int>()
     var writeFileDataBuffer = ArrayList<Int>()
     var rawListener = fun(bytes: ByteArray) {
-        enterAffectiveCloudManager?.appendEEGData(bytes)
-        //以下是原始脑波文件保存逻辑，如无需该功能可忽略
-        for (byte in bytes) {
-            var brainData = ConvertUtil.converUnchart(byte)
-            brainDataBuffer.add(brainData)
-            writeFileDataBuffer.add((brainData))
-            if (writeFileDataBuffer.size >= 20) {
-                var writeString = "${Arrays.toString(writeFileDataBuffer.toArray())}"
-                writeString = writeString.replace("[", "").replace("]", "")
-                FileHelper.getInstance().writeEEG(writeString + ",")
-                writeFileDataBuffer.clear()
+        if (currentDataType == "brain") {
+            enterAffectiveCloudManager?.appendEEGData(bytes)
+//        以下是原始脑波文件保存逻辑，如无需该功能可忽略
+            for (byte in bytes) {
+                var brainData = ConvertUtil.converUnchart(byte)
+                brainDataBuffer.add(brainData)
+                writeFileDataBuffer.add((brainData))
+                if (writeFileDataBuffer.size >= 20) {
+                    var writeString = "${Arrays.toString(writeFileDataBuffer.toArray())}"
+                    writeString = writeString.replace("[", "").replace("]", "")
+                    FileHelper.getInstance().writeEEG(writeString + ",")
+                    writeFileDataBuffer.clear()
+                }
             }
         }
     }
 
     var heartRateDataBuffer = ArrayList<Int>()
     var heartRateListener = fun(heartRate: Int) {
-            Log.d("####","心率："+heartRate)
-//        FileHelper.getInstance().writeHr("$heartRate,")
-        heartRateDataBuffer.add(heartRate)
-        enterAffectiveCloudManager?.appendHeartRateData(heartRate)
+        if (currentDataType == "heart") {
+            Log.d("####", "心率：" + heartRate)
+            FileHelper.getInstance().writeHr("$heartRate,")
+            heartRateDataBuffer.add(heartRate)
+            enterAffectiveCloudManager?.appendHeartRateData(heartRate)
+        }
     }
 
     fun onStartContact(view: View) {
@@ -251,19 +286,7 @@ class MainActivity : AppCompatActivity() {
 
 
     fun onInit(view: View) {
-        enterAffectiveCloudManager?.init(object : Callback {
-            override fun onError(error: Error?) {
-                messageReceiveFragment.appendMessageToScreen("SDK初始化失败：${error.toString()}")
-            }
-
-            override fun onSuccess() {
-                fileName = "${System.currentTimeMillis()}.txt"
-                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
-                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
-                messageReceiveFragment.appendMessageToScreen("SDK初始化成功，等待数据上传...")
-            }
-
-        })
+        initEnterAffectiveCloudManager()
     }
 
     fun onStartUpload(view: View) {

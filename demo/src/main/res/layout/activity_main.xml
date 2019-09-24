@@ -8,6 +8,30 @@
         tools:context=".activity.MainActivity"
         android:orientation="vertical"
         >
+
+    <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+        <RadioButton
+                android:id="@+id/rb_brain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="脑波"
+                android:checked="true"
+                />
+
+        <RadioButton
+                android:id="@+id/rb_heart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="心率"
+                />
+
+    </RadioGroup>
+
     <!--导航条-->
     <cn.entertech.biomoduledemo.utils.PagerSlidingTabStrip
             android:id="@+id/message_tabs"

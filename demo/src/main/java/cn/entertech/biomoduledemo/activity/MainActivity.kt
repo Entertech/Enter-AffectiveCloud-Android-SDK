@@ -235,6 +235,7 @@ class MainActivity : AppCompatActivity() {
 
     var heartRateDataBuffer = ArrayList<Int>()
     var heartRateListener = fun(heartRate: Int) {
+            Log.d("####","心率："+heartRate)
 //        FileHelper.getInstance().writeHr("$heartRate,")
         heartRateDataBuffer.add(heartRate)
         enterAffectiveCloudManager?.appendHeartRateData(heartRate)

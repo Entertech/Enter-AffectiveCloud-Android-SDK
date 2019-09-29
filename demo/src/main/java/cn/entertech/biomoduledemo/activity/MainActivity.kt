@@ -72,6 +72,7 @@ class MainActivity : AppCompatActivity() {
     fun initEnterAffectiveCloudManager() {
         biodataSubscribeParams = BiodataSubscribeParams.Builder()
             .requestAllHrData()
+            .requestAllEEGData()
             .build()
 
         affectiveSubscribeParams = AffectiveSubscribeParams.Builder()

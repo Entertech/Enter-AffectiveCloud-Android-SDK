@@ -165,6 +165,13 @@ class ApiDetailActivity : AppCompatActivity() {
         biomoduleBleManager.startHeartAndBrainCollection()
     }
 
+    fun onStopCollect(view: View) {
+        if (!isStatusOk()) {
+            return
+        }
+        biomoduleBleManager.stopHeartAndBrainCollection()
+    }
+
 
     fun onStartContact(view: View) {
         biomoduleBleManager.startContact()

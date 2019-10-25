@@ -99,6 +99,9 @@ class MainActivity : AppCompatActivity() {
         enterAffectiveCloudManager!!.addRawJsonRequestListener {
             messageSendFragment.appendMessageToScreen(it)
         }
+        enterAffectiveCloudManager!!.addRawJsonResponseListener {
+
+        }
         enterAffectiveCloudManager?.init(object : Callback {
             override fun onError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen("SDK初始化失败：${error.toString()}")

@@ -1,4 +1,4 @@
-# Enter-AffectiveCloud-Andriod-SDK [![Download](https://api.bintray.com/packages/hzentertech/maven/affectivecloud/images/download.svg?version=1.0.3)](https://bintray.com/hzentertech/maven/affectivecloud/1.0.3/link)
+# Enter-AffectiveCloud-Andriod-SDK [![Download](https://api.bintray.com/packages/hzentertech/maven/affectivecloud/images/download.svg?version=1.1.0)](https://bintray.com/hzentertech/maven/affectivecloud/1.1.0/link)
 
 <!-- TOC -->
 
@@ -52,7 +52,7 @@
 ### Gradle 自动集成
 在module的build.gradle文件下添加以下依赖
 ```groovy
-implementation 'cn.entertech:affectivecloud:1.0.3'
+implementation 'cn.entertech:affectivecloud:1.1.0'
 implementation 'com.google.code.gson:gson:2.8.5'
 implementation "org.java-websocket:Java-WebSocket:1.4.0"
 ```

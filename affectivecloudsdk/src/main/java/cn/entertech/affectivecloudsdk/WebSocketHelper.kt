@@ -111,6 +111,10 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
         mBrainDataWebSocket?.close()
     }
 
+    override fun closeConnection(code: Int, message: String) {
+        mBrainDataWebSocket?.closeConnection(code, message)
+     }
+
     fun addRawJsonRequestListener(listener: (String) -> Unit) {
         this.rawJsonRequestListeners.add(listener)
     }

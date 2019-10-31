@@ -63,9 +63,9 @@ class MainActivity : AppCompatActivity() {
         biomoduleBleManager = BiomoduleBleManager.getInstance(this)
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
+        initView()
         initEnterAffectiveCloudManager()
         initPermission()
-        initView()
         initSaveFiledir()
     }
 

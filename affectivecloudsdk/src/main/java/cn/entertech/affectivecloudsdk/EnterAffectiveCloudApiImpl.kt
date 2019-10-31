@@ -180,6 +180,16 @@ class EnterAffectiveCloudApiImpl internal constructor(
         mWebSocketHelper?.open(webSocketCallback)
     }
 
+
+    override fun closeWebSocket() {
+        mWebSocketHelper?.close()
+    }
+
+    override fun closeConnection(code: Int, message: String) {
+        mWebSocketHelper?.closeConnection(code, message)
+    }
+
+
     override fun isWebSocketOpen(): Boolean {
         if (mWebSocketHelper == null) {
             return false
@@ -236,19 +246,24 @@ class EnterAffectiveCloudApiImpl internal constructor(
             )
         }
         if (isWebSocketOpen()) {
+            Log.d("####","restore 6666")
             sendRestore()
         } else {
             mWebSocketHelper?.open(object : WebSocketCallback {
                 override fun onOpen(serverHandshake: ServerHandshake?) {
+                    Log.d("####","restore 7777")
                     sendRestore()
                 }
 
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
+
+                    Log.d("####","restore 888")
                     var error = Error(-1, "web socket closed:$reason")
                     callback.onError(error)
                 }
 
                 override fun onError(e: Exception?) {
+                    Log.d("####","restore 9999")
                     var error = Error(-1, e.toString())
                     callback.onError(error)
                 }

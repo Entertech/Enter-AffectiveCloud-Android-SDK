@@ -43,7 +43,7 @@ class ApiDetailActivity : AppCompatActivity() {
     var fileName: String = ""
     var availableAffectiveServices = listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.SLEEP)
     var availableBioServices = listOf(Service.EEG, Service.HR)
-    var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
+    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v1/"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_api_detail)

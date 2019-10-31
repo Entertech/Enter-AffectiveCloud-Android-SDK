@@ -1,5 +1,6 @@
 package cn.entertech.affectivecloudsdk
 
+import android.util.Log
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import org.java_websocket.handshake.ServerHandshake
@@ -186,15 +187,24 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
 
     override fun restore(callback: Callback) {
         if (mApi.isWebSocketOpen()) {
+            Log.d("####","restore 111")
             mApi.restore(object : Callback {
                 override fun onSuccess() {
+
+                    Log.d("####","restore 2222")
                     initBiodata(callback)
+
+                    Log.d("####","restore 333")
                     if (config.availableAffectiveServices != null) {
+
+                        Log.d("####","restore 444")
                         initAffective(callback)
                     }
                 }
 
                 override fun onError(error: Error?) {
+
+                    Log.d("####","restore 555")
                     callback.onError(error)
                 }
             })
@@ -290,6 +300,14 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
             return false
         }
         return mApi!!.isWebSocketOpen()
+    }
+
+    override fun closeWebSocket() {
+        mApi?.closeWebSocket()
+    }
+
+    override fun closeConnection(code: Int, message: String) {
+        mApi?.closeConnection(code, message)
     }
 
 }

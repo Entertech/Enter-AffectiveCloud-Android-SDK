@@ -18,6 +18,10 @@ interface BaseApi {
      */
     fun isWebSocketOpen(): Boolean
 
+    fun closeWebSocket()
+
+    fun closeConnection(code:Int, message:String)
+
     /**
      * After web socket connected, should call this method to create a session
      * @param callback2 Callback2<String, Error>

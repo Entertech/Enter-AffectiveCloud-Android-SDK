@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     val APP_KEY: String = "6eabf68e-760e-11e9-bd82-0242ac140006"
     val APP_SECRET: String = "68a09cf8e4e06718b037c399f040fb7e"
     /*自己的用户ID：邮箱或者手机号码*/
-    val USER_ID: String = "123456789@qq.com"
+    val USER_ID: String = "124589@qq.com"
     private lateinit var messageReceiveFragment: MessageReceiveFragment
     private lateinit var messageSendFragment: MessageSendFragment
     lateinit var vpContainer: ViewPager
@@ -63,9 +63,9 @@ class MainActivity : AppCompatActivity() {
         biomoduleBleManager = BiomoduleBleManager.getInstance(this)
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
+        initView()
         initEnterAffectiveCloudManager()
         initPermission()
-        initView()
         initSaveFiledir()
     }
 

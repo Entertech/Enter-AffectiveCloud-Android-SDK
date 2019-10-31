@@ -10,4 +10,5 @@ interface IWebSocketHelper {
     fun sendMessage(data: ByteArray)
     fun isOpen(): Boolean
     fun close()
+    fun closeConnection(code:Int, message:String)
 }

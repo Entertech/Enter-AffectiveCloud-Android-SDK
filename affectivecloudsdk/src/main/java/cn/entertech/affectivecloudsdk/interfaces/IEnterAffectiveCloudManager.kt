@@ -6,8 +6,10 @@ import cn.entertech.affectivecloudsdk.entity.RealtimeBioData
 interface IEnterAffectiveCloudManager {
     fun openWebSocket(webSocketCallback: WebSocketCallback)
 
+    fun closeWebSocket()
     fun isWebSocketOpen():Boolean
 
+    fun closeConnection(code:Int, message:String)
     fun restore(callback: Callback)
 
     fun init(callback: Callback)

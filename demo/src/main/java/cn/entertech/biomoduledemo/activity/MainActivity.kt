@@ -26,7 +26,7 @@ import cn.entertech.ble.BiomoduleBleManager
 import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.activity_main.*
 import org.java_websocket.handshake.ServerHandshake
-import java.io.File
+import java.io.*
 import java.lang.Exception
 import java.util.*
 import kotlin.collections.HashMap
@@ -54,6 +54,10 @@ class MainActivity : AppCompatActivity() {
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
     var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
+    //    var EEG_TEST_FILE_PATH =
+//        "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
+    var EEG_TEST_FILE_PATH = Environment.getExternalStorageDirectory().path + File.separator + "flowtime_eegdata.txt"
+
     var availableAffectiveServices =
         listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.RELAXATION, Service.PLEASURE)
     var availableBioServices = listOf(Service.EEG)

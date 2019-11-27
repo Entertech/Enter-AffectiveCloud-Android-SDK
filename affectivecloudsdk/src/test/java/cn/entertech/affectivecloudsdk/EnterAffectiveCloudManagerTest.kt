@@ -216,6 +216,7 @@ class EnterAffectiveCloudManagerTest {
             availableAffectiveServices.add(Service.AROUSAL)
             availableAffectiveServices.add(Service.RELAXATION)
             availableAffectiveServices.add(Service.PLEASURE)
+            availableAffectiveServices.add(Service.SLEEP)
             availableBioServices.add(Service.EEG)
             availableBioServices.add(Service.HR)
             biodataSubscribeParams = BiodataSubscribeParams.Builder()
@@ -224,6 +225,7 @@ class EnterAffectiveCloudManagerTest {
                 .build()
 
             affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
+                .requestAllSleepData()
                 .requestAttention()
                 .requestRelaxation()
                 .requestPressure()

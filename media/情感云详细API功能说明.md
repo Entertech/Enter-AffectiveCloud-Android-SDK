@@ -3,7 +3,7 @@
 
 如果你需要根据不同场景灵活使用情感云服务，可以使用`EnterAffectiveCloudApi`来调用相应API，该类封装了所有情感云服务对外的接口。各个API调用的相互顺序可以参考以下时序图。
 
-![时序图](media/sequence_diagram.png)
+![时序图](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/blob/master/media/sequence_diagram.png)
 
 ## 会话
 ### SDK 初始化及情感云连接

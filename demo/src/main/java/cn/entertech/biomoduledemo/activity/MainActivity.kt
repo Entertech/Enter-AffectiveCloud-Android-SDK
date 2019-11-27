@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
     var EEG_TEST_FILE_PATH = Environment.getExternalStorageDirectory().path + File.separator + "flowtime_eegdata.txt"
 
     var availableAffectiveServices =
-        listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.RELAXATION, Service.PLEASURE)
+        listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.RELAXATION, Service.PLEASURE,Service.SLEEP)
     var availableBioServices = listOf(Service.EEG)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -55,8 +55,6 @@
 在module的build.gradle文件下添加以下依赖
 ```groovy
 implementation 'cn.entertech:affectivecloud:1.1.0'
-implementation 'com.google.code.gson:gson:2.8.5'
-implementation "org.java-websocket:Java-WebSocket:1.4.0"
 ```
 在项目根目录的build.gradle文件下添加以下依赖地址
 ```groovy

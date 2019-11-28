@@ -19,6 +19,8 @@ import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import cn.entertech.affectivecloudsdk.interfaces.Observer
 import cn.entertech.biomoduledemo.R
+import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_KEY
+import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.*
@@ -32,22 +34,22 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() {
+    private var appSecret: String? = null
+    private var appKey: String? = null
     private var currentDataType: String? = "brain"
     private var enterAffectiveCloudManager: EnterAffectiveCloudManager? = null
     private var affectiveSubscribeParams: AffectiveSubscribeParams? = null
     private var biodataSubscribeParams: BiodataSubscribeParams? = null
     private lateinit var biomoduleBleManager: BiomoduleBleManager
 
-    /*需要向情感云平台申请 :APP_KEY、APP_SECRET、USER_NAME*/
-    val APP_KEY: String = "6eabf68e-760e-11e9-bd82-0242ac140006"
-    val APP_SECRET: String = "68a09cf8e4e06718b037c399f040fb7e"
     /*自己的用户ID：邮箱或者手机号码*/
     val USER_ID: String = "124589@qq.com"
     private lateinit var messageReceiveFragment: MessageReceiveFragment
     private lateinit var messageSendFragment: MessageSendFragment
     lateinit var vpContainer: ViewPager
     lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
-    var saveRootPath: String = Environment.getExternalStorageDirectory().path + File.separator + "biorawdata"
+    var saveRootPath: String =
+        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata"
     var saveEEGPath: String =
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "eeg" + File.separator
     var saveHRPath: String =
@@ -56,14 +58,23 @@ class MainActivity : AppCompatActivity() {
     var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
     //    var EEG_TEST_FILE_PATH =
 //        "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
-    var EEG_TEST_FILE_PATH = Environment.getExternalStorageDirectory().path + File.separator + "flowtime_eegdata.txt"
+    var EEG_TEST_FILE_PATH =
+        Environment.getExternalStorageDirectory().path + File.separator + "flowtime_eegdata.txt"
 
     var availableAffectiveServices =
-        listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.RELAXATION, Service.PLEASURE,Service.SLEEP)
+        listOf(
+            Service.ATTENTION,
+            Service.PRESSURE,
+            Service.AROUSAL,
+            Service.RELAXATION,
+            Service.PLEASURE,
+            Service.SLEEP
+        )
     var availableBioServices = listOf(Service.EEG)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        verifyAppKeyAndSecret()
         biomoduleBleManager = BiomoduleBleManager.getInstance(this)
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
@@ -73,6 +84,18 @@ class MainActivity : AppCompatActivity() {
         initSaveFiledir()
     }
 
+    fun verifyAppKeyAndSecret(){
+        appKey = intent.getStringExtra(INTENT_APP_KEY)
+        appSecret = intent.getStringExtra(INTENT_APP_SECRET)
+        if (appKey == null || appSecret == null){
+            Toast.makeText(
+                this@MainActivity,
+                "APP KEY 或 APP SECRET 有误请重新填写！",
+                Toast.LENGTH_LONG
+            ).show()
+            finish()
+        }
+    }
     fun initEnterAffectiveCloudManager() {
         biodataSubscribeParams = BiodataSubscribeParams.Builder()
             .requestAllHrData()
@@ -86,13 +109,14 @@ class MainActivity : AppCompatActivity() {
             .requestPleasure()
             .requestArousal()
             .build()
-        var enterAffectiveCloudConfig = EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
-            .url(websocketAddress)
-            .availableBiodataServices(availableBioServices)
-            .availableAffectiveServices(availableAffectiveServices)
-            .biodataSubscribeParams(biodataSubscribeParams!!)
-            .affectiveSubscribeParams(affectiveSubscribeParams!!)
-            .build()
+        var enterAffectiveCloudConfig =
+            EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
+                .url(websocketAddress)
+                .availableBiodataServices(availableBioServices)
+                .availableAffectiveServices(availableAffectiveServices)
+                .biodataSubscribeParams(biodataSubscribeParams!!)
+                .affectiveSubscribeParams(affectiveSubscribeParams!!)
+                .build()
         enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
         enterAffectiveCloudManager!!.addBiodataRealtimeListener {
             messageReceiveFragment.appendMessageToScreen("基础服务实时数据：${it.toString()}")
@@ -109,6 +133,16 @@ class MainActivity : AppCompatActivity() {
         enterAffectiveCloudManager?.init(object : Callback {
             override fun onError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen("SDK初始化失败：${error.toString()}")
+                if (error != null && error!!.code == 1004) {
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "APP KEY 或 APP SECRET 有误请重新填写！",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        finish()
+                    }
+                }
             }
 
             override fun onSuccess() {
@@ -171,7 +205,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    class MessageAdapter(fragmentManager: FragmentManager, fragments: List<Fragment>, titles: List<String>) :
+    class MessageAdapter(
+        fragmentManager: FragmentManager,
+        fragments: List<Fragment>,
+        titles: List<String>
+    ) :
         FragmentStatePagerAdapter(fragmentManager) {
         private var fragments: List<Fragment> = listOf()
         private var titles: List<String> = listOf()
@@ -205,7 +243,11 @@ class MainActivity : AppCompatActivity() {
         )
         val needRequestPermissions = ArrayList<String>()
         for (i in needPermission.indices) {
-            if (ActivityCompat.checkSelfPermission(this, needPermission[i]) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    needPermission[i]
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 needRequestPermissions.add(needPermission[i])
             }
         }

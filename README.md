@@ -47,6 +47,8 @@
 
 为了方便你进行 Android 平台的快速开发，我们提供了情感云快速开发 SDK，通过本 SDK 你可以快速地将情感云的能力集成到你的 app 中。
 
+[演示demo下载](https://fir.im/gb3a?release_id=5ddf4415f945484f9475bcd2)
+
 # 集成
 
 ### Gradle 自动集成

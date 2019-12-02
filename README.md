@@ -50,8 +50,11 @@
 # Demo
 
 **下载**
+
 [demo.apk](https://fir.im/gb3a?release_id=5ddf4415f945484f9475bcd2)
-**介绍**
+
+**说明**
+
 更多demo的操作说明可以查看[回车生物电采集模块演示 demo](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/tree/master/demo)
 
 # 集成

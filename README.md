@@ -47,7 +47,12 @@
 
 为了方便你进行 Android 平台的快速开发，我们提供了情感云快速开发 SDK，通过本 SDK 你可以快速地将情感云的能力集成到你的 app 中。
 
-[演示demo下载](https://fir.im/gb3a?release_id=5ddf4415f945484f9475bcd2)
+# Demo
+
+**下载**
+[demo.apk](https://fir.im/gb3a?release_id=5ddf4415f945484f9475bcd2)
+**介绍**
+更多demo的操作说明可以查看[回车生物电采集模块演示 demo](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/tree/master/demo)
 
 # 集成
 

@@ -20,5 +20,7 @@ data class Request(val services:String,val op:String){
         val REQUEST_OPTION_AFFECTIVE_START = "start"
         val REQUEST_OPTION_AFFECTIVE_REPORT = "report"
         val REQUEST_OPTION_AFFECTIVE_FINISH = "finish"
+
+        val REQUEST_OPTION_SUBMIT = "submit"
     }
 }

@@ -2,19 +2,20 @@ package cn.entertech.affectivecloudsdk.interfaces
 
 import cn.entertech.affectivecloudsdk.entity.RealtimeAffectiveData
 import cn.entertech.affectivecloudsdk.entity.RealtimeBioData
+import cn.entertech.affectivecloudsdk.entity.RecData
 
 interface IEnterAffectiveCloudManager {
     fun openWebSocket(webSocketCallback: WebSocketCallback)
 
     fun closeWebSocket()
-    fun isWebSocketOpen():Boolean
+    fun isWebSocketOpen(): Boolean
 
-    fun closeConnection(code:Int, message:String)
+    fun closeConnection(code: Int, message: String)
     fun restore(callback: Callback)
 
     fun init(callback: Callback)
 
-    fun isInited():Boolean
+    fun isInited(): Boolean
 
     fun appendEEGData(brainData: ByteArray, triggerCount: Int = 600)
 
@@ -31,6 +32,8 @@ interface IEnterAffectiveCloudManager {
     fun getBiodataReport(callback: Callback2<HashMap<Any, Any?>>)
 
     fun getAffectiveDataReport(callback: Callback2<HashMap<Any, Any?>>)
+
+    fun submit(remark: List<RecData>, callback: Callback)
 
     fun release(callback: Callback)
 

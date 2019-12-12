@@ -20,7 +20,7 @@ interface BaseApi {
 
     fun closeWebSocket()
 
-    fun closeConnection(code:Int, message:String)
+    fun closeConnection(code: Int, message: String)
 
     /**
      * After web socket connected, should call this method to create a session
@@ -58,6 +58,20 @@ interface BaseApi {
      * @param callback Callback
      */
     fun initBiodataServices(serviceList: List<Service>, callback: Callback)
+
+
+    /**
+     * Init biodata services with option params
+     *
+     * @param serviceList List<Service>
+     * @param callback Callback
+     * @param optionParams HashMap<String, Any>
+     */
+    fun initBiodataServices(
+        serviceList: List<Service>,
+        callback: Callback,
+        optionParams: java.util.HashMap<String, Any?>?
+    )
 
     /**
      * start affective services before use.
@@ -153,6 +167,13 @@ interface BaseApi {
      * @param callback Callback
      */
     fun destroySessionAndCloseWebSocket(callback: Callback)
+
+    /**
+     * submit remark for this session
+     * @param remark RecData
+     * @param callback Callback
+     */
+    fun submit(remark: List<RecData>, callback: Callback)
 
     /**
      * Add raw json request listener.

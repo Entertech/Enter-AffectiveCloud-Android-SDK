@@ -22,6 +22,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     var appSecret: String,
     var userId: String
 ) : BaseApi {
+    private var mSubmitCallback: Callback? = null
     private var mAffectiveReportGenerator: ReportGenerator? = null
     private var mAffectiveReportCallback: Callback2<java.util.HashMap<Any, Any?>>? = null
     private var mBiodataReprotGenerator: ReportGenerator? = null
@@ -58,7 +59,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     ) : this(websocketAddress, 10000, appKey, appSecret, userId)
 
     init {
-        mWebSocketHelper = WebSocketHelper(websocketAddress,timeout)
+        mWebSocketHelper = WebSocketHelper(websocketAddress, timeout)
         mWebSocketHelper?.addRawJsonResponseListener {
             Log.d(TAG, "receive msg from web socket:$it")
             var response = Gson().fromJson(it, ResponseBody::class.java)
@@ -83,6 +84,14 @@ class EnterAffectiveCloudApiImpl internal constructor(
                     mBiodataInitCallback?.onSuccess()
                 } else {
                     mBiodataInitCallback?.onError(Error(response.code, response.msg))
+                }
+            }
+
+            if (response.isSubmitOp()) {
+                if (response.code == 0) {
+                    mSubmitCallback?.onSuccess()
+                } else {
+                    mSubmitCallback?.onError(Error(response.code, response.msg))
                 }
             }
 
@@ -201,7 +210,8 @@ class EnterAffectiveCloudApiImpl internal constructor(
         this.mCreateSessionCallback = callback2
         var timestamp = "${System.currentTimeMillis()}"
         var userIdEncoded = MD5Encode(userId).toUpperCase()
-        var md5Params = "app_key=$appKey&app_secret=$appSecret&timestamp=$timestamp&user_id=$userIdEncoded"
+        var md5Params =
+            "app_key=$appKey&app_secret=$appSecret&timestamp=$timestamp&user_id=$userIdEncoded"
         mSign = MD5Encode(md5Params).toUpperCase()
         var requestBodyMap = HashMap<Any, Any>()
         requestBodyMap["app_key"] = appKey
@@ -224,7 +234,8 @@ class EnterAffectiveCloudApiImpl internal constructor(
     private fun sendRestore() {
         var userIdEncoded = MD5Encode(userId).toUpperCase()
         var timestamp = "${System.currentTimeMillis()}"
-        var md5Params = "app_key=$appKey&app_secret=$appSecret&timestamp=$timestamp&user_id=$userIdEncoded"
+        var md5Params =
+            "app_key=$appKey&app_secret=$appSecret&timestamp=$timestamp&user_id=$userIdEncoded"
         mSign = MD5Encode(md5Params).toUpperCase()
         var requestBodyMap = HashMap<Any, Any>()
         requestBodyMap["session_id"] = mSessionId!!
@@ -246,24 +257,24 @@ class EnterAffectiveCloudApiImpl internal constructor(
             )
         }
         if (isWebSocketOpen()) {
-            Log.d("####","restore 6666")
+            Log.d("####", "restore 6666")
             sendRestore()
         } else {
             mWebSocketHelper?.open(object : WebSocketCallback {
                 override fun onOpen(serverHandshake: ServerHandshake?) {
-                    Log.d("####","restore 7777")
+                    Log.d("####", "restore 7777")
                     sendRestore()
                 }
 
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
 
-                    Log.d("####","restore 888")
+                    Log.d("####", "restore 888")
                     var error = Error(-1, "web socket closed:$reason")
                     callback.onError(error)
                 }
 
                 override fun onError(e: Exception?) {
-                    Log.d("####","restore 9999")
+                    Log.d("####", "restore 9999")
                     var error = Error(-1, e.toString())
                     callback.onError(error)
                 }
@@ -271,14 +282,43 @@ class EnterAffectiveCloudApiImpl internal constructor(
         }
     }
 
-    override fun initBiodataServices(services: List<Service>, callback: Callback) {
+    override fun initBiodataServices(serviceList: List<Service>, callback: Callback) {
         this.mBiodataInitCallback = callback
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["bio_data_type"] = services.map { it.value }
+        requestBodyMap["bio_data_type"] = serviceList.map { it.value }
         var requestBody = RequestBody(SERVER_BIO_DATA, "init", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
+    override fun initBiodataServices(
+        serviceList: List<Service>,
+        callback: Callback,
+        optionParams: HashMap<String, Any?>?
+    ) {
+        this.mBiodataInitCallback = callback
+        var requestBodyMap = HashMap<Any, Any>()
+        requestBodyMap["bio_data_type"] = serviceList.map { it.value }
+        if (optionParams != null) {
+            if (optionParams.containsKey("bio_data_tolerance")) {
+                if (optionParams["bio_data_tolerance"] != null){
+                    var map =  optionParams["bio_data_tolerance"]!! as Map<Any, Any>
+                    requestBodyMap["bio_data_tolerance"] = map
+
+                }
+            }
+            if (optionParams.containsKey("storage_settings")) {
+                if (optionParams["storage_settings"] != null){
+                    var map  =  optionParams["storage_settings"]!! as StorageSettings
+                    requestBodyMap["storage_settings"] = map
+
+                }
+            }
+        }
+        var requestBody = RequestBody(SERVER_BIO_DATA, "init", requestBodyMap)
+        var requestJson = Gson().toJson(requestBody)
+        mWebSocketHelper?.sendMessage(requestJson)
+    }
+
 
     override fun initAffectiveDataServices(services: List<Service>, callback: Callback) {
         this.mAffectiveStartCallback = callback
@@ -351,7 +391,10 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
 
-    override fun getBiodataReport(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>) {
+    override fun getBiodataReport(
+        services: List<Service>,
+        callback: Callback2<HashMap<Any, Any?>>
+    ) {
         this.mBiodataReportCallback = callback
         mBiodataReprotGenerator = ReportGenerator()
         mBiodataReprotGenerator!!.init(services)
@@ -363,7 +406,10 @@ class EnterAffectiveCloudApiImpl internal constructor(
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun getAffectivedataReport(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>) {
+    override fun getAffectivedataReport(
+        services: List<Service>,
+        callback: Callback2<HashMap<Any, Any?>>
+    ) {
         this.mAffectiveReportCallback = callback
         this.mAffectiveReportGenerator = ReportGenerator()
         mAffectiveReportGenerator!!.init(services)
@@ -445,6 +491,16 @@ class EnterAffectiveCloudApiImpl internal constructor(
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
+
+    override fun submit(remark: List<RecData>, callback: Callback) {
+        this.mSubmitCallback = callback
+        var requestBodyMap = java.util.HashMap<Any, Any>()
+        requestBodyMap["rec"] = remark
+        var requestBody =
+            RequestBody(SERVER_BIO_DATA, "submit", requestBodyMap)
+        var requestJson = Gson().toJson(requestBody)
+        mWebSocketHelper?.sendMessage(requestJson)
+    }
     override fun addRawJsonRequestListener(listener: (String) -> Unit) {
         mWebSocketHelper?.addRawJsonRequestListener(listener)
     }

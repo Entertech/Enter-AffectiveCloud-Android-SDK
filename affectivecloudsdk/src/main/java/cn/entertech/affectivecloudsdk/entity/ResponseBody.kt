@@ -8,7 +8,12 @@ import cn.entertech.affectivecloudsdk.entity.*
  * 实时的值需要事先订阅，否则获取为空；
  * 要想获取报表中的值，需要事先发送report指令，并指定需要返回的字段，否则为空
  */
-data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, Any>, val msg: String) {
+data class ResponseBody(
+    val code: Int,
+    val request: Request,
+    val data: Map<Any, Any>,
+    val msg: String
+) {
     fun isCreateOp(): Boolean {
         return request.op == Request.REQUEST_OPTION_SESSION_CREATE
     }
@@ -23,6 +28,10 @@ data class ResponseBody(val code: Int, val request: Request, val data: Map<Any, 
 
     fun isStartAffectiveOp(): Boolean {
         return request.op == Request.REQUEST_OPTION_AFFECTIVE_START
+    }
+
+    fun isSubmitOp(): Boolean {
+        return request.op == Request.REQUEST_OPTION_SUBMIT
     }
 
     fun isBiodataSubOp(): Boolean {

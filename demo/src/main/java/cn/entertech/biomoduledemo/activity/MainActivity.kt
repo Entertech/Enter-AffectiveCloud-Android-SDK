@@ -21,13 +21,14 @@ import cn.entertech.affectivecloudsdk.interfaces.Observer
 import cn.entertech.biomoduledemo.R
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_KEY
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
+import cn.entertech.biomoduledemo.entity.*
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.*
 import cn.entertech.ble.BiomoduleBleManager
+import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.activity_main.*
-import org.java_websocket.handshake.ServerHandshake
 import java.io.*
 import java.lang.Exception
 import java.util.*
@@ -84,10 +85,10 @@ class MainActivity : AppCompatActivity() {
         initSaveFiledir()
     }
 
-    fun verifyAppKeyAndSecret(){
+    fun verifyAppKeyAndSecret() {
         appKey = intent.getStringExtra(INTENT_APP_KEY)
         appSecret = intent.getStringExtra(INTENT_APP_SECRET)
-        if (appKey == null || appSecret == null){
+        if (appKey == null || appSecret == null) {
             Toast.makeText(
                 this@MainActivity,
                 "APP KEY 或 APP SECRET 有误请重新填写！",
@@ -109,6 +110,16 @@ class MainActivity : AppCompatActivity() {
             .requestPleasure()
             .requestArousal()
             .build()
+
+//        var storageSettings = StorageSettings.Builder()
+//            .user("M", 8)
+//            .device("sdfsfsdf")
+//            .data("demo")
+//            .label("mode", "case")
+//            .build()
+//
+//        var biodataTolerance = BiodataTolerance.Builder()
+//            .eeg(2).build()
         var enterAffectiveCloudConfig =
             EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
                 .url(websocketAddress)
@@ -116,6 +127,8 @@ class MainActivity : AppCompatActivity() {
                 .availableAffectiveServices(availableAffectiveServices)
                 .biodataSubscribeParams(biodataSubscribeParams!!)
                 .affectiveSubscribeParams(affectiveSubscribeParams!!)
+//                .storageSettings(storageSettings)
+//                .biodataTolerance(biodataTolerance)
                 .build()
         enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
         enterAffectiveCloudManager!!.addBiodataRealtimeListener {
@@ -380,10 +393,33 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    fun onSubmit(view: View) {
+        var datas = ArrayList<RecData>()
+        var tagMap = HashMap<String, Float>()
+        tagMap["pleasure"] = 0.75f
+        var recData = RecData()
+        recData.st = 0.1f
+        recData.et = 180f
+        recData.tag = tagMap
+        recData.note = listOf("asdf", "sfdfsf")
+        datas.add(recData)
+        enterAffectiveCloudManager?.submit(
+            datas,
+            object : Callback {
+                override fun onSuccess() {
+                    messageReceiveFragment.appendMessageToScreen("评价提交成功！")
+                }
+
+                override fun onError(error: Error?) {
+                    messageReceiveFragment.appendMessageToScreen("评价提交失败：${error?.msg}")
+                }
+
+            })
+    }
+
     fun onRestore(view: View) {
         enterAffectiveCloudManager?.restore(object : Callback {
             override fun onSuccess() {
-
                 messageReceiveFragment.appendMessageToScreen("情感云已重连成功，请重新上传数据")
             }
 

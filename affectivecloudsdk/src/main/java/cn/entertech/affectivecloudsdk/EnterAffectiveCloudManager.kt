@@ -8,20 +8,21 @@ import java.lang.Exception
 import java.lang.IllegalStateException
 import java.util.concurrent.CopyOnWriteArrayList
 
-class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnterAffectiveCloudManager {
+class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
+    IEnterAffectiveCloudManager {
     var mApi: BaseApi
     var mBiodataRealtimeListener = CopyOnWriteArrayList<(RealtimeBioData?) -> Unit>()
     var mAffectiveRealtimeListener = CopyOnWriteArrayList<(RealtimeAffectiveData?) -> Unit>()
 
     init {
-        if (config.websocketTimeout == null){
+        if (config.websocketTimeout == null) {
             mApi = EnterAffectiveCloudApiImpl(
                 config.uri!!,
                 config.appKey!!,
                 config.appSecret!!,
                 config.userId!!
             )
-        }else{
+        } else {
             mApi = EnterAffectiveCloudApiImpl(
                 config.uri!!,
                 config.websocketTimeout!!,
@@ -40,6 +41,9 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
     }
 
     private fun initBiodata(callback: Callback) {
+        var optionsMap = java.util.HashMap<String, Any?>()
+        optionsMap["storage_settings"] = config.storageSettings
+        optionsMap["bio_data_tolerance"] = config.biodataTolerance?.body()
         mApi.initBiodataServices(config.availableBiodataServices!!, object : Callback {
             override fun onSuccess() {
                 if (config.mBiodataSubscribeParams != null) {
@@ -76,7 +80,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
             override fun onError(error: Error?) {
                 callback.onError(error)
             }
-        })
+        }, optionsMap)
     }
 
     private fun initAffective(callback: Callback) {
@@ -114,6 +118,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
             }
         })
     }
+
     var isInit = false
 
     override fun isInited(): Boolean {
@@ -187,24 +192,15 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
 
     override fun restore(callback: Callback) {
         if (mApi.isWebSocketOpen()) {
-            Log.d("####","restore 111")
             mApi.restore(object : Callback {
                 override fun onSuccess() {
-
-                    Log.d("####","restore 2222")
                     initBiodata(callback)
-
-                    Log.d("####","restore 333")
                     if (config.availableAffectiveServices != null) {
-
-                        Log.d("####","restore 444")
                         initAffective(callback)
                     }
                 }
 
                 override fun onError(error: Error?) {
-
-                    Log.d("####","restore 555")
                     callback.onError(error)
                 }
             })
@@ -242,24 +238,26 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
 
     override fun release(callback: Callback) {
         if (config.availableAffectiveServices != null) {
-            mApi.finishAffectiveDataServices(config.availableAffectiveServices!!, object : Callback {
-                override fun onSuccess() {
-                    mApi.destroySessionAndCloseWebSocket(object : Callback {
-                        override fun onSuccess() {
-                            callback.onSuccess()
-                        }
+            mApi.finishAffectiveDataServices(
+                config.availableAffectiveServices!!,
+                object : Callback {
+                    override fun onSuccess() {
+                        mApi.destroySessionAndCloseWebSocket(object : Callback {
+                            override fun onSuccess() {
+                                callback.onSuccess()
+                            }
 
-                        override fun onError(error: Error?) {
-                            callback.onError(error)
-                        }
-                    })
-                }
+                            override fun onError(error: Error?) {
+                                callback.onError(error)
+                            }
+                        })
+                    }
 
-                override fun onError(error: Error?) {
-                    callback.onError(error)
-                }
+                    override fun onError(error: Error?) {
+                        callback.onError(error)
+                    }
 
-            })
+                })
         }
     }
 
@@ -310,4 +308,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) : IEnter
         mApi?.closeConnection(code, message)
     }
 
+    override fun submit(remark: List<RecData>, callback: Callback) {
+        mApi?.submit(remark, callback)
+    }
 }

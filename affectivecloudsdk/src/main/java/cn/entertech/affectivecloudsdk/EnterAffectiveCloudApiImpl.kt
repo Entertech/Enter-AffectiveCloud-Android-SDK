@@ -308,7 +308,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
             }
             if (optionParams.containsKey("storage_settings")) {
                 if (optionParams["storage_settings"] != null){
-                    var map  =  optionParams["storage_settings"]!! as StorageSettings
+                    var map  =  optionParams["storage_settings"]!! as Map<Any, Any>
                     requestBodyMap["storage_settings"] = map
 
                 }
@@ -363,13 +363,13 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     override fun subscribeBioData(
-        subscribeParams: SubscribeParams,
+        optionalParams: OptionalParams,
         response: Callback2<RealtimeBioData>,
         callback: Callback2<SubBiodataFields>
     ) {
         this.mBiodataResponseCallback = response
         this.mBiodataSubscribeCallback = callback
-        this.mSubscribeBioData = subscribeParams.body()
+        this.mSubscribeBioData = optionalParams.body()
         var requestBody =
             RequestBody(SERVER_BIO_DATA, "subscribe", mSubscribeBioData)
         var requestJson = Gson().toJson(requestBody)
@@ -377,13 +377,13 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     override fun subscribeAffectiveData(
-        subscribeParams: SubscribeParams,
+        optionalParams: OptionalParams,
         response: Callback2<RealtimeAffectiveData>,
         callback: Callback2<SubAffectiveDataFields>
     ) {
         this.mAffectiveDataResponseCallback = response
         this.mAffectiveSubscribeCallback = callback
-        this.mSubscribeAffectiveData = subscribeParams.body()
+        this.mSubscribeAffectiveData = optionalParams.body()
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "subscribe", mSubscribeAffectiveData)
         var requestJson = Gson().toJson(requestBody)
@@ -422,7 +422,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     override fun unsubscribeBioData(
-        subscribeParams: SubscribeParams, callback: Callback2<SubBiodataFields>
+        optionalParams: OptionalParams, callback: Callback2<SubBiodataFields>
     ) {
         this.mBiodataUnsubscribeCallback = callback
         if (mSubscribeBioData == null) {
@@ -431,13 +431,13 @@ class EnterAffectiveCloudApiImpl internal constructor(
             )
         }
         var requestBody =
-            RequestBody(SERVER_BIO_DATA, "unsubscribe", subscribeParams.body())
+            RequestBody(SERVER_BIO_DATA, "unsubscribe", optionalParams.body())
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
     override fun unsubscribeAffectiveData(
-        subscribeParams: SubscribeParams,
+        optionalParams: OptionalParams,
         callback: Callback2<SubAffectiveDataFields>
     ) {
         this.mAffectiveUnsubscribeCallback = callback
@@ -447,7 +447,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
             )
         }
         var requestBody =
-            RequestBody(SERVER_AFFECTIVE, "unsubscribe", subscribeParams.body())
+            RequestBody(SERVER_AFFECTIVE, "unsubscribe", optionalParams.body())
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }

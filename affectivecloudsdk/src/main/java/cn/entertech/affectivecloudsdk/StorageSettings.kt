@@ -1,49 +1,92 @@
 package cn.entertech.affectivecloudsdk
 
-import cn.entertech.biomoduledemo.entity.Data
-import cn.entertech.biomoduledemo.entity.Device
-import cn.entertech.biomoduledemo.entity.Label
-import cn.entertech.biomoduledemo.entity.User
+import cn.entertech.affectivecloudsdk.interfaces.OptionalParams
 
-class StorageSettings internal constructor(builder: Builder) {
-    var `data`: Data? = null
-    var device: Device? = null
-    var label: Label? = null
-    var user: User? = null
+class StorageSettings internal constructor(builder: Builder) : OptionalParams {
+
+    enum class Sex(var value: String) {
+        MALE("m"), FEMALE("f")
+    }
+
+    var storageSettings: HashMap<Any, Any>? = null
+    override fun body(): HashMap<Any, Any>? {
+        return storageSettings
+    }
 
     init {
-        data = builder.data
-        device = builder.device
-        label = builder.label
-        user = builder.user
+        storageSettings = builder.storageSettings
     }
 
     class Builder {
-        internal var user: User? = null
-        internal var data: Data? = null
-        internal var device: Device? = null
-        internal var label: Label? = null
-        fun user(sex: String, age: Int): Builder {
-            user = User(age, sex)
+        internal var user: HashMap<Any, Any>? = null
+        internal var data: HashMap<Any, Any>? = null
+        internal var device: HashMap<Any, Any>? = null
+        internal var label: HashMap<Any, Any>? = null
+        internal var storageSettings: HashMap<Any, Any>? = null
+        fun sex(sex: Sex): Builder {
+            if (user == null) {
+                user = HashMap()
+            }
+            user!!["sex"] = sex.value
             return this
         }
 
-        fun device(sn: String): Builder {
-            device = Device(sn)
+        fun age(age: Int): Builder {
+            if (user == null) {
+                user = HashMap()
+            }
+            user!!["age"] = age
             return this
         }
 
-        fun data(source: String): Builder {
-            data = Data(source)
+        fun sn(sn: String): Builder {
+            if (device == null) {
+                device = HashMap()
+            }
+            device!!["sn"] = sn
             return this
         }
 
-        fun label(mode: String, case: String): Builder {
-            label = Label(case, mode)
+        fun source(source: String): Builder {
+            if (data == null) {
+                data = HashMap()
+            }
+            data!!["source"] = source
+            return this
+        }
+
+        fun mode(mode: String):Builder {
+            if (label == null) {
+                label = HashMap()
+            }
+            label!!["mode"] = mode
+            return this
+        }
+
+        fun case(case: String):Builder {
+            if (label == null) {
+                label = HashMap()
+            }
+            label!!["case"] = case
             return this
         }
 
         fun build(): StorageSettings {
+            if (storageSettings == null) {
+                storageSettings = HashMap()
+            }
+            if (user != null) {
+                storageSettings!!["user"] = user!!
+            }
+            if (data != null) {
+                storageSettings!!["data"] = data!!
+            }
+            if (device != null) {
+                storageSettings!!["device"] = device!!
+            }
+            if (label != null) {
+                storageSettings!!["label"] = label!!
+            }
             return StorageSettings(this)
         }
     }

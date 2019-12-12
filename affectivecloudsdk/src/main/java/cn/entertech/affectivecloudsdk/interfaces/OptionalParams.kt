@@ -1,5 +1,5 @@
 package cn.entertech.affectivecloudsdk.interfaces
 
-interface SubscribeParams{
+interface OptionalParams{
     fun body():HashMap<Any,Any>?
 }

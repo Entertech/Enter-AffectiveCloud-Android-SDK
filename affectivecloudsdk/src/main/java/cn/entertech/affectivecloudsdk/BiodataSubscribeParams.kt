@@ -1,9 +1,9 @@
 package cn.entertech.affectivecloudsdk
 
-import cn.entertech.affectivecloudsdk.interfaces.SubscribeParams
+import cn.entertech.affectivecloudsdk.interfaces.OptionalParams
 import java.lang.IllegalStateException
 
-class BiodataSubscribeParams internal constructor(builder: Builder) : SubscribeParams {
+class BiodataSubscribeParams internal constructor(builder: Builder) : OptionalParams {
     private var mSubMap: HashMap<Any, Any>? = null
 
     init {

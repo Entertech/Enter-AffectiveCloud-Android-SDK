@@ -100,7 +100,7 @@ interface BaseApi {
      * @param callback Callback2<SubBiodataFields>
      */
     fun subscribeBioData(
-        subscribeParams: SubscribeParams,
+        optionalParams: OptionalParams,
         response: Callback2<RealtimeBioData>,
         callback: Callback2<SubBiodataFields>
     )
@@ -112,7 +112,7 @@ interface BaseApi {
      * @param callback Callback2<SubAffectiveDataFields>
      */
     fun subscribeAffectiveData(
-        subscribeParams: SubscribeParams,
+        optionalParams: OptionalParams,
         response: Callback2<RealtimeAffectiveData>,
         callback: Callback2<SubAffectiveDataFields>
     )
@@ -137,7 +137,7 @@ interface BaseApi {
      * @param callback Callback2<SubBiodataFields>
      */
     fun unsubscribeBioData(
-        subscribeParams: SubscribeParams, callback: Callback2<SubBiodataFields>
+        optionalParams: OptionalParams, callback: Callback2<SubBiodataFields>
     )
 
     /**
@@ -146,7 +146,7 @@ interface BaseApi {
      * @param callback Callback2<SubAffectiveDataFields>
      */
     fun unsubscribeAffectiveData(
-        subscribeParams: SubscribeParams, callback: Callback2<SubAffectiveDataFields>
+        optionalParams: OptionalParams, callback: Callback2<SubAffectiveDataFields>
     )
 
     /**

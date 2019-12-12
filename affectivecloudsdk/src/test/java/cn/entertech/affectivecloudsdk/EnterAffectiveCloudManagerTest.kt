@@ -2,8 +2,6 @@ package cn.entertech.affectivecloudsdk
 
 import android.util.Log
 import cn.entertech.affectivecloudsdk.entity.Error
-import cn.entertech.affectivecloudsdk.entity.RealtimeAffectiveData
-import cn.entertech.affectivecloudsdk.entity.RealtimeBioData
 import cn.entertech.affectivecloudsdk.entity.Service
 import cn.entertech.affectivecloudsdk.interfaces.Callback
 import cn.entertech.affectivecloudsdk.interfaces.Callback2

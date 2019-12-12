@@ -17,16 +17,13 @@ import android.widget.Toast
 import cn.entertech.affectivecloudsdk.*
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
-import cn.entertech.affectivecloudsdk.interfaces.Observer
 import cn.entertech.biomoduledemo.R
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_KEY
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
-import cn.entertech.biomoduledemo.entity.*
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.*
 import cn.entertech.ble.BiomoduleBleManager
-import com.google.gson.Gson
 import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.*
@@ -112,12 +109,14 @@ class MainActivity : AppCompatActivity() {
             .build()
 
 //        var storageSettings = StorageSettings.Builder()
-//            .user("M", 8)
-//            .device("sdfsfsdf")
-//            .data("demo")
-//            .label("mode", "case")
+//            .sex(StorageSettings.Sex.MALE)
+//            .age(10)
+//            .source("demo")
+//            .mode("test_mode")
+//            .case("test_case")
+//            .sn("device_sn")
 //            .build()
-//
+
 //        var biodataTolerance = BiodataTolerance.Builder()
 //            .eeg(2).build()
         var enterAffectiveCloudConfig =

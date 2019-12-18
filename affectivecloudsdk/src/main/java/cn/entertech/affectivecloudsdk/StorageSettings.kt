@@ -55,7 +55,7 @@ class StorageSettings internal constructor(builder: Builder) : OptionalParams {
             return this
         }
 
-        fun mode(mode: String):Builder {
+        fun mode(mode: List<Int>):Builder {
             if (label == null) {
                 label = HashMap()
             }
@@ -63,7 +63,7 @@ class StorageSettings internal constructor(builder: Builder) : OptionalParams {
             return this
         }
 
-        fun case(case: String):Builder {
+        fun case(case: List<Int>):Builder {
             if (label == null) {
                 label = HashMap()
             }

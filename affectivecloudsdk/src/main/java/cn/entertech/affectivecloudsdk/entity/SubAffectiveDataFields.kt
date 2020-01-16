@@ -6,9 +6,10 @@ data class SubAffectiveDataFields(
     var subPressureFields: List<String>? = null,
     var subPleasureFields: List<String>? = null,
     var subArousalFields: List<String>? = null,
-    var subSleepFields: List<String>? = null
+    var subSleepFields: List<String>? = null,
+    var subCoherenceFields: List<String>? = null
 ){
     override fun toString(): String {
-        return "SubAffectiveDataFields(subAttentionFields=$subAttentionFields, subRelaxationFields=$subRelaxationFields, subPressureFields=$subPressureFields, subPleasureFields=$subPleasureFields, subArousalFields=$subArousalFields, subSleepFields=$subSleepFields)"
+        return "SubAffectiveDataFields(subAttentionFields=$subAttentionFields, subRelaxationFields=$subRelaxationFields, subPressureFields=$subPressureFields, subPleasureFields=$subPleasureFields, subArousalFields=$subArousalFields, subSleepFields=$subSleepFields, subCoherenceFields=$subCoherenceFields)"
     }
 }

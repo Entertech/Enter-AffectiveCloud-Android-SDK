@@ -21,6 +21,7 @@ class AffectiveSubscribeParams internal constructor(builder: Builder):OptionalPa
         private var pressureSubList: ArrayList<String> = ArrayList()
         private var pleasureSubList: ArrayList<String> = ArrayList()
         private var arousalSubList: ArrayList<String> = ArrayList()
+        private var coherenceSubList: ArrayList<String> = ArrayList()
         private var sleepSubList: ArrayList<String> = ArrayList()
 
         fun requestAttention(): Builder {
@@ -45,6 +46,11 @@ class AffectiveSubscribeParams internal constructor(builder: Builder):OptionalPa
 
         fun requestArousal(): Builder {
             arousalSubList.add("arousal")
+            return this
+        }
+
+        fun requestCoherence():Builder{
+            coherenceSubList.add("coherence")
             return this
         }
 
@@ -86,6 +92,9 @@ class AffectiveSubscribeParams internal constructor(builder: Builder):OptionalPa
             }
             if (sleepSubList.isNotEmpty()) {
                 subMap["sleep"] = sleepSubList
+            }
+            if (coherenceSubList.isNotEmpty()){
+                subMap["coherence"] = coherenceSubList
             }
             if (subMap.isEmpty()) {
                 throw IllegalStateException("no data request,call request.. before build")

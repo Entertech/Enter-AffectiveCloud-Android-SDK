@@ -161,6 +161,10 @@ data class ResponseBody(
                 var sleepFields = data["sub_sleep_fields"] as ArrayList<String>
                 subAffectiveDataFields.subSleepFields = sleepFields
             }
+            if (data.containsKey("sub_coherence_fields") && data["sub_coherence_fields"] != null) {
+                var coherenceFields = data["sub_coherence_fields"] as ArrayList<String>
+                subAffectiveDataFields.subCoherenceFields = coherenceFields
+            }
         }
         return subAffectiveDataFields
     }
@@ -256,6 +260,14 @@ data class ResponseBody(
                 if (map.containsKey("arousal")) {
                     realtimeArousalData.arousal = map["arousal"] as Double
                     realtimeAffectiveData.realtimeArousalData = realtimeArousalData
+                }
+            }
+            if (data.containsKey("coherence")) {
+                var realtimeCoherenceData = RealtimeCoherenceData()
+                var map = data["coherence"] as Map<Any, Any>
+                if (map.containsKey("coherence")) {
+                    realtimeCoherenceData.coherence = map["coherence"] as Double
+                    realtimeAffectiveData.realtimeCoherenceData = realtimeCoherenceData
                 }
             }
             if (data.containsKey("sleep")) {

@@ -250,7 +250,7 @@ data class ResponseBody(
                 var realtimePleasureData = RealtimePleasureData()
                 var map = data["pleasure"] as Map<Any, Any>
                 if (map.containsKey("pleasure")) {
-                    realtimePleasureData.pressure = map["pleasure"] as Double
+                    realtimePleasureData.pleasure = map["pleasure"] as Double
                     realtimeAffectiveData.realtimePleasureData = realtimePleasureData
                 }
             }

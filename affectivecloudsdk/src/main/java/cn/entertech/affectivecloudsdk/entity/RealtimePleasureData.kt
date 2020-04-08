@@ -1,7 +1,9 @@
 package cn.entertech.affectivecloudsdk.entity
 
+import com.google.gson.annotations.SerializedName
+
 data class RealtimePleasureData(
-    var pleasure: Double? = null
+    @SerializedName("pleasure") var pleasure: Double? = null
 ){
     override fun toString(): String {
         return "RealtimePleasureData(pleasure=$pleasure)"

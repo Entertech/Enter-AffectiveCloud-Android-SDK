@@ -6,8 +6,6 @@ import cn.entertech.affectivecloudsdk.interfaces.*
 import cn.entertech.affectivecloudsdk.utils.ConvertUtil
 import cn.entertech.affectivecloudsdk.utils.MD5Encode
 import cn.entertech.affectivecloudsdk.utils.ReportGenerator
-import cn.entertech.biomoduledemo.entity.RequestBody
-import cn.entertech.biomoduledemo.entity.ResponseBody
 import com.google.gson.Gson
 import org.java_websocket.handshake.ServerHandshake
 import java.lang.Exception

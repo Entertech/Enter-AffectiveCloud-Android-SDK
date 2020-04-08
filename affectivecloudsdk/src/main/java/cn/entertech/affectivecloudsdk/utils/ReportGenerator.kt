@@ -1,7 +1,7 @@
 package cn.entertech.affectivecloudsdk.utils
 
+import cn.entertech.affectivecloudsdk.entity.ResponseBody
 import cn.entertech.affectivecloudsdk.entity.Service
-import cn.entertech.biomoduledemo.entity.ResponseBody
 import java.lang.IllegalStateException
 
 class ReportGenerator {

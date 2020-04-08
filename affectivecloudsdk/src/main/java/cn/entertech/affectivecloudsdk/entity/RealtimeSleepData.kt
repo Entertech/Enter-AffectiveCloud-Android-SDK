@@ -1,8 +1,10 @@
 package cn.entertech.affectivecloudsdk.entity
 
+import com.google.gson.annotations.SerializedName
+
 data class RealtimeSleepData(
-    var sleepDegree: Double? = null,
-    var sleepState: Double? = null
+    @SerializedName("sleepDegree") var sleepDegree: Double? = null,
+    @SerializedName("sleepState") var sleepState: Double? = null
 ){
 
     override fun toString(): String {

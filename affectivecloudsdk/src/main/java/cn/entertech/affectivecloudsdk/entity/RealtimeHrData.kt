@@ -1,8 +1,10 @@
 package cn.entertech.affectivecloudsdk.entity
 
+import com.google.gson.annotations.SerializedName
+
 data class RealtimeHrData(
-    var hr: Double? = null,
-    var hrv: Double? = null
+    @SerializedName("hr") var hr: Double? = null,
+    @SerializedName("hrv") var hrv: Double? = null
 ) {
     override fun toString(): String {
         return "RealtimeHrData(hr=$hr, hrv=$hrv)"

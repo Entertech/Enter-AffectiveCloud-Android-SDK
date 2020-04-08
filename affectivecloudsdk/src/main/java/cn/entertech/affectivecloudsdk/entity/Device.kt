@@ -1,5 +1,7 @@
-package cn.entertech.biomoduledemo.entity
+package cn.entertech.affectivecloudsdk.entity
+
+import com.google.gson.annotations.SerializedName
 
 data class Device(
-    val sn: String
+    @SerializedName("sn") val sn: String
 )

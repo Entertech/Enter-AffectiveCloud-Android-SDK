@@ -1,6 +1,7 @@
-package cn.entertech.biomoduledemo.entity
+package cn.entertech.affectivecloudsdk.entity
 
 import cn.entertech.affectivecloudsdk.entity.*
+import com.google.gson.annotations.SerializedName
 
 /**
  * WebSocket返回体。
@@ -8,11 +9,11 @@ import cn.entertech.affectivecloudsdk.entity.*
  * 实时的值需要事先订阅，否则获取为空；
  * 要想获取报表中的值，需要事先发送report指令，并指定需要返回的字段，否则为空
  */
-data class ResponseBody(
-    val code: Int,
-    val request: Request,
-    val data: Map<Any, Any>,
-    val msg: String
+class ResponseBody(
+    @SerializedName("code") var code: Int,
+    @SerializedName("request") var request: Request,
+    @SerializedName("data") var data: Map<Any, Any>,
+    @SerializedName("msg") var msg: String
 ) {
     fun isCreateOp(): Boolean {
         return request.op == Request.REQUEST_OPTION_SESSION_CREATE

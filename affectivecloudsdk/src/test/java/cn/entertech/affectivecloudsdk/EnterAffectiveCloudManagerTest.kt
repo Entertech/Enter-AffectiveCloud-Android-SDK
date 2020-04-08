@@ -23,7 +23,7 @@ import junit.framework.TestCase.assertEquals
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(PowerMockRunner::class)
 @PrepareForTest(Log::class)
-@PowerMockIgnore("javax.net.ssl.*")
+@PowerMockIgnore("jdk.internal.reflect.*","javax.net.ssl.*")
 class EnterAffectiveCloudManagerTest {
 
     @Test

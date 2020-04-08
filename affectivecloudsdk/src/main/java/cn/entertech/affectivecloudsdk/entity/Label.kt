@@ -1,6 +1,8 @@
-package cn.entertech.biomoduledemo.entity
+package cn.entertech.affectivecloudsdk.entity
+
+import com.google.gson.annotations.SerializedName
 
 data class Label(
-    val case: String,
-    val mode: String
+    @SerializedName("case") val case: String,
+    @SerializedName("mode") val mode: String
 )

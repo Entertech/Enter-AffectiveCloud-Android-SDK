@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
     var saveHRPath: String =
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
-    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v1/"
+    var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
     //    var EEG_TEST_FILE_PATH =
 //        "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
     var EEG_TEST_FILE_PATH =

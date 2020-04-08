@@ -1,7 +1,9 @@
 package cn.entertech.affectivecloudsdk.entity
 
+import com.google.gson.annotations.SerializedName
+
 data class RealtimeAttentionData(
-    var attention: Double? = null
+    @SerializedName("attention") var attention: Double? = null
 ){
     override fun toString(): String {
         return "RealtimeAttentionData(attention=$attention)"

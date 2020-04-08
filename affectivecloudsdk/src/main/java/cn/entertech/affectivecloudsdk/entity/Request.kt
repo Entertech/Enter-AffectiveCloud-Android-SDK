@@ -1,6 +1,8 @@
 package cn.entertech.affectivecloudsdk.entity
 
-data class Request(val services:String,val op:String){
+import com.google.gson.annotations.SerializedName
+
+data class Request(@SerializedName("services") val services:String,@SerializedName("op") val op:String){
     companion object {
         val REQUEST_SERVICES_SESSION = "session"
         val REQUEST_SERVICES_BIODATA = "biodata"

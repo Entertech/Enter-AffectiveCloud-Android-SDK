@@ -1,6 +1,8 @@
-package cn.entertech.biomoduledemo.entity
+package cn.entertech.affectivecloudsdk.entity
+
+import com.google.gson.annotations.SerializedName
 
 data class User(
-    var age: Int,
-    var sex: String
+    @SerializedName("age") var age: Int,
+    @SerializedName("sex") var sex: String
 )

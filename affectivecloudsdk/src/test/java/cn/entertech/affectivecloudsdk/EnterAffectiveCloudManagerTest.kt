@@ -141,12 +141,12 @@ class EnterAffectiveCloudManagerTest {
 
         assertEquals(true, results[0])
         assertEquals(true, results[1])
-        assertEquals(61.6, attention[0], 1.0)
-        assertEquals(44.14, relaxation[0], 1.0)
-        assertEquals(45.07, pleasure[0], 1.0)
-        assertEquals(35.02, pressure[0], 1.0)
-        assertEquals(40.67, arousal[0], 1.0)
-        assertEquals(67.0, hr[0], 1.0)
+        assertEquals(57.51, attention[0], 5.0)
+        assertEquals(49.47, relaxation[0], 5.0)
+        assertEquals(41.93, pleasure[0], 5.0)
+        assertEquals(35.17, pressure[0], 5.0)
+        assertEquals(40.74, arousal[0], 5.0)
+        assertEquals(67.0, hr[0], 5.0)
     }
 
     fun uploadEEGRawData() {
@@ -192,9 +192,9 @@ class EnterAffectiveCloudManagerTest {
         /*自己的用户ID：邮箱或者手机号码*/
         var USER_ID = "12809@qq.com"
         var EEG_TEST_FILE_PATH =
-            "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
+            "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
         var HR_TEST_FILE_PATH =
-            "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_hrdata.txt"
+            "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_hrdata.txt"
         var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
         internal var availableAffectiveServices: MutableList<Service> = ArrayList()
         internal var availableBioServices: MutableList<Service> = ArrayList()

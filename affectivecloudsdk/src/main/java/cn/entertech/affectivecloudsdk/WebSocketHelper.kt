@@ -20,46 +20,47 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
     var rawJsonRequestListeners = CopyOnWriteArrayList<(String) -> Unit>()
     var rawJsonResponseListeners = CopyOnWriteArrayList<(String) -> Unit>()
     var connectListeners = CopyOnWriteArrayList<() -> Unit>()
-    var disconnectListeners = CopyOnWriteArrayList<() -> Unit>()
+    var disconnectListeners = CopyOnWriteArrayList<(String) -> Unit>()
 
     override fun open(webSocketCallback: WebSocketCallback) {
         try {
             this.mOpenCallback = webSocketCallback
-            mBrainDataWebSocket = object : WebSocketClient(URI(address), Draft_6455(), null, timeout) {
-                override fun onOpen(handshakedata: ServerHandshake?) {
-                    Log.d("WebSocketHelper", "onConnected " + handshakedata.toString())
-                    mOpenCallback?.onOpen(handshakedata)
-                    connectListeners?.forEach {
-                        it.invoke()
+            mBrainDataWebSocket =
+                object : WebSocketClient(URI(address), Draft_6455(), null, timeout) {
+                    override fun onOpen(handshakedata: ServerHandshake?) {
+                        Log.d("WebSocketHelper", "onConnected " + handshakedata.toString())
+                        mOpenCallback?.onOpen(handshakedata)
+                        connectListeners?.forEach {
+                            it.invoke()
+                        }
+                    }
+
+                    override fun onClose(code: Int, reason: String?, remote: Boolean) {
+                        mOpenCallback?.onClose(code, reason, remote)
+                        disconnectListeners.forEach {
+                            it.invoke("$code:$reason")
+                        }
+                        Log.d("WebSocketHelper", "onClose :$code::reason is $reason")
+                    }
+
+                    override fun onMessage(message: String?) {
+                    }
+
+                    override fun onMessage(message: ByteBuffer) {
+                        val arr = ByteArray(message.remaining())
+                        message.get(arr)
+                        Log.d("WebSocketHelper", "receive msg is " + ConvertUtil.uncompress(arr))
+                        var msg = ConvertUtil.uncompress(arr)
+                        rawJsonResponseListeners?.forEach {
+                            it.invoke(msg)
+                        }
+                    }
+
+                    override fun onError(ex: java.lang.Exception?) {
+                        mOpenCallback?.onError(ex)
+                        Log.d("WebSocketHelper", "onError " + ex.toString())
                     }
                 }
-
-                override fun onClose(code: Int, reason: String?, remote: Boolean) {
-                    mOpenCallback?.onClose(code, reason, remote)
-                    disconnectListeners.forEach {
-                        it.invoke()
-                    }
-                    Log.d("WebSocketHelper", "onClose :$code::reason is $reason")
-                }
-
-                override fun onMessage(message: String?) {
-                }
-
-                override fun onMessage(message: ByteBuffer) {
-                    val arr = ByteArray(message.remaining())
-                    message.get(arr)
-                    Log.d("WebSocketHelper", "receive msg is " + ConvertUtil.uncompress(arr))
-                    var msg = ConvertUtil.uncompress(arr)
-                    rawJsonResponseListeners?.forEach {
-                        it.invoke(msg)
-                    }
-                }
-
-                override fun onError(ex: java.lang.Exception?) {
-                    mOpenCallback?.onError(ex)
-                    Log.d("WebSocketHelper", "onError " + ex.toString())
-                }
-            }
             mBrainDataWebSocket!!.connect()
         } catch (e: Exception) {
             mOpenCallback?.onError(e)
@@ -75,7 +76,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
         connectListeners.add(listener)
     }
 
-    override fun addDisconnectListener(listener: () -> Unit) {
+    override fun addDisconnectListener(listener: (String) -> Unit) {
         disconnectListeners.add(listener)
     }
 
@@ -83,7 +84,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
         connectListeners.remove(listener)
     }
 
-    override fun removeDisconnectListener(listener: () -> Unit) {
+    override fun removeDisconnectListener(listener: (String) -> Unit) {
         disconnectListeners.remove(listener)
     }
 
@@ -95,7 +96,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
     }
 
     override fun sendMessage(data: ByteArray) {
-        if (isOpen()){
+        if (isOpen()) {
             mBrainDataWebSocket?.send(data)
         }
     }
@@ -113,7 +114,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
 
     override fun closeConnection(code: Int, message: String) {
         mBrainDataWebSocket?.closeConnection(code, message)
-     }
+    }
 
     fun addRawJsonRequestListener(listener: (String) -> Unit) {
         this.rawJsonRequestListeners.add(listener)

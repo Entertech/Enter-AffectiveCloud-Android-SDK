@@ -519,7 +519,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         mWebSocketHelper?.addConnectListener(listener)
     }
 
-    override fun addDisconnectListener(listener: () -> Unit) {
+    override fun addDisconnectListener(listener: (String) -> Unit) {
         mWebSocketHelper?.addDisconnectListener(listener)
     }
 
@@ -527,7 +527,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         mWebSocketHelper?.removeConnectListener(listener)
     }
 
-    override fun removeDisconnectListener(listener: () -> Unit) {
+    override fun removeDisconnectListener(listener: (String) -> Unit) {
         mWebSocketHelper?.removeDisconnectListener(listener)
     }
 

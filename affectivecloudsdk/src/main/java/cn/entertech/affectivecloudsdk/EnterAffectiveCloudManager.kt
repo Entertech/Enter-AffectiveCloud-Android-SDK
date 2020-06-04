@@ -265,7 +265,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.addConnectListener(listener)
     }
 
-    override fun addWebSocketDisconnectListener(listener: () -> Unit) {
+    override fun addWebSocketDisconnectListener(listener: (String) -> Unit) {
         mApi.addDisconnectListener(listener)
     }
 
@@ -273,7 +273,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.removeConnectListener(listener)
     }
 
-    override fun removeWebSocketDisconnectListener(listener: () -> Unit) {
+    override fun removeWebSocketDisconnectListener(listener: (String) -> Unit) {
         mApi.removeDisconnectListener(listener)
     }
 

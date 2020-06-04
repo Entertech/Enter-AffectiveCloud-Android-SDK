@@ -144,6 +144,9 @@ class MainActivity : AppCompatActivity() {
         enterAffectiveCloudManager!!.addRawJsonResponseListener {
 
         }
+        enterAffectiveCloudManager?.addWebSocketDisconnectListener {
+            Log.d("######","websocket disconnect:$it")
+        }
         enterAffectiveCloudManager?.init(object : Callback {
             override fun onError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen("SDK初始化失败：${error.toString()}")

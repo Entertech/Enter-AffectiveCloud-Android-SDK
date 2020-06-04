@@ -212,7 +212,7 @@ interface BaseApi {
      * Add web socket disconnect listener
      * @param listener Function0<Unit>
      */
-    fun addDisconnectListener(listener: () -> Unit)
+    fun addDisconnectListener(listener: (String) -> Unit)
 
     /**
      * Remove web socket connect listener
@@ -224,6 +224,6 @@ interface BaseApi {
      * Remove web socket disconnect listener
      * @param listener Function0<Unit>
      */
-    fun removeDisconnectListener(listener: () -> Unit)
+    fun removeDisconnectListener(listener: (String) -> Unit)
 
 }

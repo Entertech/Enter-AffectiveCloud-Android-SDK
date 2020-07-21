@@ -46,6 +46,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         optionsMap["bio_data_tolerance"] = config.biodataTolerance?.body()
         mApi.initBiodataServices(config.availableBiodataServices!!, object : Callback {
             override fun onSuccess() {
+                isInit = true
                 if (config.mBiodataSubscribeParams != null) {
                     mApi.subscribeBioData(config.mBiodataSubscribeParams!!,
                         object : Callback2<RealtimeBioData> {
@@ -78,6 +79,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
             }
 
             override fun onError(error: Error?) {
+                isInit = true
                 callback.onError(error)
             }
         }, optionsMap)
@@ -131,7 +133,6 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
             override fun onOpen(serverHandshake: ServerHandshake?) {
                 mApi.createSession(object : Callback2<String> {
                     override fun onSuccess(t: String?) {
-                        isInit = true
                         initBiodata(callback)
                         if (config.availableAffectiveServices != null) {
                             initAffective(callback)
@@ -140,17 +141,20 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
 
                     override fun onError(error: Error?) {
                         callback.onError(error)
+                        isInit = false
                     }
                 })
             }
 
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
+                isInit = false
                 if (reason != null && reason != "") {
                     callback.onError(Error(-1, reason.toString()))
                 }
             }
 
             override fun onError(e: Exception?) {
+                isInit = false
                 e?.printStackTrace()
                 callback.onError(Error(-1, e.toString()))
             }
@@ -202,6 +206,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
 
                 override fun onError(error: Error?) {
                     callback.onError(error)
+                    isInit = false
                 }
             })
         } else {
@@ -216,18 +221,21 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                         }
 
                         override fun onError(error: Error?) {
+                            isInit = false
                             callback.onError(error)
                         }
                     })
                 }
 
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
+                    isInit = false
                     if (reason != null && reason != "") {
                         callback.onError(Error(-1, reason.toString()))
                     }
                 }
 
                 override fun onError(e: Exception?) {
+                    isInit = false
                     e?.printStackTrace()
                     callback.onError(Error(-1, e.toString()))
                 }

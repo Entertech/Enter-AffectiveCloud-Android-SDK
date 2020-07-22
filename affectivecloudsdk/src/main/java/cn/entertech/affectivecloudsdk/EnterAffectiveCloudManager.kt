@@ -3,6 +3,7 @@ package cn.entertech.affectivecloudsdk
 import android.util.Log
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
+import com.google.gson.annotations.SerializedName
 import org.java_websocket.handshake.ServerHandshake
 import java.lang.Exception
 import java.lang.IllegalStateException
@@ -103,6 +104,9 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                         },
                         object : Callback2<SubAffectiveDataFields> {
                             override fun onSuccess(t: SubAffectiveDataFields?) {
+                                if (t != null) {
+                                    selectAvailableAffectiveServicesInRemote(t)
+                                }
                                 callback.onSuccess()
                             }
 
@@ -119,6 +123,32 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 callback.onError(error)
             }
         })
+    }
+
+    fun selectAvailableAffectiveServicesInRemote(subData: SubAffectiveDataFields) {
+        var affectiveServices = mutableListOf<Service>()
+        if (subData.subAttentionFields != null) {
+            affectiveServices.add(Service.ATTENTION)
+        }
+        if (subData.subRelaxationFields != null) {
+            affectiveServices.add(Service.RELAXATION)
+        }
+        if (subData.subPressureFields != null) {
+            affectiveServices.add(Service.PRESSURE)
+        }
+        if (subData.subPleasureFields != null) {
+            affectiveServices.add(Service.PLEASURE)
+        }
+        if (subData.subArousalFields != null) {
+            affectiveServices.add(Service.AROUSAL)
+        }
+        if (subData.subSleepFields != null) {
+            affectiveServices.add(Service.SLEEP)
+        }
+        if (subData.subCoherenceFields != null) {
+            affectiveServices.add(Service.COHERENCE)
+        }
+        config.availableAffectiveServices = affectiveServices
     }
 
     var isInit = false

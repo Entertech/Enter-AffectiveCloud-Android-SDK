@@ -1,6 +1,9 @@
 package cn.entertech.affectivecloudsdk
 
 import cn.entertech.affectivecloudsdk.entity.Service
+import java.lang.Exception
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 
 class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
     var appKey: String? = null
@@ -14,6 +17,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
     var availableAffectiveServices: List<Service>? = null
     var storageSettings: StorageSettings? = null
     var biodataTolerance: BiodataTolerance? = null
+    var uploadCycle = 0
 
     init {
         this.appKey = builder.appKey
@@ -27,6 +31,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
         this.availableAffectiveServices = builder.availableAffectiveServices
         this.storageSettings = builder.storageSettings
         this.biodataTolerance = builder.biodataTolerance
+        this.uploadCycle = builder.uploadCycle
     }
 
     class Builder(var appKey: String, var appSecret: String, var userId: String) {
@@ -38,6 +43,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
         var availableBiodataServices: List<Service>? = null
         var availableAffectiveServices: List<Service>? = null
         var biodataTolerance: BiodataTolerance? = null
+        var uploadCycle = 0
         fun url(url: String): Builder {
             uri = url
             return this
@@ -76,6 +82,14 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
 
         fun biodataTolerance(biodataTolerance: BiodataTolerance): Builder {
             this.biodataTolerance = biodataTolerance
+            return this
+        }
+
+        fun uploadCycle(uploadCycle: Int): Builder {
+            if (uploadCycle < 0 || uploadCycle > 100) {
+                throw IllegalStateException("upload cycle must between 0 and 100,include 0 and 100.")
+            }
+            this.uploadCycle = uploadCycle
             return this
         }
 

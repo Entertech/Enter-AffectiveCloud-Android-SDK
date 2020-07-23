@@ -141,12 +141,12 @@ class EnterAffectiveCloudManagerTest {
 
         assertEquals(true, results[0])
         assertEquals(true, results[1])
-        assertEquals(57.51, attention[0], 5.0)
-        assertEquals(49.47, relaxation[0], 5.0)
-        assertEquals(41.93, pleasure[0], 5.0)
-        assertEquals(35.17, pressure[0], 5.0)
-        assertEquals(40.74, arousal[0], 5.0)
-        assertEquals(67.0, hr[0], 5.0)
+        assertEquals(52.08, attention[0], 15.0)
+        assertEquals(49.47, relaxation[0], 15.0)
+        assertEquals(41.93, pleasure[0], 15.0)
+        assertEquals(35.17, pressure[0], 15.0)
+        assertEquals(40.74, arousal[0], 15.0)
+        assertEquals(67.0, hr[0], 15.0)
     }
 
     fun uploadEEGRawData() {
@@ -159,7 +159,7 @@ class EnterAffectiveCloudManagerTest {
                 for (j in 0..19) {
                     eegs[j] = Integer.parseInt(eeg[j + i]).toByte()
                 }
-                enterAffectiveCloudManager!!.appendEEGData(eegs, 600)
+                enterAffectiveCloudManager!!.appendEEGData(eegs)
                 try {
                     Thread.sleep(10)
                 } catch (e: InterruptedException) {
@@ -175,7 +175,7 @@ class EnterAffectiveCloudManagerTest {
         val data = readFile(HR_TEST_FILE_PATH)
         val hr = data!!.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         for (i in hr.indices) {
-            enterAffectiveCloudManager!!.appendHeartRateData(Integer.parseInt(hr[i]), 2)
+            enterAffectiveCloudManager!!.appendHeartRateData(Integer.parseInt(hr[i]))
             try {
                 Thread.sleep(200)
             } catch (e: InterruptedException) {
@@ -195,7 +195,8 @@ class EnterAffectiveCloudManagerTest {
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
         var HR_TEST_FILE_PATH =
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_hrdata.txt"
-        var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
+        var websocketAddress = "ws://server-test.affectivecloud.cn/ws/algorithm/v2/"
+//        var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
         internal var availableAffectiveServices: MutableList<Service> = ArrayList()
         internal var availableBioServices: MutableList<Service> = ArrayList()
         private var biodataSubscribeParams: BiodataSubscribeParams? = null
@@ -218,12 +219,12 @@ class EnterAffectiveCloudManagerTest {
             availableBioServices.add(Service.EEG)
             availableBioServices.add(Service.HR)
             biodataSubscribeParams = BiodataSubscribeParams.Builder()
-                .requestAllHrData()
-                .requestAllEEGData()
+                .requestEEG()
+                .requestHR()
                 .build()
 
             affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
-                .requestAllSleepData()
+                .requestSleep()
                 .requestAttention()
                 .requestRelaxation()
                 .requestPressure()

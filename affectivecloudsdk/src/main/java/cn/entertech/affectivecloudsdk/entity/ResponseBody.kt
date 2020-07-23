@@ -154,6 +154,10 @@ class ResponseBody(
                 var pressureFields = data["sub_pressure_fields"] as ArrayList<String>
                 subAffectiveDataFields.subPressureFields = pressureFields
             }
+            if (data.containsKey("sub_pleasure_fields") && data["sub_pleasure_fields"] != null) {
+                var pleasureFields = data["sub_pleasure_fields"] as ArrayList<String>
+                subAffectiveDataFields.subPleasureFields = pleasureFields
+            }
             if (data.containsKey("sub_arousal_fields") && data["sub_arousal_fields"] != null) {
                 var arousalFields = data["sub_arousal_fields"] as ArrayList<String>
                 subAffectiveDataFields.subArousalFields = arousalFields

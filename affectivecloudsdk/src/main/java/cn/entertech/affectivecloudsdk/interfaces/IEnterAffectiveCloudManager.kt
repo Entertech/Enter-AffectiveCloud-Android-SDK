@@ -17,9 +17,9 @@ interface IEnterAffectiveCloudManager {
 
     fun isInited(): Boolean
 
-    fun appendEEGData(brainData: ByteArray, triggerCount: Int = 600)
+    fun appendEEGData(brainData: ByteArray)
 
-    fun appendHeartRateData(heartRateData: Int, triggerCount: Int = 2)
+    fun appendHeartRateData(heartRateData: Int)
 
     fun addBiodataRealtimeListener(listener: (RealtimeBioData?) -> (Unit))
 

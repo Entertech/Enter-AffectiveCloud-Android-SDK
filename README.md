@@ -1,4 +1,4 @@
-# Enter-AffectiveCloud-Andriod-SDK [![Download](https://api.bintray.com/packages/hzentertech/maven/affectivecloud/images/download.svg?version=1.3.8)](https://bintray.com/hzentertech/maven/affectivecloud/1.3.10/link)
+# Enter-AffectiveCloud-Andriod-SDK [![Download](https://api.bintray.com/packages/hzentertech/maven/affectivecloud/images/download.svg?version=1.3.8)](https://bintray.com/hzentertech/maven/affectivecloud/1.4.0/link)
 - [简介](#简介)
 - [Demo](#demo)
 - [集成](#集成)
@@ -37,7 +37,7 @@
 ### Gradle自动集成
 在module的build.gradle文件下添加以下依赖
 ```groovy
-implementation 'cn.entertech:affectivecloud:1.3.10'
+implementation 'cn.entertech:affectivecloud:1.4.0'
 ```
 在项目根目录的build.gradle文件下添加以下依赖地址
 ```groovy
@@ -69,12 +69,12 @@ var availableBioServices = listOf(Service.EEG, Service.HR)
 var availableAffectiveServices = listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.SLEEP)
 //基础服务订阅参数
 var biodataSubscribeParams = BiodataSubscribeParams.Builder()
-            .requestAllEEGData()//订阅所有eeg数据
-            .requestAllHrData()//订阅所有心率相关数据
+            .requestEEG//订阅所有eeg数据
+            .requestHr//订阅所有心率相关数据
             .build()
 //情感服务订阅参数
 var affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
-            .requestAllSleepData()//订阅所有sleep服务数据
+            .requestSleep()//订阅所有sleep服务数据
             .requestAttention()//订阅attention数据
             .requestRelaxation()//订阅relaxation数据
             .requestPressure()//订阅pressure数据

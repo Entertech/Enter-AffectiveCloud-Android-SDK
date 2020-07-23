@@ -85,13 +85,13 @@ interface BaseApi {
      * Send brain data to affective cloud platform.
      * @param brainData ByteArray
      */
-    fun appendEEGData(brainData: ByteArray, triggerCount: Int = 600)
+    fun appendEEGData(brainData: ByteArray)
 
     /**
      * Send heart rate data to affective cloud platform
      * @param heartRateData ByteArray
      */
-    fun appendHeartData(heartRateData: Int, triggerCount: Int = 2)
+    fun appendHeartData(heartRateData: Int)
 
     /**
      * Subscribe biodata. After subscribing, can receive real time analysed biodata from affective cloud platform.
@@ -100,7 +100,7 @@ interface BaseApi {
      * @param callback Callback2<SubBiodataFields>
      */
     fun subscribeBioData(
-        optionalParams: OptionalParams,
+        optionalParams: OptionalParamsList,
         response: Callback2<RealtimeBioData>,
         callback: Callback2<SubBiodataFields>
     )
@@ -112,7 +112,7 @@ interface BaseApi {
      * @param callback Callback2<SubAffectiveDataFields>
      */
     fun subscribeAffectiveData(
-        optionalParams: OptionalParams,
+        optionalParams: OptionalParamsList,
         response: Callback2<RealtimeAffectiveData>,
         callback: Callback2<SubAffectiveDataFields>
     )
@@ -137,7 +137,7 @@ interface BaseApi {
      * @param callback Callback2<SubBiodataFields>
      */
     fun unsubscribeBioData(
-        optionalParams: OptionalParams, callback: Callback2<SubBiodataFields>
+        optionalParams: OptionalParamsList, callback: Callback2<SubBiodataFields>
     )
 
     /**
@@ -146,7 +146,7 @@ interface BaseApi {
      * @param callback Callback2<SubAffectiveDataFields>
      */
     fun unsubscribeAffectiveData(
-        optionalParams: OptionalParams, callback: Callback2<SubAffectiveDataFields>
+        optionalParams: OptionalParamsList, callback: Callback2<SubAffectiveDataFields>
     )
 
     /**

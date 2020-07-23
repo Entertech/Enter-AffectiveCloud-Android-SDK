@@ -1,103 +1,35 @@
 package cn.entertech.affectivecloudsdk
 
-import cn.entertech.affectivecloudsdk.interfaces.OptionalParams
+import cn.entertech.affectivecloudsdk.interfaces.OptionalParamsList
 import java.lang.IllegalStateException
 
-class BiodataSubscribeParams internal constructor(builder: Builder) : OptionalParams {
-    private var mSubMap: HashMap<Any, Any>? = null
+class BiodataSubscribeParams internal constructor(builder: Builder) : OptionalParamsList {
+    private var bioSubList: List<Any>? = null
 
     init {
-        mSubMap = builder.subMap
+        bioSubList = builder.bioSubList
     }
 
-    override fun body(): HashMap<Any, Any>? {
-        return mSubMap
+    override fun body(): List<Any>? {
+        return bioSubList
     }
 
     class Builder {
-        internal var subMap: HashMap<Any, Any> = HashMap()
-        private var eegSubList: ArrayList<String> = ArrayList()
-        private var hrSubList: ArrayList<String> = ArrayList()
+        var bioSubList: ArrayList<String> = ArrayList()
 
-        fun requestEEGLeftWave(): Builder {
-            eegSubList.add("eegl_wave")
+        fun requestEEG(): Builder {
+            bioSubList.add("eeg")
             return this
         }
 
-        fun requestEEGRightWave(): Builder {
-            eegSubList.add("eegr_wave")
-            return this
-        }
-
-        fun requestEEGAlphaPower(): Builder {
-            eegSubList.add("eeg_alpha_power")
-            return this
-        }
-
-        fun requestEEGBetaPower(): Builder {
-            eegSubList.add("eeg_beta_power")
-            return this
-        }
-
-        fun requestEEGThetaPower(): Builder {
-            eegSubList.add("eeg_theta_power")
-            return this
-        }
-
-        fun requestEEGDeltaPower(): Builder {
-            eegSubList.add("eeg_delta_power")
-            return this
-        }
-
-        fun requestEEGGammaPower(): Builder {
-            eegSubList.add("eeg_gamma_power")
-            return this
-        }
-
-        fun requestEEGQuality(): Builder {
-            eegSubList.add("eeg_quality")
-            return this
-        }
-
-        fun requestAllEEGData(): Builder {
-            eegSubList.clear()
-            eegSubList.add("eegl_wave")
-            eegSubList.add("eegr_wave")
-            eegSubList.add("eeg_alpha_power")
-            eegSubList.add("eeg_beta_power")
-            eegSubList.add("eeg_theta_power")
-            eegSubList.add("eeg_delta_power")
-            eegSubList.add("eeg_gamma_power")
-            eegSubList.add("eeg_quality")
-            return this
-        }
-
-        fun requestHeartRate(): Builder {
-            hrSubList.add("hr")
-            return this
-        }
-
-        fun requestHRV(): Builder {
-            hrSubList.add("hrv")
-            return this
-        }
-
-        fun requestAllHrData(): Builder {
-            hrSubList.clear()
-            hrSubList.add("hr")
-            hrSubList.add("hrv")
+        fun requestHR(): Builder {
+            bioSubList.add("hr")
             return this
         }
 
         fun build(): BiodataSubscribeParams {
-            if (eegSubList.isNotEmpty()) {
-                subMap["eeg"] = eegSubList
-            }
-            if (hrSubList.isNotEmpty()) {
-                subMap["hr"] = hrSubList
-            }
-            if (subMap.isEmpty()) {
-                throw IllegalStateException("no data requested,pls call request..method before build")
+            if (bioSubList.isEmpty()) {
+                throw IllegalStateException("no biodata requested,pls call request..method before build")
             }
             return BiodataSubscribeParams(this)
         }

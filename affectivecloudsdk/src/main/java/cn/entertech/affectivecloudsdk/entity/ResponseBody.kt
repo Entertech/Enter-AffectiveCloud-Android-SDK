@@ -212,7 +212,10 @@ class ResponseBody(
                 realtimeHrData.hr = hrMap["hr"] as Double
             }
             if (hrMap.containsKey("hrv")) {
-                realtimeHrData.hrv = hrMap["hrv"] as Double
+                var hrvList =  hrMap["hrv"] as ArrayList<Double>
+                if (hrvList != null && hrvList.isNotEmpty()){
+                    realtimeHrData.hrv = hrvList
+                }
             }
             realtimeBioData.realtimeHrData = realtimeHrData
 

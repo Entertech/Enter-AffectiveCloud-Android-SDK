@@ -18,7 +18,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     var timeout: Int = 10000,
     var appKey: String,
     var appSecret: String,
-    var userId: String
+    var userId: String, var uploadCycle: Int = DEFAULT_UPLOAD_CYCLE
 ) : BaseApi {
     private var mSubmitCallback: Callback? = null
     private var mAffectiveReportGenerator: ReportGenerator? = null
@@ -37,10 +37,11 @@ class EnterAffectiveCloudApiImpl internal constructor(
     private var mBiodataInitCallback: Callback? = null
     private var mRestoreCallback: Callback? = null
     private var mCreateSessionCallback: Callback2<String>? = null
-    private var mSubscribeAffectiveData: HashMap<Any, Any>? = null
-    private var mSubscribeBioData: HashMap<Any, Any>? = null
+    private var mSubscribeAffectiveData: List<Any>? = null
+    private var mSubscribeBioData: List<Any>? = null
     private var mStartedAffectiveServices: List<Service>? = null
     private var mSign: String? = null
+
     /*情感云平台服务分类：session（会话）、biodata（基础数据服务）、affective（情感数据服务）*/
     val SERVER_SESSION = "session"
     val SERVER_BIO_DATA = "biodata"
@@ -50,13 +51,29 @@ class EnterAffectiveCloudApiImpl internal constructor(
 
     private val TAG = "EnterAffectiveCloudApi"
 
+    companion object {
+        const val DEFAULT_UPLOAD_EEG_PACKAGE_COUNT = 30
+        const val DEFAULT_UPLOAD_HR_PACKAGE_COUNT = 2
+        const val BASE_UPLOAD_EEG_PACKAGE_COUNT = 50
+        const val BASE_UPLOAD_HR_PACKAGE_COUNT = 3
+        const val EEG_PACKAGE_LENGTH = 20
+        const val HR_PACKAGE_LENGTH = 1
+        const val DEFAULT_UPLOAD_CYCLE = 3
+    }
+
+    var uploadEEGTriggerCount =
+        DEFAULT_UPLOAD_EEG_PACKAGE_COUNT * EEG_PACKAGE_LENGTH * DEFAULT_UPLOAD_CYCLE
+    var uploadHRTriggerCount =
+        DEFAULT_UPLOAD_HR_PACKAGE_COUNT * HR_PACKAGE_LENGTH * DEFAULT_UPLOAD_CYCLE
+
     constructor(
         websocketAddress: String,
         appKey: String, appSecret: String,
-        userId: String
-    ) : this(websocketAddress, 10000, appKey, appSecret, userId)
+        userId: String, uploadCycle: Int
+    ) : this(websocketAddress, 10000, appKey, appSecret, userId,uploadCycle)
 
     init {
+        initUploadTrigger()
         mWebSocketHelper = WebSocketHelper(websocketAddress, timeout)
         mWebSocketHelper?.addRawJsonResponseListener {
             Log.d(TAG, "receive msg from web socket:$it")
@@ -183,6 +200,15 @@ class EnterAffectiveCloudApiImpl internal constructor(
         }
     }
 
+    fun initUploadTrigger() {
+        if (uploadCycle != 0){
+            uploadEEGTriggerCount =
+                BASE_UPLOAD_EEG_PACKAGE_COUNT * EEG_PACKAGE_LENGTH * uploadCycle
+            uploadHRTriggerCount =
+                BASE_UPLOAD_HR_PACKAGE_COUNT * HR_PACKAGE_LENGTH * uploadCycle
+        }
+    }
+
     override fun openWebSocket(webSocketCallback: WebSocketCallback) {
         mWebSocketHelper?.open(webSocketCallback)
     }
@@ -216,6 +242,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         requestBodyMap["sign"] = mSign!!
         requestBodyMap["user_id"] = userIdEncoded
         requestBodyMap["timestamp"] = timestamp
+        requestBodyMap["upload_cycle"] = uploadCycle
         var requestBody = RequestBody(SERVER_SESSION, "create", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
@@ -241,6 +268,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         requestBodyMap["sign"] = mSign!!
         requestBodyMap["timestamp"] = timestamp
         requestBodyMap["user_id"] = MD5Encode(userId).toUpperCase()
+        requestBodyMap["upload_cycle"] = uploadCycle
         var requestBody = RequestBody(SERVER_SESSION, "restore", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
@@ -255,24 +283,19 @@ class EnterAffectiveCloudApiImpl internal constructor(
             )
         }
         if (isWebSocketOpen()) {
-            Log.d("####", "restore 6666")
             sendRestore()
         } else {
             mWebSocketHelper?.open(object : WebSocketCallback {
                 override fun onOpen(serverHandshake: ServerHandshake?) {
-                    Log.d("####", "restore 7777")
                     sendRestore()
                 }
 
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
-
-                    Log.d("####", "restore 888")
                     var error = Error(-1, "web socket closed:$reason")
                     callback.onError(error)
                 }
 
                 override fun onError(e: Exception?) {
-                    Log.d("####", "restore 9999")
                     var error = Error(-1, e.toString())
                     callback.onError(error)
                 }
@@ -288,6 +311,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
+
     override fun initBiodataServices(
         serviceList: List<Service>,
         callback: Callback,
@@ -298,15 +322,15 @@ class EnterAffectiveCloudApiImpl internal constructor(
         requestBodyMap["bio_data_type"] = serviceList.map { it.value }
         if (optionParams != null) {
             if (optionParams.containsKey("bio_data_tolerance")) {
-                if (optionParams["bio_data_tolerance"] != null){
-                    var map =  optionParams["bio_data_tolerance"]!! as Map<Any, Any>
+                if (optionParams["bio_data_tolerance"] != null) {
+                    var map = optionParams["bio_data_tolerance"]!! as Map<Any, Any>
                     requestBodyMap["bio_data_tolerance"] = map
 
                 }
             }
             if (optionParams.containsKey("storage_settings")) {
-                if (optionParams["storage_settings"] != null){
-                    var map  =  optionParams["storage_settings"]!! as Map<Any, Any>
+                if (optionParams["storage_settings"] != null) {
+                    var map = optionParams["storage_settings"]!! as Map<Any, Any>
                     requestBodyMap["storage_settings"] = map
 
                 }
@@ -330,11 +354,11 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     var brainDataBuffer = CopyOnWriteArrayList<Int>()
-    override fun appendEEGData(bytes: ByteArray, triggerCount: Int) {
+    override fun appendEEGData(bytes: ByteArray) {
         for (byte in bytes) {
             var brainData = ConvertUtil.converUnchart(byte)
             brainDataBuffer.add(brainData)
-            if (brainDataBuffer.size >= triggerCount) {
+            if (brainDataBuffer.size >= uploadEEGTriggerCount) {
                 var dataMap = HashMap<Any, Any>()
                 dataMap["eeg"] = brainDataBuffer.toIntArray()
                 var requestBody =
@@ -347,9 +371,9 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     var heartRateDataBuffer = CopyOnWriteArrayList<Int>()
-    override fun appendHeartData(heartRateData: Int, triggerCount: Int) {
+    override fun appendHeartData(heartRateData: Int) {
         heartRateDataBuffer.add(heartRateData)
-        if (heartRateDataBuffer.size >= triggerCount) {
+        if (heartRateDataBuffer.size >= uploadHRTriggerCount) {
             var dataMap = HashMap<Any, Any>()
             dataMap["hr"] = heartRateDataBuffer.toIntArray()
             var requestBody =
@@ -361,7 +385,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     override fun subscribeBioData(
-        optionalParams: OptionalParams,
+        optionalParams: OptionalParamsList,
         response: Callback2<RealtimeBioData>,
         callback: Callback2<SubBiodataFields>
     ) {
@@ -369,13 +393,13 @@ class EnterAffectiveCloudApiImpl internal constructor(
         this.mBiodataSubscribeCallback = callback
         this.mSubscribeBioData = optionalParams.body()
         var requestBody =
-            RequestBody(SERVER_BIO_DATA, "subscribe", mSubscribeBioData)
+            RequestBody(SERVER_BIO_DATA, "subscribe", null, mSubscribeBioData)
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
     override fun subscribeAffectiveData(
-        optionalParams: OptionalParams,
+        optionalParams: OptionalParamsList,
         response: Callback2<RealtimeAffectiveData>,
         callback: Callback2<SubAffectiveDataFields>
     ) {
@@ -383,7 +407,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         this.mAffectiveSubscribeCallback = callback
         this.mSubscribeAffectiveData = optionalParams.body()
         var requestBody =
-            RequestBody(SERVER_AFFECTIVE, "subscribe", mSubscribeAffectiveData)
+            RequestBody(SERVER_AFFECTIVE, "subscribe", null, mSubscribeAffectiveData)
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
@@ -420,7 +444,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     override fun unsubscribeBioData(
-        optionalParams: OptionalParams, callback: Callback2<SubBiodataFields>
+        optionalParams: OptionalParamsList, callback: Callback2<SubBiodataFields>
     ) {
         this.mBiodataUnsubscribeCallback = callback
         if (mSubscribeBioData == null) {
@@ -429,13 +453,13 @@ class EnterAffectiveCloudApiImpl internal constructor(
             )
         }
         var requestBody =
-            RequestBody(SERVER_BIO_DATA, "unsubscribe", optionalParams.body())
+            RequestBody(SERVER_BIO_DATA, "unsubscribe", null, optionalParams.body())
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
     override fun unsubscribeAffectiveData(
-        optionalParams: OptionalParams,
+        optionalParams: OptionalParamsList,
         callback: Callback2<SubAffectiveDataFields>
     ) {
         this.mAffectiveUnsubscribeCallback = callback
@@ -445,7 +469,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
             )
         }
         var requestBody =
-            RequestBody(SERVER_AFFECTIVE, "unsubscribe", optionalParams.body())
+            RequestBody(SERVER_AFFECTIVE, "unsubscribe", null, optionalParams.body())
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
@@ -499,6 +523,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
     }
+
     override fun addRawJsonRequestListener(listener: (String) -> Unit) {
         mWebSocketHelper?.addRawJsonRequestListener(listener)
     }

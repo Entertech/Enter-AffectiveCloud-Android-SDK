@@ -1,9 +1,7 @@
 package cn.entertech.affectivecloudsdk
 
-import android.util.Log
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
-import com.google.gson.annotations.SerializedName
 import org.java_websocket.handshake.ServerHandshake
 import java.lang.Exception
 import java.lang.IllegalStateException
@@ -15,17 +13,6 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     var mBiodataRealtimeListener = CopyOnWriteArrayList<(RealtimeBioData?) -> Unit>()
     var mAffectiveRealtimeListener = CopyOnWriteArrayList<(RealtimeAffectiveData?) -> Unit>()
 
-    companion object {
-        const val DEFAULT_UPLOAD_EEG_PACKAGE_COUNT = 30
-        const val DEFAULT_UPLOAD_HR_PACKAGE_COUNT = 2
-        const val BASE_UPLOAD_EEG_PACKAGE_COUNT = 50
-        const val BASE_UPLOAD_HR_PACKAGE_COUNT = 3
-        const val EEG_PACKAGE_LENGTH = 20
-        const val HR_PACKAGE_LENGTH = 1
-    }
-
-    var uploadEEGTriggerCount = DEFAULT_UPLOAD_EEG_PACKAGE_COUNT * EEG_PACKAGE_LENGTH
-    var uploadHRTriggerCount = DEFAULT_UPLOAD_HR_PACKAGE_COUNT * HR_PACKAGE_LENGTH
 
     init {
         if (config.websocketTimeout == null) {
@@ -33,7 +20,8 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 config.uri!!,
                 config.appKey!!,
                 config.appSecret!!,
-                config.userId!!
+                config.userId!!,
+                config.uploadCycle
             )
         } else {
             mApi = EnterAffectiveCloudApiImpl(
@@ -41,14 +29,9 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 config.websocketTimeout!!,
                 config.appKey!!,
                 config.appSecret!!,
-                config.userId!!
+                config.userId!!,
+                config.uploadCycle
             )
-        }
-        if (config.uploadCycle != 0) {
-            uploadEEGTriggerCount =
-                BASE_UPLOAD_EEG_PACKAGE_COUNT * EEG_PACKAGE_LENGTH * config.uploadCycle
-            uploadHRTriggerCount =
-                BASE_UPLOAD_HR_PACKAGE_COUNT * HR_PACKAGE_LENGTH * config.uploadCycle
         }
         if (config.availableBiodataServices == null) {
             throw IllegalStateException("biodata services must not be null")
@@ -211,11 +194,11 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     override fun appendEEGData(bytes: ByteArray) {
-        mApi.appendEEGData(bytes, uploadEEGTriggerCount)
+        mApi.appendEEGData(bytes)
     }
 
     override fun appendHeartRateData(heartRateData: Int) {
-        mApi.appendHeartData(heartRateData, uploadHRTriggerCount)
+        mApi.appendHeartData(heartRateData)
     }
 
     override fun addBiodataRealtimeListener(listener: (RealtimeBioData?) -> Unit) {

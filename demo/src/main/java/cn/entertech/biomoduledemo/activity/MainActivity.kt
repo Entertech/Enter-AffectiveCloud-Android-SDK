@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var biomoduleBleManager: BiomoduleBleManager
 
     /*自己的用户ID：邮箱或者手机号码*/
-    val USER_ID: String = "124589@qq.com"
+    val USER_ID: String = "1245489@qq.com"
     private lateinit var messageReceiveFragment: MessageReceiveFragment
     private lateinit var messageSendFragment: MessageSendFragment
     lateinit var vpContainer: ViewPager
@@ -53,7 +53,8 @@ class MainActivity : AppCompatActivity() {
     var saveHRPath: String =
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
-    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v1/"
+//    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v1/"
+    var websocketAddress = "ws://server-test.affectivecloud.cn/ws/algorithm/v2/"
     //    var EEG_TEST_FILE_PATH =
 //        "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
     var EEG_TEST_FILE_PATH =
@@ -97,8 +98,8 @@ class MainActivity : AppCompatActivity() {
     }
     fun initEnterAffectiveCloudManager() {
         biodataSubscribeParams = BiodataSubscribeParams.Builder()
-            .requestAllHrData()
-            .requestAllEEGData()
+            .requestEEG()
+            .requestHR()
             .build()
 
         affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
@@ -336,7 +337,6 @@ class MainActivity : AppCompatActivity() {
     var heartRateDataBuffer = ArrayList<Int>()
     var heartRateListener = fun(heartRate: Int) {
         if (currentDataType == "heart") {
-            Log.d("####", "心率：" + heartRate)
             FileHelper.getInstance().writeHr("$heartRate,")
             heartRateDataBuffer.add(heartRate)
             enterAffectiveCloudManager?.appendHeartRateData(heartRate)

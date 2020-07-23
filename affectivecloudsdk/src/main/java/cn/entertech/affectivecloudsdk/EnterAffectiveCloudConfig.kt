@@ -1,5 +1,6 @@
 package cn.entertech.affectivecloudsdk
 
+import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl.Companion.DEFAULT_UPLOAD_CYCLE
 import cn.entertech.affectivecloudsdk.entity.Service
 import java.lang.Exception
 import java.lang.IllegalArgumentException
@@ -17,7 +18,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
     var availableAffectiveServices: List<Service>? = null
     var storageSettings: StorageSettings? = null
     var biodataTolerance: BiodataTolerance? = null
-    var uploadCycle = 0
+    var uploadCycle = DEFAULT_UPLOAD_CYCLE
 
     init {
         this.appKey = builder.appKey
@@ -43,7 +44,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
         var availableBiodataServices: List<Service>? = null
         var availableAffectiveServices: List<Service>? = null
         var biodataTolerance: BiodataTolerance? = null
-        var uploadCycle = 0
+        var uploadCycle = DEFAULT_UPLOAD_CYCLE
         fun url(url: String): Builder {
             uri = url
             return this

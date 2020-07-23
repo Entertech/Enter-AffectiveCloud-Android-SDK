@@ -1,8 +1,8 @@
 package cn.entertech.affectivecloudsdk
 
-import cn.entertech.affectivecloudsdk.interfaces.OptionalParams
+import cn.entertech.affectivecloudsdk.interfaces.OptionalParamsMap
 
-class StorageSettings internal constructor(builder: Builder) : OptionalParams {
+class StorageSettings internal constructor(builder: Builder) : OptionalParamsMap {
 
     enum class Sex(var value: String) {
         MALE("m"), FEMALE("f")

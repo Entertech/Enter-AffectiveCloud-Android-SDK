@@ -55,12 +55,12 @@ class ApiDetailActivity : AppCompatActivity() {
             EnterAffectiveCloudApiFactory.createApi(websocketAddress, APP_KEY, APP_SECRET, USER_ID)
 
         biodataSubscribeParams = BiodataSubscribeParams.Builder()
-            .requestAllEEGData()
-            .requestAllHrData()
+            .requestHR()
+            .requestEEG()
             .build()
 
         affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
-            .requestAllSleepData()
+            .requestSleep()
             .requestAttention()
             .requestRelaxation()
             .requestPressure()

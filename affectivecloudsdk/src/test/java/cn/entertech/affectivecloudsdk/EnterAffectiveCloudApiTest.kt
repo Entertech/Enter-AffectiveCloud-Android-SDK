@@ -64,8 +64,8 @@ class EnterAffectiveCloudApiTest {
             availableBioServices.add(Service.EEG)
             availableBioServices.add(Service.HR)
             biodataSubscribeParams = BiodataSubscribeParams.Builder()
-                .requestAllHrData()
-                .requestAllEEGData()
+                .requestHR()
+                .requestEEG()
                 .build()
 
             affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
@@ -422,7 +422,7 @@ class EnterAffectiveCloudApiTest {
                 for (j in 0..19) {
                     eegs[j] = Integer.parseInt(eeg[j + i]).toByte()
                 }
-                mEnterAffectiveCloudApi?.appendEEGData(eegs, 600)
+                mEnterAffectiveCloudApi?.appendEEGData(eegs)
                 try {
                     Thread.sleep(10)
                 } catch (e: InterruptedException) {
@@ -437,7 +437,7 @@ class EnterAffectiveCloudApiTest {
         val data = readFile(HR_TEST_FILE_PATH)
         val hr = data!!.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         for (i in hr.indices) {
-            mEnterAffectiveCloudApi?.appendHeartData(Integer.parseInt(hr[i]), 2)
+            mEnterAffectiveCloudApi?.appendHeartData(Integer.parseInt(hr[i]))
             try {
                 Thread.sleep(200)
             } catch (e: InterruptedException) {

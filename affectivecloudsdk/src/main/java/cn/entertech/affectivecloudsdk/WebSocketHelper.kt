@@ -1,7 +1,6 @@
 package cn.entertech.affectivecloudsdk
 
 import android.util.Log
-import cn.entertech.affectivecloudsdk.interfaces.Callback2
 import cn.entertech.affectivecloudsdk.interfaces.IWebSocketHelper
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import cn.entertech.affectivecloudsdk.utils.ConvertUtil
@@ -10,7 +9,12 @@ import org.java_websocket.drafts.Draft_6455
 import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
 import java.nio.ByteBuffer
+import java.security.SecureRandom
 import java.util.concurrent.CopyOnWriteArrayList
+import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocketHelper {
     private var mBrainDataWebSocket: WebSocketClient? = null
@@ -61,11 +65,40 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
                         Log.d("WebSocketHelper", "onError " + ex.toString())
                     }
                 }
+            var sslSocketFactory = getSSLSocketFactory()
+            mBrainDataWebSocket!!.setSocketFactory(sslSocketFactory)
             mBrainDataWebSocket!!.connect()
         } catch (e: Exception) {
             mOpenCallback?.onError(e)
         }
+    }
 
+    private fun getSSLSocketFactory(): SSLSocketFactory? {
+        var sslContext: SSLContext? = null
+        sslContext = SSLContext.getInstance("TLS")
+        sslContext?.init(null, arrayOf<TrustManager>(
+            object : X509TrustManager {
+                override fun checkClientTrusted(
+                    chain: Array<out java.security.cert.X509Certificate>?,
+                    authType: String?
+                ) {
+//                        Log.d("getSSLSocketFactory","checkClientTrusted")
+                }
+
+                override fun checkServerTrusted(
+                    chain: Array<out java.security.cert.X509Certificate>?,
+                    authType: String?
+                ) {
+//                        Log.d("getSSLSocketFactory","checkServerTrusted")
+                }
+
+                override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate>? {
+//                        Log.d("getSSLSocketFactory","getAcceptedIssuers")
+                    return null
+                }
+            }
+        ), SecureRandom())
+        return sslContext?.socketFactory
     }
 
     override fun addMessageResponseListener(listener: (String) -> Unit) {

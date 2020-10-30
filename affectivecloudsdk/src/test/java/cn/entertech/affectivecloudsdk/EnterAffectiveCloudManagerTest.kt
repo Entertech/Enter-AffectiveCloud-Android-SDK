@@ -195,7 +195,7 @@ class EnterAffectiveCloudManagerTest {
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
         var HR_TEST_FILE_PATH =
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_hrdata.txt"
-        var websocketAddress = "ws://server-test.affectivecloud.cn/ws/algorithm/v2/"
+        var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
 //        var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
         internal var availableAffectiveServices: MutableList<Service> = ArrayList()
         internal var availableBioServices: MutableList<Service> = ArrayList()

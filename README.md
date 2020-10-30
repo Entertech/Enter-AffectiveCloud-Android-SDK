@@ -24,7 +24,7 @@
 
 **下载**
 
-[demo.apk](https://fir.im/gb3a?release_id=5ddf4415f945484f9475bcd2)
+[demo.apk](http://fir.entertech.cn/gb3a)
 
 **说明**
 

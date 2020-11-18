@@ -5,7 +5,7 @@ import cn.entertech.affectivecloudsdk.interfaces.OptionalParamsMap
 class StorageSettings internal constructor(builder: Builder) : OptionalParamsMap {
 
     enum class Sex(var value: String) {
-        MALE("m"), FEMALE("f")
+        MALE("m"), FEMALE("f"),OTHER("o")
     }
 
     var storageSettings: HashMap<Any, Any>? = null

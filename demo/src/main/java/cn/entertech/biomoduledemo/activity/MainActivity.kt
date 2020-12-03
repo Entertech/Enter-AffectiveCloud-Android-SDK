@@ -53,8 +53,10 @@ class MainActivity : AppCompatActivity() {
     var saveHRPath: String =
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
-//    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v1/"
-    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
+
+    //    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v1/"
+    var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
+
     //    var EEG_TEST_FILE_PATH =
 //        "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
     var EEG_TEST_FILE_PATH =
@@ -115,11 +117,20 @@ class MainActivity : AppCompatActivity() {
             .sex(StorageSettings.Sex.MALE)
             .age(10)
             .source("demo")
-            .mode(listOf(1,2))
+            .mode(listOf(1, 2))
             .case(listOf(2))
             .sn("device_sn")
             .build()
-
+        var algorithmParamsEEG =
+            AlgorithmParamsEEG.Builder()
+                .tolerance(AlgorithmParamsEEG.Tolerance.LEVEL_2)
+                .filterMode(AlgorithmParamsEEG.FilterMode.SMART)
+                .powerMode(AlgorithmParamsEEG.PowerMode.DB)
+                .channelPowerVerbose(false)
+                .build()
+        var algorithmParams = AlgorithmParams.Builder()
+            .eeg(algorithmParamsEEG)
+            .build()
 //        var biodataTolerance = BiodataTolerance.Builder()
 //            .eeg(2).build()
         var enterAffectiveCloudConfig =
@@ -130,6 +141,7 @@ class MainActivity : AppCompatActivity() {
                 .biodataSubscribeParams(biodataSubscribeParams!!)
                 .affectiveSubscribeParams(affectiveSubscribeParams!!)
                 .storageSettings(storageSettings)
+                .algorithmParams(algorithmParams)
 //                .biodataTolerance(biodataTolerance)
                 .build()
         enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
@@ -146,7 +158,7 @@ class MainActivity : AppCompatActivity() {
 
         }
         enterAffectiveCloudManager?.addWebSocketDisconnectListener {
-            Log.d("######","websocket disconnect:$it")
+            Log.d("######", "websocket disconnect:$it")
         }
         enterAffectiveCloudManager?.init(object : Callback {
             override fun onError(error: Error?) {

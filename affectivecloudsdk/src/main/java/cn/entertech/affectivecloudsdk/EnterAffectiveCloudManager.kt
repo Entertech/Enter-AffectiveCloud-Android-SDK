@@ -46,6 +46,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         var optionsMap = java.util.HashMap<String, Any?>()
         optionsMap["storage_settings"] = config.storageSettings?.body()
         optionsMap["bio_data_tolerance"] = config.biodataTolerance?.body()
+        optionsMap["algorithm_params"] = config.algorithmParams?.body()
         mApi.initBiodataServices(config.availableBiodataServices!!, object : Callback {
             override fun onSuccess() {
                 isInit = true

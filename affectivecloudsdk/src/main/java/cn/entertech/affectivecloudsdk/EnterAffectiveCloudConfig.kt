@@ -17,6 +17,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
     var availableBiodataServices: List<Service>? = null
     var availableAffectiveServices: List<Service>? = null
     var storageSettings: StorageSettings? = null
+    var algorithmParams: AlgorithmParams? = null
     var biodataTolerance: BiodataTolerance? = null
     var uploadCycle = DEFAULT_UPLOAD_CYCLE
 
@@ -31,11 +32,13 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
         this.availableBiodataServices = builder.availableBiodataServices
         this.availableAffectiveServices = builder.availableAffectiveServices
         this.storageSettings = builder.storageSettings
+        this.algorithmParams = builder.algorithmParams
         this.biodataTolerance = builder.biodataTolerance
         this.uploadCycle = builder.uploadCycle
     }
 
     class Builder(var appKey: String, var appSecret: String, var userId: String) {
+        var algorithmParams: AlgorithmParams? = null
         var storageSettings: StorageSettings? = null
         var mAffectiveSubscribeParams: AffectiveSubscribeParams? = null
         var mBiodataSubscribeParams: BiodataSubscribeParams? = null
@@ -83,6 +86,11 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
 
         fun biodataTolerance(biodataTolerance: BiodataTolerance): Builder {
             this.biodataTolerance = biodataTolerance
+            return this
+        }
+
+        fun algorithmParams(algorithmParams: AlgorithmParams): Builder {
+            this.algorithmParams = algorithmParams
             return this
         }
 

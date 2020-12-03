@@ -141,12 +141,12 @@ class EnterAffectiveCloudManagerTest {
 
         assertEquals(true, results[0])
         assertEquals(true, results[1])
-        assertEquals(52.08, attention[0], 15.0)
-        assertEquals(49.47, relaxation[0], 15.0)
-        assertEquals(41.93, pleasure[0], 15.0)
-        assertEquals(35.17, pressure[0], 15.0)
-        assertEquals(40.74, arousal[0], 15.0)
-        assertEquals(67.0, hr[0], 15.0)
+        assertEquals(68.36, attention[0], 30.0)
+        assertEquals(49.47, relaxation[0], 30.0)
+        assertEquals(41.93, pleasure[0], 30.0)
+        assertEquals(35.17, pressure[0], 30.0)
+        assertEquals(40.74, arousal[0], 30.0)
+        assertEquals(67.0, hr[0], 30.0)
     }
 
     fun uploadEEGRawData() {
@@ -161,7 +161,7 @@ class EnterAffectiveCloudManagerTest {
                 }
                 enterAffectiveCloudManager!!.appendEEGData(eegs)
                 try {
-                    Thread.sleep(10)
+                    Thread.sleep(12)
                 } catch (e: InterruptedException) {
                     e.printStackTrace()
                 }
@@ -195,7 +195,7 @@ class EnterAffectiveCloudManagerTest {
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
         var HR_TEST_FILE_PATH =
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_hrdata.txt"
-        var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
+        var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 //        var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
         internal var availableAffectiveServices: MutableList<Service> = ArrayList()
         internal var availableBioServices: MutableList<Service> = ArrayList()
@@ -231,12 +231,24 @@ class EnterAffectiveCloudManagerTest {
                 .requestPleasure()
                 .requestArousal()
                 .build()
+
+            var algorithmParamsEEG =
+                AlgorithmParamsEEG.Builder()
+                    .tolerance(AlgorithmParamsEEG.Tolerance.LEVEL_2)
+                    .filterMode(AlgorithmParamsEEG.FilterMode.SMART)
+                    .powerMode(AlgorithmParamsEEG.PowerMode.DB)
+                    .channelPowerVerbose(false)
+                    .build()
+            var algorithmParams = AlgorithmParams.Builder()
+                .eeg(algorithmParamsEEG)
+                .build()
             enterAffectiveCloudConfig = EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
                 .url(websocketAddress)
                 .availableBiodataServices(availableBioServices)
                 .availableAffectiveServices(availableAffectiveServices)
                 .biodataSubscribeParams(biodataSubscribeParams!!)
                 .affectiveSubscribeParams(affectiveSubscribeParams!!)
+                .algorithmParams(algorithmParams)
                 .build()
             enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig!!)
             rawJsonResponseFunction = fun(s: String): Unit {

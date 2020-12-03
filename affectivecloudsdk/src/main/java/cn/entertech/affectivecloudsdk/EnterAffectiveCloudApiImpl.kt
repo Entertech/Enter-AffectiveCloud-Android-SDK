@@ -335,6 +335,12 @@ class EnterAffectiveCloudApiImpl internal constructor(
 
                 }
             }
+            if (optionParams.containsKey("algorithm_params")) {
+                if (optionParams["algorithm_params"] != null) {
+                    var map = optionParams["algorithm_params"]!! as Map<Any, Any>
+                    requestBodyMap["algorithm_params"] = map
+                }
+            }
         }
         var requestBody = RequestBody(SERVER_BIO_DATA, "init", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)

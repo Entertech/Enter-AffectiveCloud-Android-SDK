@@ -8,7 +8,7 @@ For the precautions for hardware use, please refer to [Enter Precautions for the
 ## Demo Description
 
 This demo demonstrates the entire process of device connection and brainwave data collection, sending the collected data to the cloud, and returning the analysis results after cloud algorithm analysis. It mainly consists of two parts:
-* Integrate the Bluetooth SDK of the module to complete device connection and data collection, please refer to this Bluetooth SDK project for details--[Enter-Biomodule-BLE-Android-SDK](https://github.com/EnterTech/Enter-Biomodule-BLE-Android-SDK)；
+* Integrate the Bluetooth SDK of the module to complete device connection and data collection, please refer to this Bluetooth SDK project for details--[Enter-Biomodule-BLE-Android-SDK](https://github.com/Entertech/Enter-Biomodule-BLE-Android-SDK/blob/master/README_EN.md)；
 * Emotion Cloud SDK, upload the raw data collected by Bluetooth to Emotion Cloud, the specific documents can be viewed [Enter Emotion Cloud Platform SDK (Android)](../README_EN.md)。
 
 ## Operation

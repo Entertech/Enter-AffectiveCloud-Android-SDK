@@ -1,17 +1,17 @@
 # Enter-AffectiveCloud-Andriod-SDK [![Download](https://api.bintray.com/packages/hzentertech/maven/affectivecloud/images/download.svg?version=2.0.0)](https://bintray.com/hzentertech/maven/affectivecloud/2.0.0/link)
-- [Introduction](#Introduction)
+- [Introduction](#introduction)
 - [Demo](#demo)
-- [Getting Started](#Getting Started)
-    + [Gradle](#Gradle)
-    + [Permissions](#Permissions)
-- [How to use](#How to use)
-  * [1.Initialization](#Initialization)
-  * [2.Add real-time data listener](#Add real-time data listener)
-  * [3.Upload data](#Upload data)
-  * [4.Get the report](#Get the report)
-  * [5.Release](#Release)
-- [Detailed API function description](#Detailed API function description)
-- [Change Notes](#Change Notes)
+- [Getting Started](#getting-started)
+    + [Gradle](#gradle)
+    + [Permissions](#permissions)
+- [How to use](#how-to-use)
+  * [1.Initialization](#1initialization)
+  * [2. Add real-time data listener](#2-add-real-time-data-listener)
+  * [3. Upload data](#3-upload-data)
+  * [4. Get the report](#4-get-the-report)
+  * [5. Release](#5-release)
+- [Detailed API function description](#detailed-api-function-description)
+- [Change Notes](#change-notes)
 # Introduction
 
 Enter Affective Cloud is a cloud algorithm platform that can perform advanced emotional data analysis based on the user’s brainwave data and heart rate data, and can also provide: relaxation, attention, pleasure, stress, excitement (internal test ), including a variety of emotional values. For details, please see [Official Website](https://www.entertech.cn).
@@ -31,7 +31,7 @@ In order to facilitate your rapid development of the Android platform, we provid
 
 For more demo operation instructions, please see [Enter Bioelectric Acquisition Module Demo](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/tree/master/demo)
 
-In addition, we also provide a heart flow demonstration application, which integrates Bluetooth SDK, Bluetooth device management SDK, affective cloud SDK and other functions. For details, please see [Heart Flow Demo Application](https://github.com/Entertech/Enter- Affective-Cloud-Demo-Android)
+In addition, we also provide a heart flow demonstration application, which integrates Bluetooth SDK, Bluetooth device management SDK, affective cloud SDK and other functions. For details, please see [Heart Flow Demo Application](https://github.com/Entertech/Enter-Affective-Cloud-Demo-Android)
 
 # Getting Started
 

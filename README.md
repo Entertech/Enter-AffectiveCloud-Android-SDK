@@ -1,3 +1,4 @@
+[English Readme](/README_EN.md)
 # Enter-AffectiveCloud-Andriod-SDK [![Download](https://api.bintray.com/packages/hzentertech/maven/affectivecloud/images/download.svg?version=2.0.0)](https://bintray.com/hzentertech/maven/affectivecloud/2.0.0/link)
 - [简介](#简介)
 - [Demo](#demo)

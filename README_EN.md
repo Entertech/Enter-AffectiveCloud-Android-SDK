@@ -18,7 +18,7 @@ Enter Affective Cloud is a cloud algorithm platform that can perform advanced em
 
 Before starting the development, please check the [Development Documents](https://docs.affectivecloud.com) of Enter Affective Cloud to understand the structure of Affective Cloud platform and specific descriptions of the services it can provide, and determine your application The service needed. You also need to contact the administrator to register the test application, and then develop.
 
-In order to facilitate your rapid development of the Android platform, we provide the affective cloud rapid development SDK, through which you can quickly integrate the emotional cloud capabilities into your app.
+In order to facilitate your rapid development of the Android platform, we provide the affective cloud rapid development SDK, through which you can quickly integrate the affective cloud capabilities into your app.
 
 # Demo
 
@@ -146,7 +146,7 @@ enterAffectiveCloudManager?.appendHeartRateData(heartRate)
 
 ## 4. Get the report
 
-The report field returned is determined by the previous configuration. For detailed descriptions of specific fields, see [Biodata Basic Report Parameters](https://docs.affectivecloud.com/🎙接口协议/4.%20生物数据基础分析服务协议.html#biodata-report) and [Emotional Calculation Report Parameters](https://docs.affectivecloud.com/🎙接口协议/5.%20情感计算服务协议.html#affective-report).
+The report field returned is determined by the previous configuration. For detailed descriptions of specific fields, see [Biodata Basic Report Parameters](https://docs.affectivecloud.com/🎙接口协议/4.%20生物数据基础分析服务协议.html#biodata-report) and [Affective Calculation Report Parameters](https://docs.affectivecloud.com/🎙接口协议/5.%20情感计算服务协议.html#affective-report).
 
 ```kotlin
 enterAffectiveCloudManager?.getBiodataReport(object: Callback2<HashMap<Any, Any?>> {
@@ -185,7 +185,7 @@ enterAffectiveCloudManager?.release(object: Callback {
 
 # Detailed API function description
 
-If you need to use emotional cloud services flexibly according to different scenarios, you can use `EnterAffectiveCloudApi` to call the corresponding API, which encapsulates all the external interfaces of emotional cloud services. For more detailed Affective Cloud API, please refer to [Affective Cloud Detailed API Function Description](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/blob/master/media/%E6%83%85%E6%84%9F%E4%BA%91%E8%AF%A6%E7%BB%86API%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E.md)
+If you need to use affective cloud services flexibly according to different scenarios, you can use `EnterAffectiveCloudApi` to call the corresponding API, which encapsulates all the external interfaces of affective cloud services. For more detailed Affective Cloud API, please refer to [Affective Cloud Detailed API Function Description](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/blob/master/media/%E6%83%85%E6%84%9F%E4%BA%91%E8%AF%A6%E7%BB%86API%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E.md)
 
 # Change Notes
 [Change Notes](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/wiki/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)

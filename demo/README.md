@@ -1,3 +1,4 @@
+[English Readme](/README_EN.md)
 # 回车生物电采集模块演示 demo
 
 ## 硬件使用

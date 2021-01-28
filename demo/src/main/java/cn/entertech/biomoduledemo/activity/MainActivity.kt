@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         if (appKey == null || appSecret == null) {
             Toast.makeText(
                 this@MainActivity,
-                "APP KEY 或 APP SECRET 有误请重新填写！",
+                getString(R.string.auth_page_title),
                 Toast.LENGTH_LONG
             ).show()
             finish()
@@ -142,14 +142,15 @@ class MainActivity : AppCompatActivity() {
                 .affectiveSubscribeParams(affectiveSubscribeParams!!)
                 .storageSettings(storageSettings)
                 .algorithmParams(algorithmParams)
+                .uploadCycle(1)
 //                .biodataTolerance(biodataTolerance)
                 .build()
         enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
         enterAffectiveCloudManager!!.addBiodataRealtimeListener {
-            messageReceiveFragment.appendMessageToScreen("基础服务实时数据：${it.toString()}")
+            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_biodata) + it.toString())
         }
         enterAffectiveCloudManager!!.addAffectiveDataRealtimeListener {
-            messageReceiveFragment.appendMessageToScreen("情感服务实时数据：${it.toString()}")
+            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_affective_data) + it.toString())
         }
         enterAffectiveCloudManager!!.addRawJsonRequestListener {
             messageSendFragment.appendMessageToScreen(it)
@@ -162,12 +163,12 @@ class MainActivity : AppCompatActivity() {
         }
         enterAffectiveCloudManager?.init(object : Callback {
             override fun onError(error: Error?) {
-                messageReceiveFragment.appendMessageToScreen("SDK初始化失败：${error.toString()}")
+                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_failed) + error.toString())
                 if (error != null && error!!.code == 1004) {
                     runOnUiThread {
                         Toast.makeText(
                             this@MainActivity,
-                            "APP KEY 或 APP SECRET 有误请重新填写！",
+                            getText(R.string.auth_page_title),
                             Toast.LENGTH_LONG
                         ).show()
                         finish()
@@ -179,7 +180,7 @@ class MainActivity : AppCompatActivity() {
                 fileName = "${System.currentTimeMillis()}.txt"
                 FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
                 FileHelper.getInstance().setHRPath(saveHRPath + fileName)
-                messageReceiveFragment.appendMessageToScreen("SDK初始化成功，等待数据上传...")
+                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_success))
             }
 
         })
@@ -209,7 +210,7 @@ class MainActivity : AppCompatActivity() {
         messageSendFragment = MessageSendFragment()
         listFragment.add(messageReceiveFragment)
         listFragment.add(messageSendFragment)
-        val listTitles = listOf("接受消息", "发送消息")
+        val listTitles = listOf(getString(R.string.main_receive), getString(R.string.main_send))
         var adapter = MessageAdapter(
             supportFragmentManager,
             listFragment,
@@ -220,7 +221,7 @@ class MainActivity : AppCompatActivity() {
 
         rb_brain.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
-                currentDataType = "brain"
+                currentDataType = "brainwave"
                 availableBioServices = listOf(Service.EEG)
                 initEnterAffectiveCloudManager()
             }
@@ -292,28 +293,29 @@ class MainActivity : AppCompatActivity() {
 
 
     fun onConnectDevice(view: View) {
-        messageReceiveFragment.appendMessageToScreen("正在扫描设备...")
+        messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_scaning))
         biomoduleBleManager.scanNearDeviceAndConnect(fun() {
-            messageReceiveFragment.appendMessageToScreen("扫描成功，正在连接设备...")
+            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_scan_success))
             Logger.d("扫描设备成功")
         }, fun(error: Exception) {
 
         }, fun(mac: String) {
-            messageReceiveFragment.appendMessageToScreen("设备连接成功!")
+            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_connect_to_ble_success))
             Logger.d("连接成功$mac")
             runOnUiThread {
                 Toast.makeText(this@MainActivity, "设备连接成功", Toast.LENGTH_SHORT).show()
             }
         }) { msg ->
             Logger.d("连接失败")
-            messageReceiveFragment.appendMessageToScreen("设备连接失败：$msg")
+            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_connect_failed) + msg)
             runOnUiThread {
                 Toast.makeText(this@MainActivity, "设备连接失败：$msg", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    fun onDisconnetDevice(view: View) {
+    fun onDisconnectDevice(view: View) {
+        messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_connect_failed))
         biomoduleBleManager.disConnect()
     }
 
@@ -355,42 +357,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onStartContact(view: View) {
-        biomoduleBleManager.startContact()
-    }
-
-    fun onStopContact(view: View) {
-        biomoduleBleManager.stopContact()
-    }
-
-
     fun onInit(view: View) {
         initEnterAffectiveCloudManager()
     }
 
     fun onStartUpload(view: View) {
         biomoduleBleManager.startHeartAndBrainCollection()
-        messageReceiveFragment.appendMessageToScreen("开始上传数据...")
+        messageReceiveFragment.appendMessageToScreen(getString(R.string.main_start_uploading))
     }
 
     fun onReport(view: View) {
         enterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
-                messageReceiveFragment.appendMessageToScreen("基础报表：${t.toString()}")
+                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_bio_report) + t.toString())
             }
 
             override fun onError(error: Error?) {
-                messageReceiveFragment.appendMessageToScreen("基础报表出错：${error.toString()}")
+                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_get_bio_report_failed) + error.toString())
             }
 
         })
         enterAffectiveCloudManager?.getAffectiveDataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
-                messageReceiveFragment.appendMessageToScreen("情感报表：${t.toString()}")
+                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_get_affective_report) + t.toString())
             }
 
             override fun onError(error: Error?) {
-                messageReceiveFragment.appendMessageToScreen("情感报表出错：${error?.msg}")
+                messageReceiveFragment.appendMessageToScreen(getString(R.string.mian_get_affective_report_failed) + error?.msg)
             }
 
         })
@@ -399,11 +392,11 @@ class MainActivity : AppCompatActivity() {
     fun onFinish(view: View) {
         enterAffectiveCloudManager?.release(object : Callback {
             override fun onSuccess() {
-                messageReceiveFragment.appendMessageToScreen("情感云已成功断开！")
+                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_disconnected_from_cloud))
             }
 
             override fun onError(error: Error?) {
-                messageReceiveFragment.appendMessageToScreen("情感云断开失败：${error?.msg}")
+                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_disconnected_from_cloud_failed) + error?.msg)
             }
 
         })
@@ -423,11 +416,11 @@ class MainActivity : AppCompatActivity() {
             datas,
             object : Callback {
                 override fun onSuccess() {
-                    messageReceiveFragment.appendMessageToScreen("评价提交成功！")
+                    messageReceiveFragment.appendMessageToScreen(getString(R.string.main_submit_comment_success))
                 }
 
                 override fun onError(error: Error?) {
-                    messageReceiveFragment.appendMessageToScreen("评价提交失败：${error?.msg}")
+                    messageReceiveFragment.appendMessageToScreen(getString(R.string.main_submit_comment_failed) + error?.msg)
                 }
 
             })
@@ -436,11 +429,11 @@ class MainActivity : AppCompatActivity() {
     fun onRestore(view: View) {
         enterAffectiveCloudManager?.restore(object : Callback {
             override fun onSuccess() {
-                messageReceiveFragment.appendMessageToScreen("情感云已重连成功，请重新上传数据")
+                messageReceiveFragment.appendMessageToScreen(getString(R.string.mian_cloud_restore_success))
             }
 
             override fun onError(error: Error?) {
-                messageReceiveFragment.appendMessageToScreen("情感云重连失败：${error?.msg}")
+                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_cloud_restore_failed) + error?.msg)
             }
 
         })

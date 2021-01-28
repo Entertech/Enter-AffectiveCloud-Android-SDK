@@ -40,7 +40,7 @@ class AuthActivity : AppCompatActivity() {
             intent.putExtra(Constant.INTENT_APP_SECRET, setting?.appSecret)
             startActivity(intent)
         } else {
-            Toast.makeText(this, "请输入正确的app key 或 app secret", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.auth_page_title), Toast.LENGTH_SHORT).show()
         }
     }
 }

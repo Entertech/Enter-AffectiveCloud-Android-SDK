@@ -66,7 +66,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
                     }
                 }
             var sslSocketFactory = getSSLSocketFactory()
-            mBrainDataWebSocket!!.setSocketFactory(sslSocketFactory)
+//            mBrainDataWebSocket!!.setSocketFactory(sslSocketFactory)
             mBrainDataWebSocket!!.connect()
         } catch (e: Exception) {
             mOpenCallback?.onError(e)

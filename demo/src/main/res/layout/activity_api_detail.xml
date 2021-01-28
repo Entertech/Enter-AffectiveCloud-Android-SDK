@@ -17,34 +17,38 @@
             >
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="连接情感云平台"
+                android:text="@string/detail_connect_to_cloud"
                 android:onClick="onConnectSocket"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="权限认证"
+                android:text="@string/detail_auth"
                 android:onClick="onSessionCreate"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="断开情感云平台"
+                android:text="@string/detail_disconnect_cloud"
                 android:onClick="onSessionClose"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="模拟中断恢复"
+                android:text="@string/detail_restore"
                 android:onClick="onSessionRestore"
                 />
 
@@ -58,51 +62,57 @@
 
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="初始化基础服务"
+                android:text="@string/detail_init_bio_service"
                 android:onClick="onInitBiodataServer"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="订阅基础服务"
+                android:text="@string/detail_sub_bio_service"
                 android:onClick="onSubscribeBiodata"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="上传生物数据"
+                android:text="@string/detail_upload_data"
                 android:onClick="onUploadBiodata"
                 />
 
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="暂停"
+                android:text="@string/detail_pause"
                 android:onClick="onStopCollect"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="获取基础报表"
+                android:text="@string/detail_get_bio_report"
                 android:onClick="onBiodataReport"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="取消订阅基础服务"
+                android:text="@string/detail_unsub_bio_service"
                 android:onClick="onUnsubscribeBiodata"
                 />
     </LinearLayout>
@@ -114,43 +124,48 @@
             >
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="启动情感云服务"
+                android:text="@string/detail_start_affective_service"
                 android:onClick="onStartAffective"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="订阅情感服务"
+                android:text="@string/detail_sub_affective_service"
                 android:onClick="onSubscribeAffective"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="获取情感数据报表"
+                android:text="@string/detail_get_affective_service"
                 android:onClick="onAffectiveReport"
                 />
 
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="取消订阅情感服务"
+                android:text="@string/detail_unsub_affective_service"
                 android:onClick="onUnsubscribeAffective"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="结束情感云服务"
+                android:text="@string/detail_finish_affective_service"
                 android:onClick="onFinishAffective"
                 />
 

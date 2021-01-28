@@ -19,7 +19,7 @@
                 android:id="@+id/rb_brain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="脑波"
+                android:text="@string/brainwave"
                 android:checked="true"
                 />
 
@@ -27,7 +27,7 @@
                 android:id="@+id/rb_heart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="心率"
+                android:text="@string/heart_rate"
                 />
 
     </RadioGroup>
@@ -61,54 +61,41 @@
             >
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="连接蓝牙设备"
+                android:text="@string/main_connect_to_ble"
                 android:onClick="onConnectDevice"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="断开蓝牙设备"
-                android:onClick="onDisconnetDevice"
+                android:text="@string/main_disconnect_ble"
+                android:onClick="onDisconnectDevice"
                 />
 
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="清屏"
+                android:text="@string/main_clear"
                 android:onClick="onClear"
                 />
 
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="暂停"
+                android:text="@string/main_pause"
                 android:onClick="onPause"
-                />
-
-
-        <Button
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="打开脱落"
-                android:onClick="onStartContact"
-                />
-
-        <Button
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="关闭脱落"
-                android:onClick="onStopContact"
                 />
 
 
@@ -121,45 +108,51 @@
             >
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="初始化"
+                android:text="@string/main_init"
                 android:onClick="onInit"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="开始上传数据"
+                android:text="@string/main_upload"
                 android:onClick="onStartUpload"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="获取报表数据"
+                android:text="@string/upload"
                 android:onClick="onReport"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="结束"
+                android:text="@string/main_finish"
                 android:onClick="onFinish"
                 />
 
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:text="提交评价"
+                android:text="@string/main_submit_comment"
                 android:onClick="onSubmit"
                 />
         <Button
+                android:textAllCaps="false"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -170,9 +163,10 @@
     </LinearLayout>
 
     <Button
+            android:textAllCaps="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="API 详细功能"
+            android:text="@string/main_api_detail"
             android:onClick="toApiDetail"
             />
 

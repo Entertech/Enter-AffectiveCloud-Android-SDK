@@ -13,7 +13,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="24dp"
-            android:text="请输入情感云 APP_KEY 和 APP_SECRET"
+            android:text="@string/auth_page_title"
             />
 
     <LinearLayout
@@ -62,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="继续"
+            android:text="@string/auth_start"
             />
 
 </LinearLayout>

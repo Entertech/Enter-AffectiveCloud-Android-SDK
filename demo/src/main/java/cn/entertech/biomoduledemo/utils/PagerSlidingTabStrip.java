@@ -1,6 +1,5 @@
 package cn.entertech.biomoduledemo.utils;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -35,7 +34,7 @@ import java.util.Locale;
 public class PagerSlidingTabStrip extends HorizontalScrollView {
 
     public interface IconTabProvider {
-        public int getPageIconResId(int position);
+        int getPageIconResId(int position);
     }
 
     // @formatter:off
@@ -171,7 +170,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
             throw new IllegalStateException("ViewPager does not have adapter instance.");
         }
 
-        pager.setOnPageChangeListener(pageListener);
+        pager.addOnPageChangeListener(pageListener);
 
         notifyDataSetChanged();
         updateTabsTextColors();
@@ -200,18 +199,9 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
         updateTabStyles();
 
         getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-
-            @SuppressWarnings("deprecation")
-            @SuppressLint("NewApi")
             @Override
             public void onGlobalLayout() {
-
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                } else {
-                    getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }
-
+                getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 currentPosition = pager.getCurrentItem();
                 scrollToChild(currentPosition, 0);
             }

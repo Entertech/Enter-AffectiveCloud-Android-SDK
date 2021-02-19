@@ -1,10 +1,10 @@
 package cn.entertech.biomoduledemo.activity
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import cn.entertech.affectivecloudsdk.AffectiveSubscribeParams
 import cn.entertech.affectivecloudsdk.BiodataSubscribeParams
 import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiFactory

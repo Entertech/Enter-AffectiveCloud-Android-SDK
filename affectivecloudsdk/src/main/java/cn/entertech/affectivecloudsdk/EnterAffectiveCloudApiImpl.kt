@@ -323,6 +323,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         if (optionParams != null) {
             if (optionParams.containsKey("bio_data_tolerance")) {
                 if (optionParams["bio_data_tolerance"] != null) {
+                    @Suppress("UNCHECKED_CAST")
                     var map = optionParams["bio_data_tolerance"]!! as Map<Any, Any>
                     requestBodyMap["bio_data_tolerance"] = map
 
@@ -330,6 +331,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
             }
             if (optionParams.containsKey("storage_settings")) {
                 if (optionParams["storage_settings"] != null) {
+                    @Suppress("UNCHECKED_CAST")
                     var map = optionParams["storage_settings"]!! as Map<Any, Any>
                     requestBodyMap["storage_settings"] = map
 
@@ -337,6 +339,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
             }
             if (optionParams.containsKey("algorithm_params")) {
                 if (optionParams["algorithm_params"] != null) {
+                    @Suppress("UNCHECKED_CAST")
                     var map = optionParams["algorithm_params"]!! as Map<Any, Any>
                     requestBodyMap["algorithm_params"] = map
                 }
@@ -360,10 +363,10 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     var brainDataBuffer = CopyOnWriteArrayList<Int>()
-    override fun appendEEGData(bytes: ByteArray) {
-        for (byte in bytes) {
-            var brainData = ConvertUtil.converUnchart(byte)
-            brainDataBuffer.add(brainData)
+    override fun appendEEGData(brainData: ByteArray) {
+        for (byte in brainData) {
+            var unchart = ConvertUtil.converUnchart(byte)
+            brainDataBuffer.add(unchart)
             if (brainDataBuffer.size >= uploadEEGTriggerCount) {
                 var dataMap = HashMap<Any, Any>()
                 dataMap["eeg"] = brainDataBuffer.toIntArray()

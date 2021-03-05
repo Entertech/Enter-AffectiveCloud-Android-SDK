@@ -194,8 +194,8 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         })
     }
 
-    override fun appendEEGData(bytes: ByteArray) {
-        mApi.appendEEGData(bytes)
+    override fun appendEEGData(brainData: ByteArray) {
+        mApi.appendEEGData(brainData)
     }
 
     override fun appendHeartRateData(heartRateData: Int) {
@@ -318,37 +318,34 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     override fun addRawJsonRequestListener(listener: (String) -> Unit) {
-        mApi?.addRawJsonRequestListener(listener)
+        mApi.addRawJsonRequestListener(listener)
     }
 
     override fun addRawJsonResponseListener(listener: (String) -> Unit) {
-        mApi?.addRawJsonResponseListener(listener)
+        mApi.addRawJsonResponseListener(listener)
     }
 
     override fun removeRawJsonRequestListener(listener: (String) -> Unit) {
-        mApi?.removeRawJsonRequestListener(listener)
+        mApi.removeRawJsonRequestListener(listener)
     }
 
     override fun removeRawJsonResponseListener(listener: (String) -> Unit) {
-        mApi?.removeRawJsonResponseListener(listener)
+        mApi.removeRawJsonResponseListener(listener)
     }
 
     override fun isWebSocketOpen(): Boolean {
-        if (mApi == null) {
-            return false
-        }
-        return mApi!!.isWebSocketOpen()
+        return mApi.isWebSocketOpen()
     }
 
     override fun closeWebSocket() {
-        mApi?.closeWebSocket()
+        mApi.closeWebSocket()
     }
 
     override fun closeConnection(code: Int, message: String) {
-        mApi?.closeConnection(code, message)
+        mApi.closeConnection(code, message)
     }
 
     override fun submit(remark: List<RecData>, callback: Callback) {
-        mApi?.submit(remark, callback)
+        mApi.submit(remark, callback)
     }
 }

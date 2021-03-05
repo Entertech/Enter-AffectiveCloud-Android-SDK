@@ -16,14 +16,12 @@ class ReportGenerator {
         if (reportServiceList == null || reportServiceList!!.isEmpty()) {
             throw IllegalStateException("please init ReportGenerator first")
         }
-        if (responseBody.data != null) {
-            var data = responseBody.data
-            var keys = responseBody.data.keys
-            keys.forEach {
-                for (service in reportServiceList!!) {
-                    if (it == service.value)
-                        item[it] = data[it]
-                }
+        var data = responseBody.data
+        var keys = responseBody.data.keys
+        keys.forEach {
+            for (service in reportServiceList!!) {
+                if (it == service.value)
+                    item[it] = data[it]
             }
         }
         for (service in reportServiceList!!) {

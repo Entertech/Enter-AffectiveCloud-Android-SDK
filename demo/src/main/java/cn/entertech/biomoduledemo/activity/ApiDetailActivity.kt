@@ -77,7 +77,7 @@ class ApiDetailActivity : AppCompatActivity() {
     }
 
 
-    fun onConnectSocket(view: View) {
+    fun onConnectSocket(@Suppress("UNUSED_PARAMETER")view: View) {
         Logger.d("正在连接情感云平台...")
         mEnterAffectiveCloudApi?.openWebSocket(object : WebSocketCallback {
             override fun onOpen(serverHandshake: ServerHandshake?) {
@@ -96,7 +96,7 @@ class ApiDetailActivity : AppCompatActivity() {
         })
     }
 
-    fun onSessionCreate(view: View) {
+    fun onSessionCreate(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk()) {
             return
         }
@@ -111,7 +111,7 @@ class ApiDetailActivity : AppCompatActivity() {
         })
     }
 
-    fun onSessionClose(view: View) {
+    fun onSessionClose(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk()) {
             return
         }
@@ -126,7 +126,7 @@ class ApiDetailActivity : AppCompatActivity() {
         })
     }
 
-    fun onSessionRestore(view: View) {
+    fun onSessionRestore(@Suppress("UNUSED_PARAMETER")view: View) {
         mEnterAffectiveCloudApi?.restore(object : Callback {
             override fun onSuccess() {
                 Logger.d("情感云会话已重连")
@@ -139,7 +139,7 @@ class ApiDetailActivity : AppCompatActivity() {
         })
     }
 
-    fun onInitBiodataServer(view: View) {
+    fun onInitBiodataServer(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk()) {
             return
         }
@@ -158,14 +158,14 @@ class ApiDetailActivity : AppCompatActivity() {
         })
     }
 
-    fun onUploadBiodata(view: View) {
+    fun onUploadBiodata(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk()) {
             return
         }
         biomoduleBleManager.startHeartAndBrainCollection()
     }
 
-    fun onStopCollect(view: View) {
+    fun onStopCollect(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk()) {
             return
         }
@@ -173,15 +173,15 @@ class ApiDetailActivity : AppCompatActivity() {
     }
 
 
-    fun onStartContact(view: View) {
+    fun onStartContact(@Suppress("UNUSED_PARAMETER")view: View) {
         biomoduleBleManager.startContact()
     }
 
-    fun onStopContact(view: View) {
+    fun onStopContact(@Suppress("UNUSED_PARAMETER")view: View) {
         biomoduleBleManager.stopContact()
     }
 
-    fun onSubscribeBiodata(view: View) {
+    fun onSubscribeBiodata(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk()) {
             return
         }
@@ -206,7 +206,7 @@ class ApiDetailActivity : AppCompatActivity() {
         })
     }
 
-    fun onBiodataReport(view: View) {
+    fun onBiodataReport(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk()) {
             return
         }
@@ -222,7 +222,7 @@ class ApiDetailActivity : AppCompatActivity() {
         })
     }
 
-    fun onUnsubscribeBiodata(view: View) {
+    fun onUnsubscribeBiodata(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk() || biodataSubscribeParams == null) {
             return
         }
@@ -237,7 +237,7 @@ class ApiDetailActivity : AppCompatActivity() {
         })
     }
 
-    fun onStartAffective(view: View) {
+    fun onStartAffective(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk()) {
             return
         }
@@ -255,7 +255,7 @@ class ApiDetailActivity : AppCompatActivity() {
     }
 
 
-    fun onSubscribeAffective(view: View) {
+    fun onSubscribeAffective(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk()) {
             return
         }
@@ -283,7 +283,7 @@ class ApiDetailActivity : AppCompatActivity() {
     }
 
 
-    fun onAffectiveReport(view: View) {
+    fun onAffectiveReport(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk()) {
             return
         }
@@ -301,7 +301,7 @@ class ApiDetailActivity : AppCompatActivity() {
     }
 
 
-    fun onUnsubscribeAffective(view: View) {
+    fun onUnsubscribeAffective(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk() || affectiveSubscribeParams == null) {
             return
         }
@@ -317,7 +317,7 @@ class ApiDetailActivity : AppCompatActivity() {
             })
     }
 
-    fun onFinishAffective(view: View) {
+    fun onFinishAffective(@Suppress("UNUSED_PARAMETER")view: View) {
         if (!isStatusOk()) {
             return
         }

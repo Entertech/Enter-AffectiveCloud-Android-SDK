@@ -76,10 +76,10 @@ interface BaseApi {
     /**
      * start affective services before use.
      *
-     * @param serviceList List<String>
+     * @param services List<String>
      * @param callback Callback
      */
-    fun initAffectiveDataServices(serviceList: List<Service>, callback: Callback)
+    fun initAffectiveDataServices(services: List<Service>, callback: Callback)
 
     /**
      * Send brain data to affective cloud platform.
@@ -151,10 +151,10 @@ interface BaseApi {
 
     /**
      * Warning!:Don't forget to call this method to finish affective services after you have used it.
-     * @param serviceList List<String>
+     * @param services List<String>
      * @param callback Callback
      */
-    fun finishAffectiveDataServices(serviceList: List<Service>, callback: Callback)
+    fun finishAffectiveDataServices(services: List<Service>, callback: Callback)
 
     /**
      * Finish all affective services started before.

@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     private var biodataSubscribeParams: BiodataSubscribeParams? = null
     private lateinit var biomoduleBleManager: BiomoduleBleManager
 
-    /*自己的用户ID：邮箱或者手机号码*/
+    /*userId:your email or phone num;自己的用户ID：邮箱或者手机号码*/
     val USER_ID: String = "1245489@qq.com"
     private lateinit var messageReceiveFragment: MessageReceiveFragment
     private lateinit var messageSendFragment: MessageSendFragment
@@ -333,7 +333,6 @@ class MainActivity : AppCompatActivity() {
     var rawListener = fun(bytes: ByteArray) {
         if (currentDataType == "brain") {
             enterAffectiveCloudManager?.appendEEGData(bytes)
-//        以下是原始脑波文件保存逻辑，如无需该功能可忽略
             for (byte in bytes) {
                 var brainData = ConvertUtil.converUnchart(byte)
                 brainDataBuffer.add(brainData)

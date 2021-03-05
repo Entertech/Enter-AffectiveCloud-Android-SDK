@@ -29,11 +29,11 @@ class ApiDetailActivity : AppCompatActivity() {
 
     private var affectiveSubscribeParams: AffectiveSubscribeParams? = null
     private var biodataSubscribeParams: BiodataSubscribeParams? = null
-    /*需要向情感云平台申请 :APP_KEY、APP_SECRET、USER_NAME*/
+    /* Need to apply  :APP_KEY、APP_SECRET、USER_NAME*/
     val APP_KEY: String = "REDACTED"
     val APP_SECRET: String = "REDACTED"
     val USER_NAME: String = "test1"
-    /*自己的用户ID：邮箱或者手机号码*/
+    /*userId:your email or phone num;自己的用户ID：邮箱或者手机号码*/
     val USER_ID: String = "REDACTED"
     var saveRootPath: String = Environment.getExternalStorageDirectory().path + File.separator + "biorawdata"
     var saveEEGPath: String =

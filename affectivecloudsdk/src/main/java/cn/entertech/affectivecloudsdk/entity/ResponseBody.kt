@@ -37,7 +37,7 @@ class ResponseBody(
 
     fun isBiodataSubOp(): Boolean {
         if (request.op == Request.REQUEST_OPTION_SUBSCRIBE && request.services == "biodata") {
-            data?.keys?.forEach {
+            data.keys.forEach {
                 if ((it as String).contains("fields")) {
                     return true
                 }
@@ -48,7 +48,7 @@ class ResponseBody(
 
     fun isAffectiveSubOp(): Boolean {
         if (request.op == Request.REQUEST_OPTION_SUBSCRIBE && request.services == "affective") {
-            data?.keys?.forEach {
+            data.keys.forEach {
                 if ((it as String).contains("fields")) {
                     return true
                 }
@@ -59,7 +59,7 @@ class ResponseBody(
 
     fun isBiodataUnsubOp(): Boolean {
         if (request.op == Request.REQUEST_OPTION_UNSUBSCRIBE && request.services == "biodata") {
-            data?.keys?.forEach {
+            data.keys.forEach {
                 if ((it as String).contains("fields")) {
                     return true
                 }
@@ -70,7 +70,7 @@ class ResponseBody(
 
     fun isAffectiveUnsubOp(): Boolean {
         if (request.op == Request.REQUEST_OPTION_UNSUBSCRIBE && request.services == "affective") {
-            data?.keys?.forEach {
+            data.keys.forEach {
                 if ((it as String).contains("fields")) {
                     return true
                 }
@@ -82,7 +82,7 @@ class ResponseBody(
     fun isBiodataResponse(): Boolean {
         var result = true
         if (request.op == Request.REQUEST_OPTION_SUBSCRIBE && request.services == "biodata") {
-            data?.keys?.forEach {
+            data.keys.forEach {
                 if ((it as String).contains("fields")) {
                     result = false
                 }
@@ -96,7 +96,7 @@ class ResponseBody(
     fun isAffectivedataResponse(): Boolean {
         var result = true
         if (request.op == Request.REQUEST_OPTION_SUBSCRIBE && request.services == "affective") {
-            data?.keys?.forEach {
+            data.keys.forEach {
                 if ((it as String).contains("fields")) {
                     result = false
                 }
@@ -126,50 +126,55 @@ class ResponseBody(
 
     fun getBiodataSubFields(): SubBiodataFields {
         var subBiodataFields = SubBiodataFields()
-        if (data != null) {
-            if (data.containsKey("sub_eeg_fields") && data["sub_eeg_fields"] != null) {
-                var eegFields = data["sub_eeg_fields"] as ArrayList<String>
-                subBiodataFields.subEEGFields = eegFields
-            }
-            if (data.containsKey("sub_hr_fields") && data["sub_hr_fields"] != null) {
-                var hrFields = data["sub_hr_fields"] as ArrayList<String>
-                subBiodataFields.subHrFields = hrFields
-            }
+        if (data.containsKey("sub_eeg_fields") && data["sub_eeg_fields"] != null) {
+            @Suppress("UNCHECKED_CAST")
+            var eegFields = data["sub_eeg_fields"] as ArrayList<String>
+            subBiodataFields.subEEGFields = eegFields
+        }
+        if (data.containsKey("sub_hr_fields") && data["sub_hr_fields"] != null) {
+            @Suppress("UNCHECKED_CAST")
+            var hrFields = data["sub_hr_fields"] as ArrayList<String>
+            subBiodataFields.subHrFields = hrFields
         }
         return subBiodataFields
     }
 
     fun getAffectiveSubFields(): SubAffectiveDataFields {
         var subAffectiveDataFields = SubAffectiveDataFields()
-        if (data != null) {
-            if (data.containsKey("sub_attention_fields") && data["sub_attention_fields"] != null) {
-                var attentionFields = data["sub_attention_fields"] as ArrayList<String>
-                subAffectiveDataFields.subAttentionFields = attentionFields
-            }
-            if (data.containsKey("sub_relaxation_fields") && data["sub_relaxation_fields"] != null) {
-                var relaxationFields = data["sub_relaxation_fields"] as ArrayList<String>
-                subAffectiveDataFields.subRelaxationFields = relaxationFields
-            }
-            if (data.containsKey("sub_pressure_fields") && data["sub_pressure_fields"] != null) {
-                var pressureFields = data["sub_pressure_fields"] as ArrayList<String>
-                subAffectiveDataFields.subPressureFields = pressureFields
-            }
-            if (data.containsKey("sub_pleasure_fields") && data["sub_pleasure_fields"] != null) {
-                var pleasureFields = data["sub_pleasure_fields"] as ArrayList<String>
-                subAffectiveDataFields.subPleasureFields = pleasureFields
-            }
-            if (data.containsKey("sub_arousal_fields") && data["sub_arousal_fields"] != null) {
-                var arousalFields = data["sub_arousal_fields"] as ArrayList<String>
-                subAffectiveDataFields.subArousalFields = arousalFields
-            }
-            if (data.containsKey("sub_sleep_fields") && data["sub_sleep_fields"] != null) {
-                var sleepFields = data["sub_sleep_fields"] as ArrayList<String>
-                subAffectiveDataFields.subSleepFields = sleepFields
-            }
-            if (data.containsKey("sub_coherence_fields") && data["sub_coherence_fields"] != null) {
-                var coherenceFields = data["sub_coherence_fields"] as ArrayList<String>
-                subAffectiveDataFields.subCoherenceFields = coherenceFields
-            }
+        if (data.containsKey("sub_attention_fields") && data["sub_attention_fields"] != null) {
+            @Suppress("UNCHECKED_CAST")
+            var attentionFields = data["sub_attention_fields"] as ArrayList<String>
+            subAffectiveDataFields.subAttentionFields = attentionFields
+        }
+        if (data.containsKey("sub_relaxation_fields") && data["sub_relaxation_fields"] != null) {
+            @Suppress("UNCHECKED_CAST")
+            var relaxationFields = data["sub_relaxation_fields"] as ArrayList<String>
+            subAffectiveDataFields.subRelaxationFields = relaxationFields
+        }
+        if (data.containsKey("sub_pressure_fields") && data["sub_pressure_fields"] != null) {
+            @Suppress("UNCHECKED_CAST")
+            var pressureFields = data["sub_pressure_fields"] as ArrayList<String>
+            subAffectiveDataFields.subPressureFields = pressureFields
+        }
+        if (data.containsKey("sub_pleasure_fields") && data["sub_pleasure_fields"] != null) {
+            @Suppress("UNCHECKED_CAST")
+            var pleasureFields = data["sub_pleasure_fields"] as ArrayList<String>
+            subAffectiveDataFields.subPleasureFields = pleasureFields
+        }
+        if (data.containsKey("sub_arousal_fields") && data["sub_arousal_fields"] != null) {
+            @Suppress("UNCHECKED_CAST")
+            var arousalFields = data["sub_arousal_fields"] as ArrayList<String>
+            subAffectiveDataFields.subArousalFields = arousalFields
+        }
+        if (data.containsKey("sub_sleep_fields") && data["sub_sleep_fields"] != null) {
+            @Suppress("UNCHECKED_CAST")
+            var sleepFields = data["sub_sleep_fields"] as ArrayList<String>
+            subAffectiveDataFields.subSleepFields = sleepFields
+        }
+        if (data.containsKey("sub_coherence_fields") && data["sub_coherence_fields"] != null) {
+            @Suppress("UNCHECKED_CAST")
+            var coherenceFields = data["sub_coherence_fields"] as ArrayList<String>
+            subAffectiveDataFields.subCoherenceFields = coherenceFields
         }
         return subAffectiveDataFields
     }
@@ -182,14 +187,17 @@ class ResponseBody(
         var realtimeBioData = RealtimeBioData()
         if (data.containsKey("eeg")) {
             var realtimeEEGData = RealtimeEEGData()
+            @Suppress("UNCHECKED_CAST")
             var eegData = data["eeg"] as Map<Any, Any>
             if (eegData.containsKey("eeg_quality")) {
                 realtimeEEGData.quality = eegData["eeg_quality"] as Double
             }
             if (eegData.containsKey("eegr_wave")) {
+                @Suppress("UNCHECKED_CAST")
                 realtimeEEGData.rightwave = eegData["eegr_wave"] as ArrayList<Double>
             }
             if (eegData.containsKey("eegl_wave")) {
+                @Suppress("UNCHECKED_CAST")
                 realtimeEEGData.leftwave = eegData["eegl_wave"] as ArrayList<Double>
             }
             if (eegData.containsKey("eeg_gamma_power")) {
@@ -211,13 +219,15 @@ class ResponseBody(
         }
         if (data.containsKey("hr")) {
             var realtimeHrData = RealtimeHrData()
+            @Suppress("UNCHECKED_CAST")
             var hrMap = data["hr"] as Map<Any, Any>
             if (hrMap.containsKey("hr")) {
                 realtimeHrData.hr = hrMap["hr"] as Double
             }
             if (hrMap.containsKey("hrv")) {
-                var hrvList =  hrMap["hrv"] as ArrayList<Double>
-                if (hrvList != null && hrvList.isNotEmpty()){
+                @Suppress("UNCHECKED_CAST")
+                var hrvList = hrMap["hrv"] as ArrayList<Double>
+                if (hrvList.isNotEmpty()) {
                     realtimeHrData.hrv = hrvList
                 }
             }
@@ -229,66 +239,71 @@ class ResponseBody(
 
     fun getRealtimeAffectiveData(): RealtimeAffectiveData? {
         var realtimeAffectiveData = RealtimeAffectiveData()
-        if (data != null) {
-            if (data.containsKey("attention")) {
-                var realtimeAttentionData = RealtimeAttentionData()
-                var map = data["attention"] as Map<Any, Any>
-                if (map.containsKey("attention")) {
-                    realtimeAttentionData.attention = map["attention"] as Double
-                    realtimeAffectiveData.realtimeAttentionData = realtimeAttentionData
-                }
+        if (data.containsKey("attention")) {
+            var realtimeAttentionData = RealtimeAttentionData()
+            @Suppress("UNCHECKED_CAST")
+            var map = data["attention"] as Map<Any, Any>
+            if (map.containsKey("attention")) {
+                realtimeAttentionData.attention = map["attention"] as Double
+                realtimeAffectiveData.realtimeAttentionData = realtimeAttentionData
             }
-            if (data.containsKey("relaxation")) {
-                var realtimeRelaxationData = RealtimeRelaxationData()
-                var map = data["relaxation"] as Map<Any, Any>
-                if (map.containsKey("relaxation")) {
-                    realtimeRelaxationData.relaxation = map["relaxation"] as Double
-                    realtimeAffectiveData.realtimeRelaxationData = realtimeRelaxationData
-                }
+        }
+        if (data.containsKey("relaxation")) {
+            var realtimeRelaxationData = RealtimeRelaxationData()
+            @Suppress("UNCHECKED_CAST")
+            var map = data["relaxation"] as Map<Any, Any>
+            if (map.containsKey("relaxation")) {
+                realtimeRelaxationData.relaxation = map["relaxation"] as Double
+                realtimeAffectiveData.realtimeRelaxationData = realtimeRelaxationData
             }
-            if (data.containsKey("pressure")) {
-                var realtimePressureData = RealtimePressureData()
-                var map = data["pressure"] as Map<Any, Any>
-                if (map.containsKey("pressure")) {
-                    realtimePressureData.pressure = map["pressure"] as Double
-                    realtimeAffectiveData.realtimePressureData = realtimePressureData
-                }
+        }
+        if (data.containsKey("pressure")) {
+            var realtimePressureData = RealtimePressureData()
+            @Suppress("UNCHECKED_CAST")
+            var map = data["pressure"] as Map<Any, Any>
+            if (map.containsKey("pressure")) {
+                realtimePressureData.pressure = map["pressure"] as Double
+                realtimeAffectiveData.realtimePressureData = realtimePressureData
             }
-            if (data.containsKey("pleasure")) {
-                var realtimePleasureData = RealtimePleasureData()
-                var map = data["pleasure"] as Map<Any, Any>
-                if (map.containsKey("pleasure")) {
-                    realtimePleasureData.pleasure = map["pleasure"] as Double
-                    realtimeAffectiveData.realtimePleasureData = realtimePleasureData
-                }
+        }
+        if (data.containsKey("pleasure")) {
+            var realtimePleasureData = RealtimePleasureData()
+            @Suppress("UNCHECKED_CAST")
+            var map = data["pleasure"] as Map<Any, Any>
+            if (map.containsKey("pleasure")) {
+                realtimePleasureData.pleasure = map["pleasure"] as Double
+                realtimeAffectiveData.realtimePleasureData = realtimePleasureData
             }
-            if (data.containsKey("arousal")) {
-                var realtimeArousalData = RealtimeArousalData()
-                var map = data["arousal"] as Map<Any, Any>
-                if (map.containsKey("arousal")) {
-                    realtimeArousalData.arousal = map["arousal"] as Double
-                    realtimeAffectiveData.realtimeArousalData = realtimeArousalData
-                }
+        }
+        if (data.containsKey("arousal")) {
+            var realtimeArousalData = RealtimeArousalData()
+            @Suppress("UNCHECKED_CAST")
+            var map = data["arousal"] as Map<Any, Any>
+            if (map.containsKey("arousal")) {
+                realtimeArousalData.arousal = map["arousal"] as Double
+                realtimeAffectiveData.realtimeArousalData = realtimeArousalData
             }
-            if (data.containsKey("coherence")) {
-                var realtimeCoherenceData = RealtimeCoherenceData()
-                var map = data["coherence"] as Map<Any, Any>
-                if (map.containsKey("coherence")) {
-                    realtimeCoherenceData.coherence = map["coherence"] as Double
-                    realtimeAffectiveData.realtimeCoherenceData = realtimeCoherenceData
-                }
+        }
+        if (data.containsKey("coherence")) {
+            var realtimeCoherenceData = RealtimeCoherenceData()
+            @Suppress("UNCHECKED_CAST")
+            var map = data["coherence"] as Map<Any, Any>
+            if (map.containsKey("coherence")) {
+                realtimeCoherenceData.coherence = map["coherence"] as Double
+                realtimeAffectiveData.realtimeCoherenceData = realtimeCoherenceData
             }
-            if (data.containsKey("sleep")) {
-                var realtimeSleepData = RealtimeSleepData()
-                var attentionMap = data["sleep"] as Map<Any, Any>
-                if (attentionMap.containsKey("sleep_degree")) {
-                    realtimeSleepData.sleepDegree = attentionMap["sleep_degree"] as Double
-                }
-                if (attentionMap.containsKey("sleep_state")) {
-                    realtimeSleepData.sleepState = attentionMap["sleep_state"] as Double
-                }
-                realtimeAffectiveData.realtimeSleepData = realtimeSleepData
+        }
+        if (data.containsKey("sleep")) {
+            var realtimeSleepData = RealtimeSleepData()
+            @Suppress("UNCHECKED_CAST")
+            var attentionMap = data["sleep"] as Map<Any, Any>
+            if (attentionMap.containsKey("sleep_degree")) {
+                realtimeSleepData.sleepDegree = attentionMap["sleep_degree"] as Double
             }
+            if (attentionMap.containsKey("sleep_state")) {
+                realtimeSleepData.sleepState = attentionMap["sleep_state"] as Double
+            }
+            realtimeAffectiveData.realtimeSleepData = realtimeSleepData
         }
         return realtimeAffectiveData
     }
@@ -297,7 +312,7 @@ class ResponseBody(
      * 获取session id
      */
     fun getSessionId(): String? {
-        if (request.op == Request.REQUEST_OPTION_SESSION_CREATE && data != null) {
+        if (request.op == Request.REQUEST_OPTION_SESSION_CREATE) {
             if (data.containsKey("session_id")) {
                 return data["session_id"] as String
             }
@@ -311,8 +326,10 @@ class ResponseBody(
     fun getLeftBrainwave(): ArrayList<Float>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eegl_wave")) {
+                    @Suppress("UNCHECKED_CAST")
                     return eegData["eegl_wave"] as ArrayList<Float>
                 }
             }
@@ -326,8 +343,10 @@ class ResponseBody(
     fun getRightBrainwave(): ArrayList<Float>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eegr_wave")) {
+                    @Suppress("UNCHECKED_CAST")
                     return eegData["eegr_wave"] as ArrayList<Float>
                 }
             }
@@ -341,6 +360,7 @@ class ResponseBody(
     fun getEEGAlphaPower(): Double? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eeg_alpha_power")) {
                     return eegData["eeg_alpha_power"] as Double
@@ -356,6 +376,7 @@ class ResponseBody(
     fun getEEGBetaPower(): Double? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eeg_beta_power")) {
                     return eegData["eeg_beta_power"] as Double
@@ -372,6 +393,7 @@ class ResponseBody(
     fun getEEGThetaPower(): Double? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eeg_theta_power")) {
                     return eegData["eeg_theta_power"] as Double
@@ -388,6 +410,7 @@ class ResponseBody(
     fun getEEGDeltaPower(): Double? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eeg_delta_power")) {
                     return eegData["eeg_delta_power"] as Double
@@ -403,6 +426,7 @@ class ResponseBody(
     fun getEEGGammaPower(): Double? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eeg_gamma_power")) {
                     return eegData["eeg_gamma_power"] as Double
@@ -418,6 +442,7 @@ class ResponseBody(
     fun getEEGProgress(): Double? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eeg_progress")) {
                     return eegData["eeg_progress"] as Double
@@ -433,6 +458,7 @@ class ResponseBody(
     fun getHeartRate(): Double? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("hr")) {
+                @Suppress("UNCHECKED_CAST")
                 var hrData = data["hr"] as Map<Any, Any>
                 if (hrData.containsKey("hr")) {
                     return hrData["hr"] as Double
@@ -448,6 +474,7 @@ class ResponseBody(
     fun getHeartRateVariability(): Double? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("hr")) {
+                @Suppress("UNCHECKED_CAST")
                 var hrData = data["hr"] as Map<Any, Any>
                 if (hrData.containsKey("hrv")) {
                     return hrData["hrv"] as Double
@@ -463,8 +490,10 @@ class ResponseBody(
     fun getEEGAlphaCurve(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eeg_alpha_curve")) {
+                    @Suppress("UNCHECKED_CAST")
                     return eegData["eeg_alpha_curve"] as ArrayList<Double>
                 }
             }
@@ -478,8 +507,10 @@ class ResponseBody(
     fun getEEGBetaCurve(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eeg_beta_curve")) {
+                    @Suppress("UNCHECKED_CAST")
                     return eegData["eeg_beta_curve"] as ArrayList<Double>
                 }
             }
@@ -493,8 +524,10 @@ class ResponseBody(
     fun getEEGThetaCurve(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eeg_theta_curve")) {
+                    @Suppress("UNCHECKED_CAST")
                     return eegData["eeg_theta_curve"] as ArrayList<Double>
                 }
             }
@@ -508,8 +541,10 @@ class ResponseBody(
     fun getEEGDeltaCurve(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eeg_delta_curve")) {
+                    @Suppress("UNCHECKED_CAST")
                     return eegData["eeg_delta_curve"] as ArrayList<Double>
                 }
             }
@@ -523,8 +558,10 @@ class ResponseBody(
     fun getEEGGammaCurve(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("eeg")) {
+                @Suppress("UNCHECKED_CAST")
                 var eegData = data["eeg"] as Map<Any, Any>
                 if (eegData.containsKey("eeg_gamma_curve")) {
+                    @Suppress("UNCHECKED_CAST")
                     return eegData["eeg_gamma_curve"] as ArrayList<Double>
                 }
             }
@@ -539,6 +576,7 @@ class ResponseBody(
     fun getHeartRateAvg(): Double? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("hr")) {
+                @Suppress("UNCHECKED_CAST")
                 var hrData = data["hr"] as Map<Any, Any>
                 if (hrData.containsKey("hr_avg")) {
                     return hrData["hr_avg"] as Double
@@ -554,6 +592,7 @@ class ResponseBody(
     fun getHeartRateMax(): Double? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("hr")) {
+                @Suppress("UNCHECKED_CAST")
                 var hrData = data["hr"] as Map<Any, Any>
                 if (hrData.containsKey("hr_max")) {
                     return hrData["hr_max"] as Double
@@ -569,6 +608,7 @@ class ResponseBody(
     fun getHeartRateMin(): Double? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("hr")) {
+                @Suppress("UNCHECKED_CAST")
                 var hrData = data["hr"] as Map<Any, Any>
                 if (hrData.containsKey("hr_min")) {
                     return hrData["hr_min"] as Double
@@ -584,8 +624,10 @@ class ResponseBody(
     fun getHeartRateRec(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("hr")) {
+                @Suppress("UNCHECKED_CAST")
                 var hrData = data["hr"] as Map<Any, Any>
                 if (hrData.containsKey("hr_rec")) {
+                    @Suppress("UNCHECKED_CAST")
                     return hrData["hr_rec"] as ArrayList<Double>?
                 }
             }
@@ -599,8 +641,10 @@ class ResponseBody(
     fun getHeartRateVariabilityRec(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_BIODATA && request.op == Request.REQUEST_OPTION_BIODATA_REPORT) {
             if (data.containsKey("hr")) {
+                @Suppress("UNCHECKED_CAST")
                 var hrData = data["hr"] as Map<Any, Any>
                 if (hrData.containsKey("hrv_rec")) {
+                    @Suppress("UNCHECKED_CAST")
                     return hrData["hrv_rec"] as ArrayList<Double>?
                 }
             }
@@ -614,6 +658,7 @@ class ResponseBody(
     fun getAttention(): Double? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("attention")) {
+                @Suppress("UNCHECKED_CAST")
                 var attentionMap = data["attention"] as Map<Any, Any>
                 if (attentionMap.containsKey("attention")) {
                     return attentionMap["attention"] as Double
@@ -629,6 +674,7 @@ class ResponseBody(
     fun getRelaxation(): Double? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("relaxation")) {
+                @Suppress("UNCHECKED_CAST")
                 var relaxationMap = data["relaxation"] as Map<Any, Any>
                 if (relaxationMap.containsKey("relaxation")) {
                     return relaxationMap["relaxation"] as Double
@@ -644,6 +690,7 @@ class ResponseBody(
     fun getPressure(): Double? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_SUBSCRIBE) {
             if (data.containsKey("pressure")) {
+                @Suppress("UNCHECKED_CAST")
                 var pressureMap = data["pressure"] as Map<Any, Any>
                 if (pressureMap.containsKey("pressure")) {
                     return pressureMap["pressure"] as Double
@@ -659,6 +706,7 @@ class ResponseBody(
     fun getAttentionAvg(): Double? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_AFFECTIVE_REPORT) {
             if (data.containsKey("attention")) {
+                @Suppress("UNCHECKED_CAST")
                 var attentionMap = data["attention"] as Map<Any, Any>
                 if (attentionMap.containsKey("attention_avg")) {
                     return attentionMap["attention_avg"] as Double
@@ -674,8 +722,10 @@ class ResponseBody(
     fun getAttentionRec(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_AFFECTIVE_REPORT) {
             if (data.containsKey("attention")) {
+                @Suppress("UNCHECKED_CAST")
                 var attentionMap = data["attention"] as Map<Any, Any>
                 if (attentionMap.containsKey("attention_rec")) {
+                    @Suppress("UNCHECKED_CAST")
                     return attentionMap["attention_rec"] as ArrayList<Double>
                 }
             }
@@ -689,6 +739,7 @@ class ResponseBody(
     fun getRelaxationAvg(): Double? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_AFFECTIVE_REPORT) {
             if (data.containsKey("relaxation")) {
+                @Suppress("UNCHECKED_CAST")
                 var relaxationMap = data["relaxation"] as Map<Any, Any>
                 if (relaxationMap.containsKey("relaxation_avg")) {
                     return relaxationMap["relaxation_avg"] as Double
@@ -704,8 +755,10 @@ class ResponseBody(
     fun getRelaxationRec(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_AFFECTIVE_REPORT) {
             if (data.containsKey("relaxation")) {
+                @Suppress("UNCHECKED_CAST")
                 var relaxationMap = data["relaxation"] as Map<Any, Any>
                 if (relaxationMap.containsKey("relaxation_rec")) {
+                    @Suppress("UNCHECKED_CAST")
                     return relaxationMap["relaxation_rec"] as ArrayList<Double>
                 }
             }
@@ -719,6 +772,7 @@ class ResponseBody(
     fun getPressureAvg(): Double? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_AFFECTIVE_REPORT) {
             if (data.containsKey("pressure")) {
+                @Suppress("UNCHECKED_CAST")
                 var pressureMap = data["pressure"] as Map<Any, Any>
                 if (pressureMap.containsKey("pressure_avg")) {
                     return pressureMap["pressure_avg"] as Double
@@ -734,8 +788,10 @@ class ResponseBody(
     fun getPressureRec(): ArrayList<Double>? {
         if (request.services == Request.REQUEST_SERVICES_AFFECTIVE && request.op == Request.REQUEST_OPTION_AFFECTIVE_REPORT) {
             if (data.containsKey("pressure")) {
+                @Suppress("UNCHECKED_CAST")
                 var pressureMap = data["pressure"] as Map<Any, Any>
                 if (pressureMap.containsKey("pressure_rec")) {
+                    @Suppress("UNCHECKED_CAST")
                     return pressureMap["pressure_rec"] as ArrayList<Double>
                 }
             }

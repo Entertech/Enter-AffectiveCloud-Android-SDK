@@ -34,7 +34,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
                     override fun onOpen(handshakedata: ServerHandshake?) {
                         Log.d("WebSocketHelper", "onConnected " + handshakedata.toString())
                         mOpenCallback?.onOpen(handshakedata)
-                        connectListeners?.forEach {
+                        connectListeners.forEach {
                             it.invoke()
                         }
                     }
@@ -55,7 +55,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
                         message.get(arr)
                         Log.d("WebSocketHelper", "receive msg is " + ConvertUtil.uncompress(arr))
                         var msg = ConvertUtil.uncompress(arr)
-                        rawJsonResponseListeners?.forEach {
+                        rawJsonResponseListeners.forEach {
                             it.invoke(msg)
                         }
                     }
@@ -74,8 +74,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
     }
 
     private fun getSSLSocketFactory(): SSLSocketFactory? {
-        var sslContext: SSLContext? = null
-        sslContext = SSLContext.getInstance("TLS")
+        var sslContext: SSLContext? = SSLContext.getInstance("TLS")
         sslContext?.init(null, arrayOf<TrustManager>(
             object : X509TrustManager {
                 override fun checkClientTrusted(

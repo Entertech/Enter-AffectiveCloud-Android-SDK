@@ -29,7 +29,7 @@ class AuthActivity : AppCompatActivity() {
         }
     }
 
-    fun onContinue(view: View) {
+    fun onContinue(@Suppress("UNUSED_PARAMETER")view: View) {
         var appKey = et_app_key.text
         var appSecret = et_app_secret.text
         if (!appKey.isNullOrEmpty() && !appSecret.isNullOrEmpty()) {

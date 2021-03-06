@@ -1,4 +1,4 @@
-
+[English Readme](/Detail_API.md)
 # 情感云详细API功能说明
 - [会话](#会话)
   * [SDK初始化及情感云连接](#sdk初始化及情感云连接)

@@ -105,7 +105,7 @@ enterAffectiveCloudApi.initAffectiveDataServices(serviceList,fun(){
 })
 ```
 
-The available services are as follows, see [here] (https://docs.affectivecloud.com/🎙接口协议/5.%20情感计算服务协议.html#affective-start):
+The available services are as follows, see [here](https://docs.affectivecloud.com/🎙接口协议/5.%20情感计算服务协议.html#affective-start):
 
 | Name | Description |
 | :--------: | :---------------------------: |

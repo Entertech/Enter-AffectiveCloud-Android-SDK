@@ -105,7 +105,7 @@ enterAffectiveCloudApi.initAffectiveDataServices(serviceList,fun(){
 })
 ```
 
-The available services are as follows, see [here] (https://docs.affectivecloud.com/🎙interface protocol/5.%20 affective computing service protocol.html#affective-start):
+The available services are as follows, see [here] (https://docs.affectivecloud.com/🎙接口协议/5.%20情感计算服务协议.html#affective-start):
 
 | Name | Description |
 | :--------: | :---------------------------: |
@@ -224,7 +224,7 @@ enterAffectiveCloudApi.getBiodataReport(dataNameList,fun(data:BiodataReport)){
 
 ### Generate affective data report
 
-For the format parameters of the generated affective data report, see [here](https://docs.affectivecloud.com/🎙接口协议/4.%20生物数据基础分析服务协议.html#biodata-report).
+For the format parameters of the generated affective data report, see [here](https://docs.affectivecloud.com/🎙接口协议/5.%20情感计算服务协议.html#affective-report).
 
 
 ```kotlin

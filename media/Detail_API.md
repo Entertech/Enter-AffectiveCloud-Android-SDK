@@ -1,32 +1,32 @@
 # Detailed API function description of Affective Cloud
--[Session](#session)
-  * [SDK initialization and affective cloud connection] (#sdk initialization and affective cloud connection)
-  * [Whether connected to the affective cloud] (# Whether connected to the affective cloud)
-  * [Establish Session] (#Establish Session)
-  * [Whether the session has been established] (#whether the session has been established)
-  * [Restore Session](#restoreSession)
--[Initial Service](#Initialize Service)
-  * [Initialize basic services](#Initialize basic services)
-  * [Initialize affective service] (#Initialize affective service)
--[Send data](#Send data)
-  * [Send brain wave data] (#Send brain wave data)
-  * [Send Heart Rate Data] (#Send Heart Rate Data)
--[Accept subscription data](#Accept subscription data)
-  * [Subscription basic data](#Subscription basic data)
-  * [Subscribe to affective data] (#Subscribe to affective data)
--[Cancel Subscription](#Cancel Subscription)
-  * [Unsubscribe basic data](#Unsubscribe basic data)
-  * [Unsubscribe affective data](#Unsubscribe affective data)
--[Generate report](#Generate report)
-  * [Generate basic data report](#Generate basic data report)
-  * [Generate affective data report](#Generate affective data report)
--[End Affective Service] (#End Affective Service)
--[Close Affective Cloud] (#Close Affective Cloud)
+- [Session](#session)
+  * [SDK initialization and affective cloud connection](#sdk-initialization-and-affective-cloud-connection)
+  * [Is the affective cloud connected?](#is-the-affective-cloud-connected-)
+  * [Establish a session](#establish-a-session)
+  * [Is the session established?](#is-the-session-established-)
+  * [Restore session](#restore-session)
+- [Initialize the service](#initialize-the-service)
+  * [Initialize basic services](#initialize-basic-services)
+  * [Initialize affective service](#initialize-affective-service)
+- [send data](#send-data)
+  * [Send brainwave data](#send-brainwave-data)
+  * [Send heart rate data](#send-heart-rate-data)
+- [Accept subscription data](#accept-subscription-data)
+  * [Subscribe to basic data](#subscribe-to-basic-data)
+  * [Subscribe to affective data](#subscribe-to-affective-data)
+- [unsubscribe](#unsubscribe)
+  * [Unsubscribe basic data](#unsubscribe-basic-data)
+  * [Unsubscribe from affective data](#unsubscribe-from-affective-data)
+- [Generate reports](#generate-reports)
+  * [Generate basic data report](#generate-basic-data-report)
+  * [Generate affective data report](#generate-affective-data-report)
+- [End affective service](#end-affective-service)
+- [Close affective cloud](#close-affective-cloud)
 
 If you need to use affective cloud services flexibly according to different scenarios, you can use `EnterAffectiveCloudApi` to call the corresponding API, which encapsulates all the external interfaces of affective cloud services. The mutual sequence of each API call can refer to the following sequence diagram.
 ![时序图](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/blob/master/media/sequence_diagram.png)
-## Conversation
-### SDK initialization and emotional cloud connection
+## Session
+### SDK initialization and affective cloud connection
 
 ```kotlin
 var appKey = "YOUR_APP_KEY"
@@ -41,11 +41,11 @@ enterAffectiveCloudApi.openWebSocket(fun(){
 })
 ```
 
-### Is the emotional cloud connected?
+### Is the affective cloud connected?
 
 ```Kotlin
 var isWebSocketOpen = enterAffectiveCloudApi.isWebSocketOpen()
-Logger.d("Is the emotional cloud connected:"+isWebSocketOpen)
+Logger.d("Is the affective cloud connected:"+isWebSocketOpen)
 ```
 ### Establish a session
 
@@ -93,7 +93,7 @@ enterAffectiveCloudApi.initBiodataServices(serviceList,fun(){
 | EEG | Brain Wave Data |
 | HeartRate | Heart Rate Data |
 
-### Initialize emotional service
+### Initialize affective service
 
 ```kotlin
 enterAffectiveCloudApi.initAffectiveDataServices(serviceList,fun(){
@@ -156,7 +156,8 @@ The basic biological data services that can be subscribed are as follows:
 | eeg_quality | Brainwave data quality |
 | hr_value | Heart rate |
 | hr_variability | Heart Rate Variability |
-### Subscribe to emotional data
+
+### Subscribe to affective data
 
 ```
 enterAffectiveCloudApi.subscribeAffectiveData(dataNameList,fun(data:Type){
@@ -175,8 +176,8 @@ The sentiment analysis data services that can be subscribed are as follows, see 
 | attention | attention | float | [0, 100] | Attention value, the higher the value, the higher the attention |
 | relaxation | relaxation | float | [0, 100] | Relaxation value, the higher the value, the higher the relaxation |
 | pressure | pressure | float | [0, 100] | The pressure level value, the higher the value, the higher the pressure level |
-| pleasure | pleasure | float | [0, 100] | Pleasure value, the higher the value, the higher the emotional pleasure |
-| arousal | arousal | float | [0, 100] | Activation value, the higher the value, the higher the emotional activation |
+| pleasure | pleasure | float | [0, 100] | Pleasure value, the higher the value, the higher the affective pleasure |
+| arousal | arousal | float | [0, 100] | Activation value, the higher the value, the higher the affective activation |
 | sleep | sleep_degree | float | [0, 100] | Sleep degree, the smaller the value, the deeper the sleep |
 | | sleep_state | int | {0, 1} | Sleep state, 0 means not falling asleep, 1 means falling asleep |
 
@@ -195,7 +196,7 @@ enterAffectiveCloudApi.unsubscribeBiodata(dataNameList,fun(){
 })
 ```
 
-### Unsubscribe from emotional data
+### Unsubscribe from affective data
 
 Configure the service you want to unsubscribe.
 
@@ -210,7 +211,7 @@ enterAffectiveCloudApi.unsubscribeAffectivedata(dataNameList,fun(){
 
 ### Generate basic data report
 
-For the format parameters of the generated basic biological data report, please refer to [here](https://docs.affectivecloud.com/🎙Interface Protocol/4.%20Biodata Basic Analysis Service Agreement.html#biodata-report).
+For the format parameters of the generated basic biological data report, please refer to [here](https://docs.affectivecloud.com/🎙接口协议/4.%20生物数据基础分析服务协议.html#biodata-report).
 
 ```kotlin
 enterAffectiveCloudApi.getBiodataReport(dataNameList,fun(data:BiodataReport)){
@@ -218,9 +219,9 @@ enterAffectiveCloudApi.getBiodataReport(dataNameList,fun(data:BiodataReport)){
 }
 ```
 
-### Generate emotional data report
+### Generate affective data report
 
-For the format parameters of the generated emotional data report, see [here](https://docs.affectivecloud.com/🎙interface protocol/5.%20 affective computing service protocol.html#affective-report).
+For the format parameters of the generated affective data report, see [here](https://docs.affectivecloud.com/🎙接口协议/5.%20情感计算服务协议.html#affective-report).
 
 ```kotlin
 enterAffectiveCloudApi.getAffectivedataReport(dataNameList,fun(data:AffectiveDataReport)){
@@ -228,17 +229,17 @@ enterAffectiveCloudApi.getAffectivedataReport(dataNameList,fun(data:AffectiveDat
 }
 ```
 
-## End emotional service
+## End affective service
 
 ```kotlin
 enterAffectiveCloudApi.finishAffectiveDataServices(fun(){
-    Logger.d("The emotional cloud service has ended normally")
+    Logger.d("The affective cloud service has ended normally")
 },fun(error:String){
-    Logger.d("End of the emotional cloud service encountered a problem: $error")
+    Logger.d("End of the affective cloud service encountered a problem: $error")
 })
 ```
 
-## Close emotional cloud
+## Close affective cloud
 
 ```kotlin
 enterAffectiveCloudApi.destroySessionAndCloseWebSocket()

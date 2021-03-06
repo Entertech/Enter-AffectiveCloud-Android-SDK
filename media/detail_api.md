@@ -229,7 +229,7 @@ enterAffectiveCloudApi.getAffectivedataReport(dataNameList,fun(data:AffectiveDat
 }
 ```
 
-## End affective service
+## Finish affective service
 
 ```kotlin
 enterAffectiveCloudApi.finishAffectiveDataServices(fun(){

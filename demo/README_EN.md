@@ -13,9 +13,9 @@ This demo demonstrates the entire process of device connection and brainwave dat
 
 ## Operation
 * When opening the demo for the first time, you need to enter the app key and app secret of the emotional cloud you applied for, if not, you need to apply to the administrator;
-* Click `连接蓝牙设备` to connect the device with Bluetooth, and the device needs to be in the broadcast state;
-* After connecting the device, click the buttons of `初始化`, `开始上传数据`, `获取报表数据`, `结束`, etc. to quickly interact with the emotional cloud platform;
-* If you have some custom interaction scenarios, or want to learn more about the interfaces provided by Emotion Cloud, you can also click `API详细功能` to view.
+* Click `Connect to Ble` to connect the device with Bluetooth, and the device needs to be in the broadcast state;
+* After connecting the device, click the buttons of `Init`, `Upload`, `Get Report`, `Finish`, etc. to quickly interact with the emotional cloud platform;
+* If you have some custom interaction scenarios, or want to learn more about the interfaces provided by Emotion Cloud, you can also click `API Details` to view.
 ## Display
 The received and sent data will be displayed on the screen in real time, and you can swipe left and right to switch.
 

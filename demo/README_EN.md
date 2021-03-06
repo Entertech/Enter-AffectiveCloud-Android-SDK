@@ -21,6 +21,6 @@ The received and sent data will be displayed on the screen in real time, and you
 
 <img src="../media/demo_en.jpeg" width="40%">
 
-<img src="../media/receive_en.png" width="40%">
+<img src="../media/receive_en.jpeg" width="40%">
 
-<img src="../media/send_en.png" width="40%">
+<img src="../media/send_en.jpeg" width="40%">

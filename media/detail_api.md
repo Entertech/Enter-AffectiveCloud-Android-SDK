@@ -169,7 +169,7 @@ enterAffectiveCloudApi.subscribeAffectiveData(dataNameList,fun(data:Type){
 })
 ```
 
-The sentiment analysis data services that can be subscribed are as follows, see [here] (https://docs.affectivecloud.com/🎙interface agreement/5.%20 affective computing service agreement.html#affective-subscribe):
+The sentiment analysis data services that can be subscribed are as follows, see [here](https://docs.affectivecloud.com/🎙interface agreement/5.%20 affective computing service agreement.html#affective-subscribe):
 
 | Service type (cloud_service) | Data type (data_type) | Type | Value range | Description |
 | :---------------------: | :-----------------: | :---: | :------: | :----------------------------------: |
@@ -213,6 +213,7 @@ enterAffectiveCloudApi.unsubscribeAffectivedata(dataNameList,fun(){
 
 For the format parameters of the generated basic biological data report, please refer to [here](https://docs.affectivecloud.com/🎙接口协议/4.%20生物数据基础分析服务协议.html#biodata-report).
 
+
 ```kotlin
 enterAffectiveCloudApi.getBiodataReport(dataNameList,fun(data:BiodataReport)){
      Logger.d("Basic report:"+data)
@@ -222,6 +223,7 @@ enterAffectiveCloudApi.getBiodataReport(dataNameList,fun(data:BiodataReport)){
 ### Generate affective data report
 
 For the format parameters of the generated affective data report, see [here](https://docs.affectivecloud.com/🎙接口协议/5.%20情感计算服务协议.html#affective-report).
+
 
 ```kotlin
 enterAffectiveCloudApi.getAffectivedataReport(dataNameList,fun(data:AffectiveDataReport)){

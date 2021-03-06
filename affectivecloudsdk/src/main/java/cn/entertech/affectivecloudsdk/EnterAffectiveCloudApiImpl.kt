@@ -42,6 +42,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     private var mStartedAffectiveServices: List<Service>? = null
     private var mSign: String? = null
 
+    /*service type：session、biodata、affective*/
     /*情感云平台服务分类：session（会话）、biodata（基础数据服务）、affective（情感数据服务）*/
     val SERVER_SESSION = "session"
     val SERVER_BIO_DATA = "biodata"

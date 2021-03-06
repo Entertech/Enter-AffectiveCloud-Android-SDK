@@ -12,6 +12,7 @@ public class ConvertUtil {
     }
 
     /**
+     * compress string
      * 压缩指定的字符串
      *
      * @param str
@@ -28,6 +29,7 @@ public class ConvertUtil {
 
     private static final String TAG = "ConvertUtil";
     /**
+     * uncompress string
      * 解压缩字节数组
      *
      * @param b

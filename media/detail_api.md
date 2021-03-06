@@ -24,7 +24,9 @@
 - [Close affective cloud](#close-affective-cloud)
 
 If you need to use affective cloud services flexibly according to different scenarios, you can use `EnterAffectiveCloudApi` to call the corresponding API, which encapsulates all the external interfaces of affective cloud services. The mutual sequence of each API call can refer to the following sequence diagram.
-![时序图](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/blob/master/media/sequence_diagram.png)
+
+![Timing Diagram](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/blob/master/media/sequence_diagram.png)
+
 ## Session
 ### SDK initialization and affective cloud connection
 
@@ -169,7 +171,7 @@ enterAffectiveCloudApi.subscribeAffectiveData(dataNameList,fun(data:Type){
 })
 ```
 
-The sentiment analysis data services that can be subscribed are as follows, see [here](https://docs.affectivecloud.com/🎙interface agreement/5.%20 affective computing service agreement.html#affective-subscribe):
+The sentiment analysis data services that can be subscribed are as follows, see [here](https://docs.affectivecloud.com/🎙接口协议/5.%20情感计算服务协议.html#affective-subscribe):
 
 | Service type (cloud_service) | Data type (data_type) | Type | Value range | Description |
 | :---------------------: | :-----------------: | :---: | :------: | :----------------------------------: |
@@ -222,7 +224,7 @@ enterAffectiveCloudApi.getBiodataReport(dataNameList,fun(data:BiodataReport)){
 
 ### Generate affective data report
 
-For the format parameters of the generated affective data report, see [here](https://docs.affectivecloud.com/🎙接口协议/5.%20情感计算服务协议.html#affective-report).
+For the format parameters of the generated affective data report, see [here](https://docs.affectivecloud.com/🎙接口协议/4.%20生物数据基础分析服务协议.html#biodata-report).
 
 
 ```kotlin

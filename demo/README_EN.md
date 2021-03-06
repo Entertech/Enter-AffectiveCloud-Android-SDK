@@ -19,8 +19,8 @@ This demo demonstrates the entire process of device connection and brainwave dat
 ## Display
 The received and sent data will be displayed on the screen in real time, and you can swipe left and right to switch.
 
-<img src="../media/情感云demo.jpeg" width="40%">
+<img src="../media/demo_en.jpeg" width="40%">
 
-<img src="../media/receive.png" width="40%">
+<img src="../media/receive_en.png" width="40%">
 
-<img src="../media/send.png" width="40%">
+<img src="../media/send_en.png" width="40%">

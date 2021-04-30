@@ -1,4 +1,4 @@
-# Enter-AffectiveCloud-Andriod-SDK [![Download](https://api.bintray.com/packages/hzentertech/maven/affectivecloud/images/download.svg?version=2.0.0)](https://bintray.com/hzentertech/maven/affectivecloud/2.0.0/link)
+# Enter-AffectiveCloud-Andriod-SDK [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.entertech.android/affectivecloud/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.entertech.android/affectivecloud)
 - [Introduction](#introduction)
 - [Demo](#demo)
 - [Getting Started](#getting-started)
@@ -38,15 +38,13 @@ In addition, we also provide a heart flow demonstration application, which integ
 ### Gradle
 Add the following dependencies under the module's build.gradle file
 ```groovy
-    implementation'cn.entertech:affectivecloud:2.0.0'
+    implementation'cn.entertech.android:affectivecloud:2.0.0'
 ```
 Add the following dependency address under the build.gradle file in the project root directory
 ```groovy
 allprojects {
     repositories {
-        maven {
-            url "https://dl.bintray.com/hzentertech/maven"
-        }
+        mavenCentral()
     }
 }
 ```

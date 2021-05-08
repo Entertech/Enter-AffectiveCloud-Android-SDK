@@ -22,6 +22,7 @@ class StorageSettings internal constructor(builder: Builder) : OptionalParamsMap
         internal var data: HashMap<Any, Any>? = null
         internal var device: HashMap<Any, Any>? = null
         internal var label: HashMap<Any, Any>? = null
+        internal var allow: Boolean = true
         internal var storageSettings: HashMap<Any, Any>? = null
         fun sex(sex: Sex): Builder {
             if (user == null) {
@@ -71,6 +72,11 @@ class StorageSettings internal constructor(builder: Builder) : OptionalParamsMap
             return this
         }
 
+        fun allowStoreRawData(allow:Boolean):Builder{
+            this.allow = allow
+            return this
+        }
+
         fun build(): StorageSettings {
             if (storageSettings == null) {
                 storageSettings = HashMap()
@@ -87,6 +93,7 @@ class StorageSettings internal constructor(builder: Builder) : OptionalParamsMap
             if (label != null) {
                 storageSettings!!["label"] = label!!
             }
+            storageSettings!!["allow"] = allow
             return StorageSettings(this)
         }
     }

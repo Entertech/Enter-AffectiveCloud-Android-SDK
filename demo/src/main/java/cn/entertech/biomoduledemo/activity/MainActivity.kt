@@ -99,10 +99,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
     fun initEnterAffectiveCloudManager() {
-        biodataSubscribeParams = BiodataSubscribeParams.Builder()
-            .requestEEG()
-            .requestHR()
-            .build()
+        if (availableBioServices.contains(Service.EEG)){
+            biodataSubscribeParams = BiodataSubscribeParams.Builder()
+                .requestEEG()
+                .build()
+        }else{
+            biodataSubscribeParams = BiodataSubscribeParams.Builder()
+                .requestHR()
+                .build()
+        }
 
         affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
             .requestAttention()
@@ -120,6 +125,7 @@ class MainActivity : AppCompatActivity() {
             .mode(listOf(1, 2))
             .case(listOf(2))
             .sn("device_sn")
+            .allowStoreRawData(true)
             .build()
         var algorithmParamsEEG =
             AlgorithmParamsEEG.Builder()

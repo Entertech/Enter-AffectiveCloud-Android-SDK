@@ -46,7 +46,7 @@ In addition, we also provide a heart flow demonstration application, which integ
 ### Gradle
 Add the following dependencies under the module's build.gradle file
 ```groovy
-    implementation'cn.entertech.android:affectivecloud:2.0.0'
+    implementation'cn.entertech.android:affectivecloud:2.1.0'
 ```
 Add the following dependency address under the build.gradle file in the project root directory
 ```groovy

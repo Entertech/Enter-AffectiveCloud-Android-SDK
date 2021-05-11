@@ -2,12 +2,13 @@ package cn.entertech.affectivecloudsdk.sourcedataapi
 
 import cn.entertech.affectivecloudsdk.entity.SourceDataApiAuthRequest
 import cn.entertech.affectivecloudsdk.entity.SourceDataRecord
-import cn.entertech.affectivecloudsdk.entity.SourceDataRecordListWithPages
+import cn.entertech.affectivecloudsdk.entity.SourceDataRecordPageList
 import cn.entertech.affectivecloudsdk.utils.MD5Encode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 class AffectiveCloudSourceDataApi internal constructor(
+    private var url:String,
     private var appKey: String,
     private var appSecret: String,
     private var userId: String
@@ -17,6 +18,7 @@ class AffectiveCloudSourceDataApi internal constructor(
     private var mToken: String? = null
 
     init {
+        Network.createRetrofitService(url)
         var timestamp = "${System.currentTimeMillis()}"
         var userIdEncoded = MD5Encode(userId).toUpperCase()
         userName =
@@ -45,17 +47,17 @@ class AffectiveCloudSourceDataApi internal constructor(
         }
     }
 
-    fun getSourceDataListWithPages(
+    fun getSourceDataPageList(
         page: Int,
         pageSize:Int,
-        success: (SourceDataRecordListWithPages?) -> Unit,
+        success: (SourceDataRecordPageList?) -> Unit,
         failure: (String?) -> Unit
     ) {
         if (mToken == null) {
             throw IllegalStateException("please invoke auth method first")
         }
         GlobalScope.launch(Dispatchers.IO){
-            var resource = Network.getSourceDataListWithPages(mToken!!,page,pageSize)
+            var resource = Network.getSourceDataPageList(mToken!!,page,pageSize)
             if (resource.status == Status.SUCCESS){
                 success.invoke(resource.data)
             }else{

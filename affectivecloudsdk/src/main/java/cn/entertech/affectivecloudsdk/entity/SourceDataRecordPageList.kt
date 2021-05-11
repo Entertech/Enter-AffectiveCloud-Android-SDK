@@ -1,6 +1,6 @@
 package cn.entertech.affectivecloudsdk.entity
 
-data class SourceDataRecordListWithPages(
+data class SourceDataRecordPageList(
     val count: Int,
     val next: String,
     val previous: Any,

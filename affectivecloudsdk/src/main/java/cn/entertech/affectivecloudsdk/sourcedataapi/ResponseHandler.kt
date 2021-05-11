@@ -6,7 +6,7 @@ import java.net.SocketTimeoutException
 
 open class ResponseHandler {
     companion object{
-        fun <T : Any> handleSuccess(data: T): Resource<T> {
+        fun <T : Any> handleSuccess(data: T?): Resource<T> {
             return Resource.success(data)
         }
 

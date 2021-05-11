@@ -86,19 +86,6 @@ class MainActivity : AppCompatActivity() {
         initPermission()
         initSaveFiledir()
 
-
-
-        var affectiveSourceDataApi = AffectiveCloudSourceDataApiFactory.createApi("6eabf68e-760e-11e9-bd82-0242ac140006","68a09cf8e4e06718b037c399f040fb7e",USER_ID)
-
-        affectiveSourceDataApi.auth(fun(token){
-            affectiveSourceDataApi.getSourceDataListWithPages(1,2,fun(lists){
-                Log.d("########","records is ${lists}")
-            },fun(e){
-
-            })
-        },fun(e){
-
-        })
     }
 
     fun verifyAppKeyAndSecret() {
@@ -114,11 +101,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
     fun initEnterAffectiveCloudManager() {
-        if (availableBioServices.contains(Service.EEG)){
+        if (availableBioServices.contains(Service.EEG)) {
             biodataSubscribeParams = BiodataSubscribeParams.Builder()
                 .requestEEG()
                 .build()
-        }else{
+        } else {
             biodataSubscribeParams = BiodataSubscribeParams.Builder()
                 .requestHR()
                 .build()
@@ -307,7 +294,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun onConnectDevice(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun onConnectDevice(@Suppress("UNUSED_PARAMETER") view: View) {
         messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_scaning))
         biomoduleBleManager.scanNearDeviceAndConnect(fun() {
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_scan_success))
@@ -329,17 +316,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onDisconnectDevice(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun onDisconnectDevice(@Suppress("UNUSED_PARAMETER") view: View) {
         messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_connect_failed))
         biomoduleBleManager.disConnect()
     }
 
-    fun onClear(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun onClear(@Suppress("UNUSED_PARAMETER") view: View) {
         messageSendFragment.clearScreen()
         messageReceiveFragment.clearScreen()
     }
 
-    fun onPause(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun onPause(@Suppress("UNUSED_PARAMETER") view: View) {
         biomoduleBleManager.stopHeartAndBrainCollection()
     }
 
@@ -371,16 +358,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onInit(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun onInit(@Suppress("UNUSED_PARAMETER") view: View) {
         initEnterAffectiveCloudManager()
     }
 
-    fun onStartUpload(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun onStartUpload(@Suppress("UNUSED_PARAMETER") view: View) {
         biomoduleBleManager.startHeartAndBrainCollection()
         messageReceiveFragment.appendMessageToScreen(getString(R.string.main_start_uploading))
     }
 
-    fun onReport(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun onReport(@Suppress("UNUSED_PARAMETER") view: View) {
         enterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_bio_report) + t.toString())
@@ -403,7 +390,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    fun onFinish(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun onFinish(@Suppress("UNUSED_PARAMETER") view: View) {
         enterAffectiveCloudManager?.release(object : Callback {
             override fun onSuccess() {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_disconnected_from_cloud))
@@ -416,7 +403,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    fun onSubmit(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun onSubmit(@Suppress("UNUSED_PARAMETER") view: View) {
         var datas = ArrayList<RecData>()
         var tagMap = HashMap<String, Float>()
         tagMap["pleasure"] = 0.75f
@@ -440,7 +427,7 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
-    fun onRestore(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun onRestore(@Suppress("UNUSED_PARAMETER") view: View) {
         enterAffectiveCloudManager?.restore(object : Callback {
             override fun onSuccess() {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.mian_cloud_restore_success))
@@ -453,7 +440,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    fun toApiDetail(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun toApiDetail(@Suppress("UNUSED_PARAMETER") view: View) {
         startActivity(Intent(this, ApiDetailActivity::class.java))
     }
 

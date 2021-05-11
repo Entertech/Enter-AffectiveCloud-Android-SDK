@@ -3,7 +3,7 @@ package cn.entertech.affectivecloudsdk.sourcedataapi
 import cn.entertech.affectivecloudsdk.entity.SourceDataApiAuthRequest
 import cn.entertech.affectivecloudsdk.entity.SourceDataApiAuthResponse
 import cn.entertech.affectivecloudsdk.entity.SourceDataRecord
-import cn.entertech.affectivecloudsdk.entity.SourceDataRecordListWithPages
+import cn.entertech.affectivecloudsdk.entity.SourceDataRecordPageList
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -12,11 +12,11 @@ interface RetrofitService {
     suspend fun auth(@Body body: SourceDataApiAuthRequest): SourceDataApiAuthResponse
 
     @GET("/v1/sourceDataRecords/")
-    suspend fun getSourceDataListWithPages(
+    suspend fun getSourceDataPageList(
         @Header("Authorization") authorization: String,
         @Query("page") page:Int,
         @Query("page_size") page_size:Int
-    ): SourceDataRecordListWithPages
+    ): SourceDataRecordPageList
 
     @GET("/v1/sourceDataRecords/")
     suspend fun getSourceDataRecordByUserId(

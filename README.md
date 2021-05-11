@@ -11,6 +11,14 @@
   * [3.上传数据](#3上传数据)
   * [4.获取报表](#4获取报表)
   * [5.资源释放](#5资源释放)
+- [原始数据操作](#------)
+  * [是否保存原始数据](#--------)
+  * [原始数据的查询和删除](#----------)
+      - [初始化](#---)
+      - [授权](#--)
+      - [查询](#--)
+      - [删除](#--)
+      - [Record数据说明](#record----)
 - [详细API功能说明](#详细api功能说明)
 - [更新日志](#更新日志)
 # 简介
@@ -193,7 +201,7 @@ var storageSettings = StorageSettings.Builder()
 var enterAffectiveCloudConfig =
             EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
                 .storageSettings(storageSettings) //storage settings
-								.otherParams(otherParams)  //other params,reference the docs above
+				.otherParams(otherParams)  //other params,reference the docs above
                 .build()
 ```
 

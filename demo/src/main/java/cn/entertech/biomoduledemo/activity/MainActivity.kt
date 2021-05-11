@@ -17,6 +17,7 @@ import androidx.viewpager.widget.ViewPager
 import cn.entertech.affectivecloudsdk.*
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
+import cn.entertech.affectivecloudsdk.sourcedataapi.AffectiveCloudSourceDataApiFactory
 import cn.entertech.biomoduledemo.R
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_KEY
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
@@ -84,6 +85,20 @@ class MainActivity : AppCompatActivity() {
         initEnterAffectiveCloudManager()
         initPermission()
         initSaveFiledir()
+
+
+
+        var affectiveSourceDataApi = AffectiveCloudSourceDataApiFactory.createApi("6eabf68e-760e-11e9-bd82-0242ac140006","68a09cf8e4e06718b037c399f040fb7e",USER_ID)
+
+        affectiveSourceDataApi.auth(fun(token){
+            affectiveSourceDataApi.getSourceDataListWithPages(1,2,fun(lists){
+                Log.d("########","records is ${lists}")
+            },fun(e){
+
+            })
+        },fun(e){
+
+        })
     }
 
     fun verifyAppKeyAndSecret() {
@@ -119,13 +134,7 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         var storageSettings = StorageSettings.Builder()
-            .sex(StorageSettings.Sex.MALE)
-            .age(10)
-            .source("demo")
-            .mode(listOf(1, 2))
-            .case(listOf(2))
-            .sn("device_sn")
-            .allowStoreRawData(true)
+            .allowStoreRawData(true)// Whether to allow the raw data to be saved on the server
             .build()
         var algorithmParamsEEG =
             AlgorithmParamsEEG.Builder()

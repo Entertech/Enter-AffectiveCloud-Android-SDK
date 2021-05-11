@@ -201,7 +201,7 @@ var enterAffectiveCloudConfig =
 
 ## 原始数据的查询和删除
 
-### 可以通过`AffectiveCloudSourceDataApi`来查询及删除原始数据
+可以通过`AffectiveCloudSourceDataApi`来查询及删除原始数据
 
 #### 初始化
 
@@ -217,9 +217,9 @@ var affectiveSourceDataApi = AffectiveCloudSourceDataApiFactory.createApi(server
 
 ```kotlin
 affectiveSourceDataApi.auth(fun(token){
-   Log.d("AffectiveCloudSourceDataApi","auth success ${token}")
+    Log.d("AffectiveCloudSourceDataApi","auth success ${token}")
 },fun(error){
-	Log.d("AffectiveCloudSourceDataApi","auth failed ${error}")
+    Log.d("AffectiveCloudSourceDataApi","auth failed ${error}")
 })
 ```
 
@@ -229,9 +229,9 @@ affectiveSourceDataApi.auth(fun(token){
 
 ```kotlin
 affectiveSourceDataApi.getSourceDataPageList(1,10,fun(lists){
-	 Log.d("AffectiveCloudSourceDataApi","get records list success:${lists}")
+    Log.d("AffectiveCloudSourceDataApi","get records list success:${lists}")
 },fun(error){
-	 Log.d("AffectiveCloudSourceDataApi","get records list failed:${error}")
+    Log.d("AffectiveCloudSourceDataApi","get records list failed:${error}")
 })
 ```
 
@@ -239,9 +239,9 @@ affectiveSourceDataApi.getSourceDataPageList(1,10,fun(lists){
 
 ```kotlin
 affectiveSourceDataApi.getSourceDataByUserId(userId, fun(lists) {
-		Log.d("AffectiveCloudSourceDataApi","get records list success:${lists}")
+    Log.d("AffectiveCloudSourceDataApi","get records list success:${lists}")
 }, fun(error) {
-		Log.d("AffectiveCloudSourceDataApi","get records list failed:${error}")
+    Log.d("AffectiveCloudSourceDataApi","get records list failed:${error}")
 })
 ```
 
@@ -249,9 +249,9 @@ affectiveSourceDataApi.getSourceDataByUserId(userId, fun(lists) {
 
 ```kotlin
 affectiveSourceDataApi.getSourceDataById(recordId, fun(lists) {
-		Log.d("AffectiveCloudSourceDataApi","get records list success:${lists}")
+    Log.d("AffectiveCloudSourceDataApi","get records list success:${lists}")
 }, fun(error) {
-		Log.d("AffectiveCloudSourceDataApi","get records list failed:${error}")
+    Log.d("AffectiveCloudSourceDataApi","get records list failed:${error}")
 })
 ```
 
@@ -261,9 +261,9 @@ affectiveSourceDataApi.getSourceDataById(recordId, fun(lists) {
 
 ````kotlin
 affectiveSourceDataApi.deleteSourceDataRecordById(recordId, fun() {
-		Log.d("AffectiveCloudSourceDataApi","delete record success")
+    Log.d("AffectiveCloudSourceDataApi","delete record success")
 }, fun(error) {
-		Log.d("AffectiveCloudSourceDataApi","delete record failed")
+    Log.d("AffectiveCloudSourceDataApi","delete record failed")
 })
 ````
 

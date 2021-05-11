@@ -200,8 +200,8 @@ var storageSettings = StorageSettings.Builder()
 
 var enterAffectiveCloudConfig =
         EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
-            .storageSettings(storageSettings) //storage settings
 			.otherParams(otherParams)  //other params,reference the docs above
+            .storageSettings(storageSettings) //storage settings
             .build()
 ```
 
@@ -253,7 +253,7 @@ affectiveSourceDataApi.getSourceDataByUserId(userId, fun(lists) {
 })
 ```
 
-**根据Recrod ID 查询**
+**根据Record ID 查询**
 
 ```kotlin
 affectiveSourceDataApi.getSourceDataById(recordId, fun(lists) {

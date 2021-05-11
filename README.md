@@ -179,6 +179,115 @@ enterAffectiveCloudManager?.release(object : Callback {
             }
         })
 ```
+# 原始数据操作
+
+## 是否保存原始数据
+
+在情感云初始化时可传入`allow`参数，来指定服务器是否保存当前会话的原始数据。
+
+```kotlin
+var storageSettings = StorageSettings.Builder()
+		.allowStoreRawData(true)// whether to allow the raw data to be saved on the server
+		.build()
+
+var enterAffectiveCloudConfig =
+            EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
+                .storageSettings(storageSettings) //storage settings
+								.otherParams(otherParams)  //other params,reference the docs above
+                .build()
+```
+
+
+
+## 原始数据的查询和删除
+
+### 可以通过`AffectiveCloudSourceDataApi`来查询及删除原始数据
+
+#### 初始化
+
+```kotlin
+
+var affectiveSourceDataApi = AffectiveCloudSourceDataApiFactory.createApi(serverUrl,APP_KEY,APP_SECRET,USER_ID)
+
+```
+
+#### 授权
+
+对原始数据进行操作前需进行权限认证
+
+```kotlin
+affectiveSourceDataApi.auth(fun(token){
+   Log.d("AffectiveCloudSourceDataApi","auth success ${token}")
+},fun(error){
+	Log.d("AffectiveCloudSourceDataApi","auth failed ${error}")
+})
+```
+
+#### 查询
+
+**查询当前账户所有数据**
+
+```kotlin
+affectiveSourceDataApi.getSourceDataPageList(1,10,fun(lists){
+	 Log.d("AffectiveCloudSourceDataApi","get records list success:${lists}")
+},fun(error){
+	 Log.d("AffectiveCloudSourceDataApi","get records list failed:${error}")
+})
+```
+
+**根据用户ID查询**
+
+```kotlin
+affectiveSourceDataApi.getSourceDataByUserId(userId, fun(lists) {
+		Log.d("AffectiveCloudSourceDataApi","get records list success:${lists}")
+}, fun(error) {
+		Log.d("AffectiveCloudSourceDataApi","get records list failed:${error}")
+})
+```
+
+**根据Recrod ID 查询**
+
+```kotlin
+affectiveSourceDataApi.getSourceDataById(recordId, fun(lists) {
+		Log.d("AffectiveCloudSourceDataApi","get records list success:${lists}")
+}, fun(error) {
+		Log.d("AffectiveCloudSourceDataApi","get records list failed:${error}")
+})
+```
+
+#### 删除
+
+**根据Record ID删除**
+
+````kotlin
+affectiveSourceDataApi.deleteSourceDataRecordById(recordId, fun() {
+		Log.d("AffectiveCloudSourceDataApi","delete record success")
+}, fun(error) {
+		Log.d("AffectiveCloudSourceDataApi","delete record failed")
+})
+````
+
+#### Record数据说明
+
+| 参数       | 类型   | 说明                              |
+| ---------- | ------ | --------------------------------- |
+| record_id  | Int    | record id                         |
+| client_id  | String | 客户端 id (user id 的MD5加密格式) |
+| session_id | String | 会话id                            |
+| device     | String | 设备                              |
+| data_type  | String | 数据类型： eeg 、hr               |
+| start_time | String | 会话开始时间                      |
+| close_time | String | 会话结束时间                      |
+| rec        | String | 标签                              |
+| sex        | String | 性别 m:男；f:女                   |
+| age        | Int    | 年龄                              |
+| url        | String | 原始数据文件路径                  |
+| gmt_create | String | Record创建时间                    |
+| gmt_modify | String | Record最后修改时间                |
+| app        | Int    | 平台                              |
+| mode       | List   | 模式                              |
+| case       | List   | 场景                              |
+
 
 
 # 详细API功能说明

@@ -199,10 +199,10 @@ var storageSettings = StorageSettings.Builder()
 		.build()
 
 var enterAffectiveCloudConfig =
-            EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
-                .storageSettings(storageSettings) //storage settings
-				.otherParams(otherParams)  //other params,reference the docs above
-                .build()
+        EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
+            .storageSettings(storageSettings) //storage settings
+			.otherParams(otherParams)  //other params,reference the docs above
+            .build()
 ```
 
 

@@ -180,6 +180,115 @@ enterAffectiveCloudManager?.release(object: Callback {
         })
 ```
 
+# Source Data
+
+## Store Source Data
+
+The "allow" parameter can be predefined when the affective cloud is initialized to specify whether the server saves the source data of the current session.
+
+```kotlin
+var storageSettings = StorageSettings.Builder()
+		.allowStoreRawData(true)// whether to allow the raw data to be saved on the server
+		.build()
+
+var enterAffectiveCloudConfig =
+        EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
+            .storageSettings(storageSettings) //storage settings
+            .otherParams(otherParams)  //other params,reference the docs above
+            .build()
+```
+
+
+
+## Query and Delete
+
+You can query and delete the source data through `AffectiveCloudSourceDataApi`
+
+#### Initialization
+
+```kotlin
+
+var affectiveSourceDataApi = AffectiveCloudSourceDataApiFactory.createApi(serverUrl,APP_KEY,APP_SECRET,USER_ID)
+
+```
+
+#### Authorization
+
+Authorization is required before operating on raw data
+
+```kotlin
+affectiveSourceDataApi.auth(fun(token){
+    Log.d("AffectiveCloudSourceDataApi","auth success ${token}")
+},fun(error){
+    Log.d("AffectiveCloudSourceDataApi","auth failed ${error}")
+})
+```
+
+#### Query
+
+**Query all data of the current account**
+
+```kotlin
+affectiveSourceDataApi.getSourceDataPageList(1,10,fun(lists){
+    Log.d("AffectiveCloudSourceDataApi","get records list success:${lists}")
+},fun(error){
+    Log.d("AffectiveCloudSourceDataApi","get records list failed:${error}")
+})
+```
+
+**Query by user ID**
+
+```kotlin
+affectiveSourceDataApi.getSourceDataByUserId(userId, fun(lists) {
+    Log.d("AffectiveCloudSourceDataApi","get records list success:${lists}")
+}, fun(error) {
+    Log.d("AffectiveCloudSourceDataApi","get records list failed:${error}")
+})
+```
+
+**Query by Record ID**
+
+```kotlin
+affectiveSourceDataApi.getSourceDataById(recordId, fun(lists) {
+    Log.d("AffectiveCloudSourceDataApi","get records list success:${lists}")
+}, fun(error) {
+    Log.d("AffectiveCloudSourceDataApi","get records list failed:${error}")
+})
+```
+
+#### Delete
+
+**Delete based on Record ID**
+
+````kotlin
+affectiveSourceDataApi.deleteSourceDataRecordById(recordId, fun() {
+    Log.d("AffectiveCloudSourceDataApi","delete record success")
+}, fun(error) {
+    Log.d("AffectiveCloudSourceDataApi","delete record failed")
+})
+````
+
+#### Record data description
+
+| Params       | Type   | Description                          |
+| ---------- | ------ | --------------------------------- |
+| record_id  | Int    | record id                         |
+| client_id  | String | client id (MD5 encryption format of user id) |
+| session_id | String | session id                                   |
+| device     | String | device                            |
+| data_type  | String | type： eeg 、hr                    |
+| start_time | String | session start time                |
+| close_time | String | session close time                |
+| rec        | String | tag                               |
+| sex        | String |  gender m:male；f:female          |
+| age        | Int    | age                               |
+| url        | String | raw data file url                 |
+| gmt_create | String | Record create time                |
+| gmt_modify | String | Record update time                |
+| app        | Int    | platform                          |
+| mode       | List   | mode                              |
+| case       | List   | case                              |
+
 
 # Detailed API function description
 

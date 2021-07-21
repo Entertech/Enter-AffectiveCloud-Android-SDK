@@ -46,10 +46,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
-    implementation 'cn.entertech:biomoduleble:1.0.9'
-//    implementation 'cn.entertech:affectivecloud:2.0.0'
-
-
+    implementation 'cn.entertech.android:biomoduleble:1.4.2'
     implementation 'com.orhanobut:logger:1.15'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation "org.java-websocket:Java-WebSocket:1.4.0"

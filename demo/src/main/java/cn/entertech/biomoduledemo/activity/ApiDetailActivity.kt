@@ -15,7 +15,7 @@ import cn.entertech.affectivecloudsdk.interfaces.Callback2
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import cn.entertech.biomoduledemo.R
 import cn.entertech.biomoduledemo.utils.FileHelper
-import cn.entertech.ble.BiomoduleBleManager
+import cn.entertech.ble.single.BiomoduleBleManager
 import com.orhanobut.logger.Logger
 import org.java_websocket.handshake.ServerHandshake
 import java.io.File

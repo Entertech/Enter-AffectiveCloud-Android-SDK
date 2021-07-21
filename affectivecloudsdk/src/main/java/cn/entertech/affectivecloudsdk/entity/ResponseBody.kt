@@ -187,6 +187,7 @@ class ResponseBody(
         var realtimeBioData = RealtimeBioData()
         if (data.containsKey("eeg")) {
             var realtimeEEGData = RealtimeEEGData()
+
             @Suppress("UNCHECKED_CAST")
             var eegData = data["eeg"] as Map<Any, Any>
             if (eegData.containsKey("eeg_quality")) {
@@ -217,19 +218,15 @@ class ResponseBody(
             }
             realtimeBioData.realtimeEEGData = realtimeEEGData
         }
-        if (data.containsKey("hr")) {
+        if (data.containsKey("hr-v2")) {
             var realtimeHrData = RealtimeHrData()
             @Suppress("UNCHECKED_CAST")
-            var hrMap = data["hr"] as Map<Any, Any>
+            var hrMap = data["hr-v2"] as Map<Any, Any>
             if (hrMap.containsKey("hr")) {
                 realtimeHrData.hr = hrMap["hr"] as Double
             }
             if (hrMap.containsKey("hrv")) {
-                @Suppress("UNCHECKED_CAST")
-                var hrvList = hrMap["hrv"] as ArrayList<Double>
-                if (hrvList.isNotEmpty()) {
-                    realtimeHrData.hrv = hrvList
-                }
+                realtimeHrData.hrv = hrMap["hrv"] as Double
             }
             realtimeBioData.realtimeHrData = realtimeHrData
 
@@ -241,6 +238,7 @@ class ResponseBody(
         var realtimeAffectiveData = RealtimeAffectiveData()
         if (data.containsKey("attention")) {
             var realtimeAttentionData = RealtimeAttentionData()
+
             @Suppress("UNCHECKED_CAST")
             var map = data["attention"] as Map<Any, Any>
             if (map.containsKey("attention")) {
@@ -250,6 +248,7 @@ class ResponseBody(
         }
         if (data.containsKey("relaxation")) {
             var realtimeRelaxationData = RealtimeRelaxationData()
+
             @Suppress("UNCHECKED_CAST")
             var map = data["relaxation"] as Map<Any, Any>
             if (map.containsKey("relaxation")) {
@@ -259,6 +258,7 @@ class ResponseBody(
         }
         if (data.containsKey("pressure")) {
             var realtimePressureData = RealtimePressureData()
+
             @Suppress("UNCHECKED_CAST")
             var map = data["pressure"] as Map<Any, Any>
             if (map.containsKey("pressure")) {
@@ -268,6 +268,7 @@ class ResponseBody(
         }
         if (data.containsKey("pleasure")) {
             var realtimePleasureData = RealtimePleasureData()
+
             @Suppress("UNCHECKED_CAST")
             var map = data["pleasure"] as Map<Any, Any>
             if (map.containsKey("pleasure")) {
@@ -277,6 +278,7 @@ class ResponseBody(
         }
         if (data.containsKey("arousal")) {
             var realtimeArousalData = RealtimeArousalData()
+
             @Suppress("UNCHECKED_CAST")
             var map = data["arousal"] as Map<Any, Any>
             if (map.containsKey("arousal")) {
@@ -286,6 +288,7 @@ class ResponseBody(
         }
         if (data.containsKey("coherence")) {
             var realtimeCoherenceData = RealtimeCoherenceData()
+
             @Suppress("UNCHECKED_CAST")
             var map = data["coherence"] as Map<Any, Any>
             if (map.containsKey("coherence")) {
@@ -295,6 +298,7 @@ class ResponseBody(
         }
         if (data.containsKey("sleep")) {
             var realtimeSleepData = RealtimeSleepData()
+
             @Suppress("UNCHECKED_CAST")
             var attentionMap = data["sleep"] as Map<Any, Any>
             if (attentionMap.containsKey("sleep_degree")) {

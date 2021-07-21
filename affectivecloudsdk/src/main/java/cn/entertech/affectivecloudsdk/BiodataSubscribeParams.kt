@@ -23,7 +23,7 @@ class BiodataSubscribeParams internal constructor(builder: Builder) : OptionalPa
         }
 
         fun requestHR(): Builder {
-            bioSubList.add("hr")
+            bioSubList.add("hr-v2")
             return this
         }
 

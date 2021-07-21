@@ -24,7 +24,7 @@ import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.*
-import cn.entertech.ble.BiomoduleBleManager
+import cn.entertech.ble.single.BiomoduleBleManager
 import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.*

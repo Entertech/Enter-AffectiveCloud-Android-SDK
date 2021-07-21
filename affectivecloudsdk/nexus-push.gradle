@@ -22,7 +22,7 @@ uploadArchives{
             // library的项目名
             pom.artifactId = 'affectivecloud'
             // library的版本号
-            pom.version = '2.1.0'
+            pom.version = '2.2.0'
 
             pom.project {
                 licenses {

@@ -385,7 +385,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         heartRateDataBuffer.add(heartRateData)
         if (heartRateDataBuffer.size >= uploadHRTriggerCount) {
             var dataMap = HashMap<Any, Any>()
-            dataMap["hr"] = heartRateDataBuffer.toIntArray()
+            dataMap["hr-v2"] = heartRateDataBuffer.toIntArray()
             var requestBody =
                 RequestBody(SERVER_BIO_DATA, "upload", dataMap)
             var requestJson = Gson().toJson(requestBody)

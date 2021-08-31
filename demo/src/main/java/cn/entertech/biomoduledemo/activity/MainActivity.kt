@@ -144,7 +144,7 @@ class MainActivity : AppCompatActivity() {
                 .affectiveSubscribeParams(affectiveSubscribeParams!!)
                 .storageSettings(storageSettings)
                 .algorithmParams(algorithmParams)
-                .uploadCycle(1)
+                .uploadCycle(3)
 //                .biodataTolerance(biodataTolerance)
                 .build()
         enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)

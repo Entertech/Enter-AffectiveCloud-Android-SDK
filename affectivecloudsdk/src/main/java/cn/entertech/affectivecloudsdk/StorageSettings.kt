@@ -40,6 +40,14 @@ class StorageSettings internal constructor(builder: Builder) : OptionalParamsMap
             return this
         }
 
+        fun channelNum(channelNum:AlgorithmParams.ChannelNum):Builder{
+            if (device == null) {
+                device = HashMap()
+            }
+            device!!["channel_num"] = channelNum.value
+            return this
+        }
+
         fun sn(sn: String): Builder {
             if (device == null) {
                 device = HashMap()

@@ -21,6 +21,10 @@ interface IEnterAffectiveCloudManager {
 
     fun appendHeartRateData(heartRateData: Int)
 
+    fun appendMCEEGData(brainData: ByteArray)
+
+    fun appendBCGData(bcgData: ByteArray)
+
     fun addBiodataRealtimeListener(listener: (RealtimeBioData?) -> (Unit))
 
     fun addAffectiveDataRealtimeListener(listener: (RealtimeAffectiveData?) -> (Unit))

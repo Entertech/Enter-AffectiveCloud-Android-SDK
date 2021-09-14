@@ -94,6 +94,19 @@ interface BaseApi {
     fun appendHeartData(heartRateData: Int)
 
     /**
+     * Send multi-channel brain data to affective cloud platform.
+     * @param brainData ByteArray
+     */
+    fun appendMCEEGData(brainData: ByteArray)
+
+    /**
+     * Send bcg data to affective cloud platform
+     *
+     * @param bcgData
+     */
+    fun appendBCGData(bcgData: ByteArray)
+
+    /**
      * Subscribe biodata. After subscribing, can receive real time analysed biodata from affective cloud platform.
      * @param data HashMap<Any, Any>
      * @param response Callback2<RealtimeBioData>

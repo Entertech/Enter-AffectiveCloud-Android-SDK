@@ -193,6 +193,13 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
 
         })
     }
+    override fun appendMCEEGData(mceegData: ByteArray) {
+        mApi.appendMCEEGData(mceegData)
+    }
+
+    override fun appendBCGData(bcgData: ByteArray) {
+        mApi.appendBCGData(bcgData)
+    }
 
     override fun appendEEGData(brainData: ByteArray) {
         mApi.appendEEGData(brainData)

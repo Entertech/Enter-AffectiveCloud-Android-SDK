@@ -125,9 +125,9 @@ class MainActivity : AppCompatActivity() {
             .build()
         var algorithmParamsEEG =
             AlgorithmParamsEEG.Builder()
-                .tolerance(AlgorithmParamsEEG.Tolerance.LEVEL_2)
-                .filterMode(AlgorithmParamsEEG.FilterMode.SMART)
-                .powerMode(AlgorithmParamsEEG.PowerMode.DB)
+                .tolerance(AlgorithmParams.Tolerance.LEVEL_2)
+                .filterMode(AlgorithmParams.FilterMode.SMART)
+                .powerMode(AlgorithmParams.PowerMode.DB)
                 .channelPowerVerbose(false)
                 .build()
         var algorithmParams = AlgorithmParams.Builder()

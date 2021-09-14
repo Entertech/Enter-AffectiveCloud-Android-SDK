@@ -57,6 +57,8 @@ class EnterAffectiveCloudApiImpl internal constructor(
         const val DEFAULT_UPLOAD_HR_PACKAGE_COUNT = 2
         const val BASE_UPLOAD_EEG_PACKAGE_COUNT = 50
         const val BASE_UPLOAD_HR_PACKAGE_COUNT = 3
+        const val UPLOAD_MCEEG_PACKAGE_COUNT = 30
+        const val UPLOAD_BCG_PACKAGE_COUNT = 15
         const val EEG_PACKAGE_LENGTH = 20
         const val HR_PACKAGE_LENGTH = 1
         const val DEFAULT_UPLOAD_CYCLE = 3
@@ -66,7 +68,8 @@ class EnterAffectiveCloudApiImpl internal constructor(
         DEFAULT_UPLOAD_EEG_PACKAGE_COUNT * EEG_PACKAGE_LENGTH * DEFAULT_UPLOAD_CYCLE
     var uploadHRTriggerCount =
         DEFAULT_UPLOAD_HR_PACKAGE_COUNT * HR_PACKAGE_LENGTH * DEFAULT_UPLOAD_CYCLE
-
+    var uploadMCEEGPackageTriggerCount = UPLOAD_MCEEG_PACKAGE_COUNT * DEFAULT_UPLOAD_CYCLE
+    var uploadBCGPackageTriggerCount = UPLOAD_BCG_PACKAGE_COUNT * DEFAULT_UPLOAD_CYCLE
     constructor(
         websocketAddress: String,
         appKey: String, appSecret: String,
@@ -207,6 +210,8 @@ class EnterAffectiveCloudApiImpl internal constructor(
                 BASE_UPLOAD_EEG_PACKAGE_COUNT * EEG_PACKAGE_LENGTH * uploadCycle
             uploadHRTriggerCount =
                 BASE_UPLOAD_HR_PACKAGE_COUNT * HR_PACKAGE_LENGTH * uploadCycle
+            uploadMCEEGPackageTriggerCount = UPLOAD_MCEEG_PACKAGE_COUNT * uploadCycle
+            uploadBCGPackageTriggerCount = UPLOAD_BCG_PACKAGE_COUNT * uploadCycle
         }
     }
 
@@ -380,6 +385,23 @@ class EnterAffectiveCloudApiImpl internal constructor(
         }
     }
 
+    var mceegDataBuffer = CopyOnWriteArrayList<Int>()
+    var mceegPackageCount = 0
+    override fun appendMCEEGData(mceegData: ByteArray) {
+        mceegDataBuffer.addAll(mceegData.toList().map { ConvertUtil.converUnchart(it) })
+        mceegPackageCount++
+        if (mceegPackageCount >= uploadMCEEGPackageTriggerCount){
+            var dataMap = HashMap<Any, Any>()
+            dataMap["mceeg"] = mceegDataBuffer.toIntArray()
+            var requestBody =
+                RequestBody(SERVER_BIO_DATA, "upload", dataMap)
+            var requestJson = Gson().toJson(requestBody)
+            mWebSocketHelper?.sendMessage(requestJson)
+            mceegPackageCount = 0
+            mceegDataBuffer.clear()
+        }
+    }
+
     var heartRateDataBuffer = CopyOnWriteArrayList<Int>()
     override fun appendHeartData(heartRateData: Int) {
         heartRateDataBuffer.add(heartRateData)
@@ -391,6 +413,23 @@ class EnterAffectiveCloudApiImpl internal constructor(
             var requestJson = Gson().toJson(requestBody)
             mWebSocketHelper?.sendMessage(requestJson)
             heartRateDataBuffer.clear()
+        }
+    }
+
+    var bcgDataBuffer = CopyOnWriteArrayList<Int>()
+    var bcgPackageCount = 0
+    override fun appendBCGData(bcgData: ByteArray) {
+        bcgDataBuffer.addAll(bcgData.toList().map { ConvertUtil.converUnchart(it) })
+        bcgPackageCount++
+        if (bcgPackageCount >= uploadBCGPackageTriggerCount){
+            var dataMap = HashMap<Any, Any>()
+            dataMap["bcg"] = bcgDataBuffer.toIntArray()
+            var requestBody =
+                RequestBody(SERVER_BIO_DATA, "upload", dataMap)
+            var requestJson = Gson().toJson(requestBody)
+            mWebSocketHelper?.sendMessage(requestJson)
+            bcgPackageCount = 0
+            bcgDataBuffer.clear()
         }
     }
 

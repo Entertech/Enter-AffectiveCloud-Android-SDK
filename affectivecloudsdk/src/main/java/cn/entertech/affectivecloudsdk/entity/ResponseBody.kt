@@ -1,6 +1,5 @@
 package cn.entertech.affectivecloudsdk.entity
 
-import cn.entertech.affectivecloudsdk.entity.*
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -229,6 +228,77 @@ class ResponseBody(
                 realtimeHrData.hrv = hrMap["hrv"] as Double
             }
             realtimeBioData.realtimeHrData = realtimeHrData
+
+        }
+        if (data.containsKey("mceeg")) {
+            var realtimeMCEEGData = RealtimeMCEEGData()
+
+            @Suppress("UNCHECKED_CAST")
+            var mceegData = data["mceeg"] as Map<Any, Any>
+            if (mceegData.containsKey("mceeg_wave")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeMCEEGData.mceegWave = MCEEGWaveData(mceegData["mceeg_wave"] as Map<Any, Any>)
+            }
+            if (mceegData.containsKey("mceog_wave")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeMCEEGData.mceogWave = MCEOGWaveData(mceegData["mceog_wave"] as Map<Any, Any>)
+            }
+            if (mceegData.containsKey("eeg_alpha_power")) {
+                realtimeMCEEGData.eegAlphaPower = mceegData["eeg_alpha_power"] as Double
+            }
+            if (mceegData.containsKey("eeg_beta_power")) {
+                realtimeMCEEGData.eegBetaPower = mceegData["eeg_beta_power"] as Double
+            }
+            if (mceegData.containsKey("eeg_theta_power")) {
+                realtimeMCEEGData.eegThetaPower = mceegData["eeg_theta_power"] as Double
+            }
+            if (mceegData.containsKey("eeg_delta_power")) {
+                realtimeMCEEGData.eegDeltaPower = mceegData["eeg_delta_power"] as Double
+            }
+            if (mceegData.containsKey("eeg_gamma_power")) {
+                realtimeMCEEGData.eegGammaPower = mceegData["eeg_gamma_power"] as Double
+            }
+            if (mceegData.containsKey("mceeg_quality")) {
+                realtimeMCEEGData.mceegQuality = MCEEGQualityData(mceegData["mceeg_quality"] as Map<Any, Any>)
+            }
+            if (mceegData.containsKey("mceog_quality")) {
+                realtimeMCEEGData.mceogQuality = MCEOGQualityData(mceegData["mceog_quality"] as Map<Any, Any>)
+            }
+            if (mceegData.containsKey("mceeg_alpha_power")) {
+                realtimeMCEEGData.mceegAlphaPower = mceegData["mceeg_alpha_power"] as Double
+            }
+            if (mceegData.containsKey("mceeg_beta_power")) {
+                realtimeMCEEGData.mceegBetaPower = mceegData["mceeg_beta_power"] as Double
+            }
+            if (mceegData.containsKey("mceeg_theta_power")) {
+                realtimeMCEEGData.mceegThetaPower = mceegData["mceeg_theta_power"] as Double
+            }
+            if (mceegData.containsKey("mceeg_delta_power")) {
+                realtimeMCEEGData.mceegDeltaPower = mceegData["mceeg_delta_power"] as Double
+            }
+            if (mceegData.containsKey("mceeg_gamma_power")) {
+                realtimeMCEEGData.mceegGammaPower = mceegData["mceeg_gamma_power"] as Double
+            }
+            realtimeBioData.realtimeMCEEGData = realtimeMCEEGData
+        }
+        if (data.containsKey("bcg")) {
+            var realtimeBcgData = RealtimeBCGData()
+            @Suppress("UNCHECKED_CAST")
+            var bcgMap = data["bcg"] as Map<Any, Any>
+            if (bcgMap.containsKey("hr")) {
+                realtimeBcgData.hr = bcgMap["hr"] as Double
+            }
+            if (bcgMap.containsKey("hrv")) {
+                realtimeBcgData.hrv = bcgMap["hrv"] as Double
+            }
+            if (bcgMap.containsKey("bcg_wave")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeBcgData.bcgWave = bcgMap["bcg_wave"] as ArrayList<Double>
+            }
+            if (bcgMap.containsKey("bcg_quality")) {
+                realtimeBcgData.bcgQuality = bcgMap["bcg_quality"] as Double
+            }
+            realtimeBioData.realtimeBCGData = realtimeBcgData
 
         }
         return realtimeBioData

@@ -22,7 +22,7 @@ import java.util.*
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(PowerMockRunner::class)
 @PrepareForTest(Log::class)
-@PowerMockIgnore("jdk.internal.reflect.*","javax.net.ssl.*")
+@PowerMockIgnore("jdk.internal.reflect.*", "javax.net.ssl.*")
 class EnterAffectiveCloudManagerTestMultichannel {
 
     @Test
@@ -38,11 +38,11 @@ class EnterAffectiveCloudManagerTestMultichannel {
         }
 
         enterAffectiveCloudManager!!.addAffectiveDataRealtimeListener {
-//            results[1] = true
-//            countDownLatch.countDown()
-//            null
+            results[1] = true
+            countDownLatch.countDown()
+            null
         }
-//        uploadMCEEGRawData()
+        uploadMCEEGRawData()
         uploadBCGRawData()
         try {
             countDownLatch.await()
@@ -51,7 +51,7 @@ class EnterAffectiveCloudManagerTestMultichannel {
         }
 
         assertEquals(true, results[0])
-//        assertEquals(true, results[1])
+        assertEquals(true, results[1])
     }
 
     @Test
@@ -153,13 +153,11 @@ class EnterAffectiveCloudManagerTestMultichannel {
             val data = readFile(MCEEG_TEST_FILE_PATH)
             val mceeg = data!!.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             var i = 0
-            System.out.println("mceeg size is "+mceeg.size)
             while (i < mceeg.size) {
                 val eegs = ByteArray(124)
                 for (j in 0..123) {
                     eegs[j] = Integer.parseInt(mceeg[j + i]).toByte()
                 }
-                System.out.println("mceeg append size is "+eegs.size)
                 enterAffectiveCloudManager!!.appendMCEEGData(eegs)
                 try {
                     Thread.sleep(20)
@@ -173,32 +171,29 @@ class EnterAffectiveCloudManagerTestMultichannel {
     }
 
     fun uploadBCGRawData() {
-        Thread(Runnable {
-            val data = readFile(BCG_TEST_FILE_PATH)
-            val bcg = data!!.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            var i = 0
-            while (i < bcg.size) {
-                val bcgs = ByteArray(13)
-                for (j in 0..12) {
-                    bcgs[j] = Integer.parseInt(bcg[j + i]).toByte()
-                }
-                enterAffectiveCloudManager!!.appendBCGData(bcgs)
-                try {
-                    Thread.sleep(40)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
-                i = i + 13
-
-                System.out.println("upload complete uploadBCGRawData11111")
+        val data = readFile(BCG_TEST_FILE_PATH)
+        val bcg = data!!.split(", ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        var i = 0
+        while (i < bcg.size) {
+            val bcgs = ByteArray(13)
+            for (j in 0..12) {
+                bcgs[j] = Integer.parseInt(bcg[j + i]).toByte()
             }
-            System.out.println("upload complete uploadBCGRawData")
-        }).start()
+            enterAffectiveCloudManager!!.appendBCGData(bcgs)
+            try {
+                Thread.sleep(40)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+            i = i + 13
+        }
     }
+
     companion object {
 
         var APP_KEY = "015b7118-b81e-11e9-9ea1-8c8590cb54f9"
         var APP_SECRET = "cd9c757ae9a7b7e1cff01ee1bb4d4f98"
+
         /*自己的用户ID：邮箱或者手机号码*/
         var USER_ID = "12809@qq.com"
         var EEG_TEST_FILE_PATH =
@@ -210,7 +205,8 @@ class EnterAffectiveCloudManagerTestMultichannel {
         var BCG_TEST_FILE_PATH =
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/entertech_vr_bcg.txt"
         var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
-//        var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
+
+        //        var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
         internal var availableAffectiveServices: MutableList<Service> = ArrayList()
         internal var availableBioServices: MutableList<Service> = ArrayList()
         private var biodataSubscribeParams: BiodataSubscribeParams? = null
@@ -227,24 +223,24 @@ class EnterAffectiveCloudManagerTestMultichannel {
             availableBioServices.add(Service.MCEEG)
             availableBioServices.add(Service.BCG)
 
-//            availableAffectiveServices.add(Service.ATTENTION)
+            availableAffectiveServices.add(Service.ATTENTION)
             availableAffectiveServices.add(Service.PRESSURE)
-//            availableAffectiveServices.add(Service.AROUSAL)
-//            availableAffectiveServices.add(Service.RELAXATION)
-//            availableAffectiveServices.add(Service.PLEASURE)
-//            availableAffectiveServices.add(Service.COHERENCE)
+            availableAffectiveServices.add(Service.AROUSAL)
+            availableAffectiveServices.add(Service.RELAXATION)
+            availableAffectiveServices.add(Service.PLEASURE)
+            availableAffectiveServices.add(Service.COHERENCE)
             biodataSubscribeParams = BiodataSubscribeParams.Builder()
                 .requestBCG()
                 .requestMCEEG()
                 .build()
 
             affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
-//                .requestAttention()
-//                .requestRelaxation()
+                .requestAttention()
+                .requestRelaxation()
                 .requestPressure()
-//                .requestPleasure()
-//                .requestArousal()
-//                .requestCoherence()
+                .requestPleasure()
+                .requestArousal()
+                .requestCoherence()
                 .build()
             var algorithmParamsMCEEG =
                 AlgorithmParamsMCEEG.Builder()
@@ -256,16 +252,19 @@ class EnterAffectiveCloudManagerTestMultichannel {
             var algorithmParams = AlgorithmParams.Builder()
                 .mceeg(algorithmParamsMCEEG)
                 .build()
-            var storageSettings = StorageSettings.Builder().channelNum(AlgorithmParams.ChannelNum.CHANNEL_NUM_8).build()
-            enterAffectiveCloudConfig = EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
-                .url(websocketAddress)
-                .availableBiodataServices(availableBioServices)
-                .availableAffectiveServices(availableAffectiveServices)
-                .affectiveSubscribeParams(affectiveSubscribeParams!!)
-                .biodataSubscribeParams(biodataSubscribeParams!!)
-                .algorithmParams(algorithmParams)
-                .storageSettings(storageSettings)
-                .build()
+            var storageSettings =
+                StorageSettings.Builder().channelNum(AlgorithmParams.ChannelNum.CHANNEL_NUM_8)
+                    .build()
+            enterAffectiveCloudConfig =
+                EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
+                    .url(websocketAddress)
+                    .availableBiodataServices(availableBioServices)
+                    .availableAffectiveServices(availableAffectiveServices)
+                    .affectiveSubscribeParams(affectiveSubscribeParams!!)
+                    .biodataSubscribeParams(biodataSubscribeParams!!)
+                    .algorithmParams(algorithmParams)
+                    .storageSettings(storageSettings)
+                    .build()
             enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig!!)
             rawJsonResponseFunction = fun(s: String): Unit {
                 println(s)

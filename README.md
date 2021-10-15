@@ -125,6 +125,8 @@ enterAffectiveCloudManager?.init(object : Callback {
 
 注意如果要想实时返回数据，需要在上面步骤中配置订阅相应数据字段，否则监听将无数据返回。
 
+实时数据字段说明详见：[基础数据字段说明](https://docs.affectivecloud.cn/%F0%9F%8E%99%E6%8E%A5%E5%8F%A3%E5%8D%8F%E8%AE%AE/4.%20%E7%94%9F%E7%89%A9%E6%95%B0%E6%8D%AE%E5%9F%BA%E7%A1%80%E5%88%86%E6%9E%90%E6%9C%8D%E5%8A%A1%E5%8D%8F%E8%AE%AE.html#%E5%AE%9E%E6%97%B6%E7%94%9F%E7%89%A9%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E8%BF%94%E5%9B%9E%E5%80%BC),[情感数据字段说明](https://docs.affectivecloud.cn/%F0%9F%8E%99%E6%8E%A5%E5%8F%A3%E5%8D%8F%E8%AE%AE/5.%20%E6%83%85%E6%84%9F%E8%AE%A1%E7%AE%97%E6%9C%8D%E5%8A%A1%E5%8D%8F%E8%AE%AE.html#%E6%83%85%E6%84%9F%E4%BA%91%E8%AE%A1%E7%AE%97%E5%AE%9E%E6%97%B6%E8%BF%94%E5%9B%9E%E6%95%B0%E6%8D%AE%E6%9C%8D%E5%8A%A1%E5%92%8C%E5%8F%82%E6%95%B0%E9%A1%B9)
+
 ```kotlin
 enterAffectiveCloudManager!!.addBiodataRealtimeListener {
             messageReceiveFragment.appendMessageToScreen("基础服务实时数据：${it.toString()}")
@@ -152,7 +154,7 @@ enterAffectiveCloudManager?.appendHeartRateData(heartRate)
 
 ## 4.获取报表
 
-相应返回的 report 字段，由之前配置决定。具体字段的详细描述见[生物数据基础报表参数](https://docs.affectivecloud.com/🎙接口协议/4.%20生物数据基础分析服务协议.html#biodata-report)和[情感计算报表参数](https://docs.affectivecloud.com/🎙接口协议/5.%20情感计算服务协议.html#affective-report)。
+相应返回的 report 字段，由之前配置决定。具体字段的详细描述见[生物数据基础报表参数](https://docs.affectivecloud.cn/%F0%9F%8E%99%E6%8E%A5%E5%8F%A3%E5%8D%8F%E8%AE%AE/4.%20%E7%94%9F%E7%89%A9%E6%95%B0%E6%8D%AE%E5%9F%BA%E7%A1%80%E5%88%86%E6%9E%90%E6%9C%8D%E5%8A%A1%E5%8D%8F%E8%AE%AE.html#biodata-report)和[情感计算报表参数](https://docs.affectivecloud.cn/%F0%9F%8E%99%E6%8E%A5%E5%8F%A3%E5%8D%8F%E8%AE%AE/5.%20%E6%83%85%E6%84%9F%E8%AE%A1%E7%AE%97%E6%9C%8D%E5%8A%A1%E5%8D%8F%E8%AE%AE.html#affective-report)。
 
 ```kotlin
 enterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {

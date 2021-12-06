@@ -58,7 +58,8 @@ class EnterAffectiveCloudApiImpl internal constructor(
         const val BASE_UPLOAD_EEG_PACKAGE_COUNT = 50
         const val BASE_UPLOAD_HR_PACKAGE_COUNT = 3
         const val UPLOAD_MCEEG_PACKAGE_COUNT = 30
-        const val UPLOAD_BCG_PACKAGE_COUNT = 15
+        const val UPLOAD_BCG_PACKAGE_COUNT = 10
+        const val UPLOAD_GYRO_PACKAGE_COUNT = 5
         const val EEG_PACKAGE_LENGTH = 20
         const val HR_PACKAGE_LENGTH = 1
         const val DEFAULT_UPLOAD_CYCLE = 3
@@ -70,6 +71,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         DEFAULT_UPLOAD_HR_PACKAGE_COUNT * HR_PACKAGE_LENGTH * DEFAULT_UPLOAD_CYCLE
     var uploadMCEEGPackageTriggerCount = UPLOAD_MCEEG_PACKAGE_COUNT * DEFAULT_UPLOAD_CYCLE
     var uploadBCGPackageTriggerCount = UPLOAD_BCG_PACKAGE_COUNT * DEFAULT_UPLOAD_CYCLE
+    var uploadGyroPackageTriggerCount = UPLOAD_GYRO_PACKAGE_COUNT * DEFAULT_UPLOAD_CYCLE
     constructor(
         websocketAddress: String,
         appKey: String, appSecret: String,
@@ -418,7 +420,8 @@ class EnterAffectiveCloudApiImpl internal constructor(
 
     var bcgDataBuffer = CopyOnWriteArrayList<Int>()
     var bcgPackageCount = 0
-    override fun appendBCGData(bcgData: ByteArray) {
+    override fun appendBCGData(bcgData: ByteArray,packageCount: Int) {
+        uploadBCGPackageTriggerCount = packageCount * uploadCycle
         bcgDataBuffer.addAll(bcgData.toList().map { ConvertUtil.converUnchart(it) })
         bcgPackageCount++
         if (bcgPackageCount >= uploadBCGPackageTriggerCount){
@@ -430,6 +433,25 @@ class EnterAffectiveCloudApiImpl internal constructor(
             mWebSocketHelper?.sendMessage(requestJson)
             bcgPackageCount = 0
             bcgDataBuffer.clear()
+        }
+    }
+
+
+    var gyroDataBuffer = CopyOnWriteArrayList<Int>()
+    var gyroPackageCount = 0
+    override fun appendGyroData(gyroData: ByteArray,packageCount:Int) {
+        uploadGyroPackageTriggerCount = packageCount * uploadCycle
+        gyroDataBuffer.addAll(gyroData.toList().map { ConvertUtil.converUnchart(it) })
+        gyroPackageCount++
+        if (gyroPackageCount >= uploadGyroPackageTriggerCount){
+            var dataMap = HashMap<Any, Any>()
+            dataMap["gyro"] = gyroDataBuffer.toIntArray()
+            var requestBody =
+                RequestBody(SERVER_BIO_DATA, "upload", dataMap)
+            var requestJson = Gson().toJson(requestBody)
+            mWebSocketHelper?.sendMessage(requestJson)
+            gyroPackageCount = 0
+            gyroDataBuffer.clear()
         }
     }
 

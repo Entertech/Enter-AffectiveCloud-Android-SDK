@@ -1,5 +1,8 @@
 package cn.entertech.affectivecloudsdk.interfaces
 
+import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl
+import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl.Companion.UPLOAD_BCG_PACKAGE_COUNT
+import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl.Companion.UPLOAD_GYRO_PACKAGE_COUNT
 import cn.entertech.affectivecloudsdk.entity.*
 
 /**
@@ -104,7 +107,14 @@ interface BaseApi {
      *
      * @param bcgData
      */
-    fun appendBCGData(bcgData: ByteArray)
+    fun appendBCGData(bcgData: ByteArray,packageCount:Int)
+
+    /**
+     * Append gyro data
+     *
+     * @param gyroData
+     */
+    fun appendGyroData(gyroData:ByteArray,packageCount:Int)
 
     /**
      * Subscribe biodata. After subscribing, can receive real time analysed biodata from affective cloud platform.

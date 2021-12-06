@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.CpuUsageInfo
 import android.os.Environment
 import androidx.core.app.ActivityCompat
 import android.util.Log
@@ -24,6 +25,7 @@ import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.*
+import cn.entertech.ble.cushion.CushionBleManager
 import cn.entertech.ble.single.BiomoduleBleManager
 import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.activity_main.*
@@ -33,6 +35,7 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() {
+    private var cushionBleManager: CushionBleManager? = null
     private var appSecret: String? = null
     private var appKey: String? = null
     private var currentDataType: String? = "brain"
@@ -55,8 +58,8 @@ class MainActivity : AppCompatActivity() {
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
 
-        var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
-//    var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
+//        var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
+    var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 
     //    var EEG_TEST_FILE_PATH =
 //        "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
@@ -73,7 +76,7 @@ class MainActivity : AppCompatActivity() {
             Service.SLEEP,
             Service.COHERENCE
         )
-    var availableBioServices = listOf(Service.EEG)
+    var availableBioServices = listOf(Service.BCG,Service.GYRO)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -81,6 +84,9 @@ class MainActivity : AppCompatActivity() {
         biomoduleBleManager = BiomoduleBleManager.getInstance(this)
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
+        cushionBleManager = CushionBleManager.getInstance(this)
+        cushionBleManager?.addBCGDataListener(bcgDataListener)
+        cushionBleManager?.addGyroDataListener(gyroDataListener)
         initView()
         initEnterAffectiveCloudManager()
         initPermission()
@@ -101,25 +107,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
     fun initEnterAffectiveCloudManager() {
-        if (availableBioServices.contains(Service.EEG)) {
-            biodataSubscribeParams = BiodataSubscribeParams.Builder()
-                .requestEEG()
-                .build()
-        } else {
-            biodataSubscribeParams = BiodataSubscribeParams.Builder()
-                .requestHR()
-                .build()
-        }
-
-        affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
-            .requestAttention()
-            .requestRelaxation()
-            .requestPressure()
-            .requestPleasure()
-            .requestArousal()
-            .requestCoherence()
+        biodataSubscribeParams = BiodataSubscribeParams.Builder()
+            .requestBCG()
+            .requestGyro()
             .build()
-
         var storageSettings = StorageSettings.Builder()
             .allowStoreRawData(true)// Whether to allow the raw data to be saved on the server
             .build()
@@ -139,12 +130,10 @@ class MainActivity : AppCompatActivity() {
             EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
                 .url(websocketAddress)
                 .availableBiodataServices(availableBioServices)
-                .availableAffectiveServices(availableAffectiveServices)
                 .biodataSubscribeParams(biodataSubscribeParams!!)
-                .affectiveSubscribeParams(affectiveSubscribeParams!!)
                 .storageSettings(storageSettings)
                 .algorithmParams(algorithmParams)
-                .uploadCycle(3)
+                .uploadCycle(1)
 //                .biodataTolerance(biodataTolerance)
                 .build()
         enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
@@ -186,6 +175,7 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+        enterAffectiveCloudManager?.appendBCGData(ByteArray(3))
     }
 
 
@@ -296,7 +286,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onConnectDevice(@Suppress("UNUSED_PARAMETER") view: View) {
         messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_scaning))
-        biomoduleBleManager.scanNearDeviceAndConnect(fun() {
+        cushionBleManager?.scanNearDeviceAndConnect(fun() {
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_scan_success))
             Logger.d("扫描设备成功")
         }, fun(_: Exception) {
@@ -318,7 +308,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onDisconnectDevice(@Suppress("UNUSED_PARAMETER") view: View) {
         messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_connect_failed))
-        biomoduleBleManager.disConnect()
+        cushionBleManager?.disconnect()
     }
 
     fun onClear(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -356,6 +346,14 @@ class MainActivity : AppCompatActivity() {
             heartRateDataBuffer.add(heartRate)
             enterAffectiveCloudManager?.appendHeartRateData(heartRate)
         }
+    }
+
+    var bcgDataListener = fun(byteArray:ByteArray){
+        enterAffectiveCloudManager?.appendBCGData(byteArray)
+    }
+
+    var gyroDataListener = fun(byteArray:ByteArray){
+        enterAffectiveCloudManager?.appendGyroData(byteArray)
     }
 
     fun onInit(@Suppress("UNUSED_PARAMETER") view: View) {

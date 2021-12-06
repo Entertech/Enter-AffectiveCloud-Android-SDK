@@ -24,6 +24,9 @@ allprojects {
         maven {
             url "https://dl.bintray.com/hzentertech/maven"
         }
+        maven {
+            url "https://s01.oss.sonatype.org/content/repositories/releases/"
+        }
     }
 }
 

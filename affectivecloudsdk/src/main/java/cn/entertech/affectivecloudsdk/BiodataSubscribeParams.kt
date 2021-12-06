@@ -37,6 +37,12 @@ class BiodataSubscribeParams internal constructor(builder: Builder) : OptionalPa
             return this
         }
 
+        fun requestGyro():Builder{
+            bioSubList.add("gyro")
+            return this
+        }
+
+
         fun build(): BiodataSubscribeParams {
             if (bioSubList.isEmpty()) {
                 throw IllegalStateException("no biodata requested,pls call request..method before build")

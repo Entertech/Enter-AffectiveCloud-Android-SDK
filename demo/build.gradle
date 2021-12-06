@@ -34,6 +34,11 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
+
+    packagingOptions {
+        exclude 'META-INF/ble_release.kotlin_module'
+    }
+
 }
 
 dependencies {
@@ -47,6 +52,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     implementation 'cn.entertech.android:biomoduleble:1.4.2'
+    implementation 'cn.entertech.android:cushionble:1.0.0-alpha02'
     implementation 'com.orhanobut:logger:1.15'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation "org.java-websocket:Java-WebSocket:1.4.0"

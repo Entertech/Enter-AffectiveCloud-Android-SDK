@@ -1,5 +1,7 @@
 package cn.entertech.affectivecloudsdk.interfaces
 
+import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl.Companion.UPLOAD_BCG_PACKAGE_COUNT
+import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl.Companion.UPLOAD_GYRO_PACKAGE_COUNT
 import cn.entertech.affectivecloudsdk.entity.RealtimeAffectiveData
 import cn.entertech.affectivecloudsdk.entity.RealtimeBioData
 import cn.entertech.affectivecloudsdk.entity.RecData
@@ -23,7 +25,9 @@ interface IEnterAffectiveCloudManager {
 
     fun appendMCEEGData(brainData: ByteArray)
 
-    fun appendBCGData(bcgData: ByteArray)
+    fun appendBCGData(bcgData: ByteArray,packageCount:Int = UPLOAD_BCG_PACKAGE_COUNT)
+
+    fun appendGyroData(gyroData:ByteArray,packageCount: Int = UPLOAD_GYRO_PACKAGE_COUNT)
 
     fun addBiodataRealtimeListener(listener: (RealtimeBioData?) -> (Unit))
 

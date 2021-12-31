@@ -55,6 +55,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     companion object {
         const val DEFAULT_UPLOAD_EEG_PACKAGE_COUNT = 30
         const val DEFAULT_UPLOAD_HR_PACKAGE_COUNT = 2
+        const val DEFAULT_UPLOAD_PEPR_PACKAGE_COUNT = 15
         const val BASE_UPLOAD_EEG_PACKAGE_COUNT = 50
         const val BASE_UPLOAD_HR_PACKAGE_COUNT = 3
         const val UPLOAD_MCEEG_PACKAGE_COUNT = 30
@@ -62,6 +63,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         const val UPLOAD_GYRO_PACKAGE_COUNT = 5
         const val EEG_PACKAGE_LENGTH = 20
         const val HR_PACKAGE_LENGTH = 1
+        const val PEPR_PACKAGE_LENGTH = 15
         const val DEFAULT_UPLOAD_CYCLE = 3
     }
 
@@ -69,14 +71,17 @@ class EnterAffectiveCloudApiImpl internal constructor(
         DEFAULT_UPLOAD_EEG_PACKAGE_COUNT * EEG_PACKAGE_LENGTH * DEFAULT_UPLOAD_CYCLE
     var uploadHRTriggerCount =
         DEFAULT_UPLOAD_HR_PACKAGE_COUNT * HR_PACKAGE_LENGTH * DEFAULT_UPLOAD_CYCLE
+    var uploadPEPRTriggerCount =
+        DEFAULT_UPLOAD_PEPR_PACKAGE_COUNT * PEPR_PACKAGE_LENGTH * DEFAULT_UPLOAD_CYCLE
     var uploadMCEEGPackageTriggerCount = UPLOAD_MCEEG_PACKAGE_COUNT * DEFAULT_UPLOAD_CYCLE
     var uploadBCGPackageTriggerCount = UPLOAD_BCG_PACKAGE_COUNT * DEFAULT_UPLOAD_CYCLE
     var uploadGyroPackageTriggerCount = UPLOAD_GYRO_PACKAGE_COUNT * DEFAULT_UPLOAD_CYCLE
+
     constructor(
         websocketAddress: String,
         appKey: String, appSecret: String,
         userId: String, uploadCycle: Int
-    ) : this(websocketAddress, 10000, appKey, appSecret, userId,uploadCycle)
+    ) : this(websocketAddress, 10000, appKey, appSecret, userId, uploadCycle)
 
     init {
         initUploadTrigger()
@@ -207,7 +212,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     fun initUploadTrigger() {
-        if (uploadCycle != 0){
+        if (uploadCycle != 0) {
             uploadEEGTriggerCount =
                 BASE_UPLOAD_EEG_PACKAGE_COUNT * EEG_PACKAGE_LENGTH * uploadCycle
             uploadHRTriggerCount =
@@ -392,7 +397,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     override fun appendMCEEGData(mceegData: ByteArray) {
         mceegDataBuffer.addAll(mceegData.toList().map { ConvertUtil.converUnchart(it) })
         mceegPackageCount++
-        if (mceegPackageCount >= uploadMCEEGPackageTriggerCount){
+        if (mceegPackageCount >= uploadMCEEGPackageTriggerCount) {
             var dataMap = HashMap<Any, Any>()
             dataMap["mceeg"] = mceegDataBuffer.toIntArray()
             var requestBody =
@@ -418,13 +423,27 @@ class EnterAffectiveCloudApiImpl internal constructor(
         }
     }
 
+    var peprDataBuffer = CopyOnWriteArrayList<Int>()
+    override fun appendPEPRData(peprData: ByteArray) {
+        peprDataBuffer.addAll(peprData.toList().map { ConvertUtil.converUnchart(it) })
+        if (peprDataBuffer.size >= uploadPEPRTriggerCount) {
+            var dataMap = HashMap<Any, Any>()
+            dataMap["pepr"] = peprDataBuffer.toIntArray()
+            var requestBody =
+                RequestBody(SERVER_BIO_DATA, "upload", dataMap)
+            var requestJson = Gson().toJson(requestBody)
+            mWebSocketHelper?.sendMessage(requestJson)
+            peprDataBuffer.clear()
+        }
+    }
+
     var bcgDataBuffer = CopyOnWriteArrayList<Int>()
     var bcgPackageCount = 0
-    override fun appendBCGData(bcgData: ByteArray,packageCount: Int) {
+    override fun appendBCGData(bcgData: ByteArray, packageCount: Int) {
         uploadBCGPackageTriggerCount = packageCount * uploadCycle
         bcgDataBuffer.addAll(bcgData.toList().map { ConvertUtil.converUnchart(it) })
         bcgPackageCount++
-        if (bcgPackageCount >= uploadBCGPackageTriggerCount){
+        if (bcgPackageCount >= uploadBCGPackageTriggerCount) {
             var dataMap = HashMap<Any, Any>()
             dataMap["bcg"] = bcgDataBuffer.toIntArray()
             var requestBody =
@@ -439,11 +458,11 @@ class EnterAffectiveCloudApiImpl internal constructor(
 
     var gyroDataBuffer = CopyOnWriteArrayList<Int>()
     var gyroPackageCount = 0
-    override fun appendGyroData(gyroData: ByteArray,packageCount:Int) {
+    override fun appendGyroData(gyroData: ByteArray, packageCount: Int) {
         uploadGyroPackageTriggerCount = packageCount * uploadCycle
         gyroDataBuffer.addAll(gyroData.toList().map { ConvertUtil.converUnchart(it) })
         gyroPackageCount++
-        if (gyroPackageCount >= uploadGyroPackageTriggerCount){
+        if (gyroPackageCount >= uploadGyroPackageTriggerCount) {
             var dataMap = HashMap<Any, Any>()
             dataMap["gyro"] = gyroDataBuffer.toIntArray()
             var requestBody =

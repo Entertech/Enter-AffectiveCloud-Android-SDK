@@ -42,6 +42,11 @@ class BiodataSubscribeParams internal constructor(builder: Builder) : OptionalPa
             return this
         }
 
+        fun requestPEPR():Builder{
+            bioSubList.add("pepr")
+            return this
+        }
+
 
         fun build(): BiodataSubscribeParams {
             if (bioSubList.isEmpty()) {

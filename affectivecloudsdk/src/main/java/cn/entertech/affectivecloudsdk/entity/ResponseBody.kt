@@ -219,6 +219,7 @@ class ResponseBody(
         }
         if (data.containsKey("hr-v2")) {
             var realtimeHrData = RealtimeHrData()
+
             @Suppress("UNCHECKED_CAST")
             var hrMap = data["hr-v2"] as Map<Any, Any>
             if (hrMap.containsKey("hr")) {
@@ -237,11 +238,13 @@ class ResponseBody(
             var mceegData = data["mceeg"] as Map<Any, Any>
             if (mceegData.containsKey("mceeg_wave")) {
                 @Suppress("UNCHECKED_CAST")
-                realtimeMCEEGData.mceegWave = MCEEGWaveData(mceegData["mceeg_wave"] as Map<Any, Any>)
+                realtimeMCEEGData.mceegWave =
+                    MCEEGWaveData(mceegData["mceeg_wave"] as Map<Any, Any>)
             }
             if (mceegData.containsKey("mceog_wave")) {
                 @Suppress("UNCHECKED_CAST")
-                realtimeMCEEGData.mceogWave = MCEOGWaveData(mceegData["mceog_wave"] as Map<Any, Any>)
+                realtimeMCEEGData.mceogWave =
+                    MCEOGWaveData(mceegData["mceog_wave"] as Map<Any, Any>)
             }
             if (mceegData.containsKey("eeg_alpha_power")) {
                 realtimeMCEEGData.eegAlphaPower = mceegData["eeg_alpha_power"] as Double
@@ -259,10 +262,12 @@ class ResponseBody(
                 realtimeMCEEGData.eegGammaPower = mceegData["eeg_gamma_power"] as Double
             }
             if (mceegData.containsKey("mceeg_quality")) {
-                realtimeMCEEGData.mceegQuality = MCEEGQualityData(mceegData["mceeg_quality"] as Map<Any, Any>)
+                realtimeMCEEGData.mceegQuality =
+                    MCEEGQualityData(mceegData["mceeg_quality"] as Map<Any, Any>)
             }
             if (mceegData.containsKey("mceog_quality")) {
-                realtimeMCEEGData.mceogQuality = MCEOGQualityData(mceegData["mceog_quality"] as Map<Any, Any>)
+                realtimeMCEEGData.mceogQuality =
+                    MCEOGQualityData(mceegData["mceog_quality"] as Map<Any, Any>)
             }
             if (mceegData.containsKey("mceeg_alpha_power")) {
                 realtimeMCEEGData.mceegAlphaPower = mceegData["mceeg_alpha_power"] as Double
@@ -283,6 +288,7 @@ class ResponseBody(
         }
         if (data.containsKey("bcg")) {
             var realtimeBcgData = RealtimeBCGData()
+
             @Suppress("UNCHECKED_CAST")
             var bcgMap = data["bcg"] as Map<Any, Any>
             if (bcgMap.containsKey("hr")) {
@@ -299,6 +305,34 @@ class ResponseBody(
                 realtimeBcgData.bcgQuality = bcgMap["bcg_quality"] as Double
             }
             realtimeBioData.realtimeBCGData = realtimeBcgData
+
+        }
+        if (data.containsKey("pepr")) {
+            var realtimePEPRData = RealtimePEPRData()
+
+            @Suppress("UNCHECKED_CAST")
+            var peprMap = data["pepr"] as Map<Any, Any>
+            if (peprMap.containsKey("hr")) {
+                realtimePEPRData.hr = peprMap["hr"] as Double
+            }
+            if (peprMap.containsKey("hrv")) {
+                realtimePEPRData.hrv = peprMap["hrv"] as Double
+            }
+            if (peprMap.containsKey("bcg_wave")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimePEPRData.bcgWave = peprMap["bcg_wave"] as ArrayList<Double>
+            }
+            if (peprMap.containsKey("rw_wave")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimePEPRData.rwWave = peprMap["rw_wave"] as ArrayList<Double>
+            }
+            if (peprMap.containsKey("bcg_quality")) {
+                realtimePEPRData.bcgQuality = (peprMap["bcg_quality"] as Double).toInt()
+            }
+            if (peprMap.containsKey("rw_quality")) {
+                realtimePEPRData.rwQuality = (peprMap["rw_quality"] as Double).toInt()
+            }
+            realtimeBioData.realtimePEPRData = realtimePEPRData
 
         }
         return realtimeBioData

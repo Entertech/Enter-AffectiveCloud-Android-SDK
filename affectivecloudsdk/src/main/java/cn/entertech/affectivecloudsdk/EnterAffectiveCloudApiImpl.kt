@@ -219,6 +219,8 @@ class EnterAffectiveCloudApiImpl internal constructor(
                 BASE_UPLOAD_HR_PACKAGE_COUNT * HR_PACKAGE_LENGTH * uploadCycle
             uploadMCEEGPackageTriggerCount = UPLOAD_MCEEG_PACKAGE_COUNT * uploadCycle
             uploadBCGPackageTriggerCount = UPLOAD_BCG_PACKAGE_COUNT * uploadCycle
+            uploadPEPRTriggerCount =
+                DEFAULT_UPLOAD_PEPR_PACKAGE_COUNT * PEPR_PACKAGE_LENGTH * uploadCycle
         }
     }
 

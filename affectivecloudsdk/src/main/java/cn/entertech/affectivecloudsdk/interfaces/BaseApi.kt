@@ -103,6 +103,13 @@ interface BaseApi {
     fun appendMCEEGData(brainData: ByteArray)
 
     /**
+     * ApSendpend pepr data to affective cloud platform.
+     *
+     * @param peprData
+     */
+    fun appendPEPRData(peprData:ByteArray)
+
+    /**
      * Send bcg data to affective cloud platform
      *
      * @param bcgData

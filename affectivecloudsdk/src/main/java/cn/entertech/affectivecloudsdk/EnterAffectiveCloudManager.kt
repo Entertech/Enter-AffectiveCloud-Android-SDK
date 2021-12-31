@@ -197,6 +197,10 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.appendMCEEGData(mceegData)
     }
 
+    override fun appendPEPRData(peprData: ByteArray) {
+        mApi.appendPEPRData(peprData)
+    }
+
     override fun appendBCGData(bcgData: ByteArray,pacakgeCount:Int) {
         mApi.appendBCGData(bcgData,pacakgeCount)
     }

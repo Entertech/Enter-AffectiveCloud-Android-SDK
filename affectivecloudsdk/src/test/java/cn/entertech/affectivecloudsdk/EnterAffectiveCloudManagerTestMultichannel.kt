@@ -42,8 +42,7 @@ class EnterAffectiveCloudManagerTestMultichannel {
             countDownLatch.countDown()
             null
         }
-        uploadMCEEGRawData()
-        uploadBCGRawData()
+        uploadPEPRRawData()
         try {
             countDownLatch.await()
         } catch (e: InterruptedException) {
@@ -188,6 +187,24 @@ class EnterAffectiveCloudManagerTestMultichannel {
             i = i + 13
         }
     }
+    fun uploadPEPRRawData() {
+        val data = readFile(PEPR_TEST_FILE_PATH)
+        val bcg = data!!.split(", ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        var i = 0
+        while (i < bcg.size) {
+            val peprs = ByteArray(15)
+            for (j in 0..14) {
+                peprs[j] = Integer.parseInt(bcg[j + i]).toByte()
+            }
+            enterAffectiveCloudManager!!.appendPEPRData(peprs)
+            try {
+                Thread.sleep(40)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+            i = i + 15
+        }
+    }
 
     companion object {
 
@@ -204,6 +221,9 @@ class EnterAffectiveCloudManagerTestMultichannel {
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/entertech_vr_mceeg.txt"
         var BCG_TEST_FILE_PATH =
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/entertech_vr_bcg.txt"
+        var PEPR_TEST_FILE_PATH =
+            "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/cushion_pepr.txt"
+
         var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 
         //        var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
@@ -220,37 +240,19 @@ class EnterAffectiveCloudManagerTestMultichannel {
         @JvmStatic
         fun init() {
             PowerMockito.mockStatic(Log::class.java)
-            availableBioServices.add(Service.MCEEG)
-            availableBioServices.add(Service.BCG)
+            availableBioServices.add(Service.PEPR)
 
-            availableAffectiveServices.add(Service.ATTENTION)
             availableAffectiveServices.add(Service.PRESSURE)
-            availableAffectiveServices.add(Service.AROUSAL)
-            availableAffectiveServices.add(Service.RELAXATION)
-            availableAffectiveServices.add(Service.PLEASURE)
             availableAffectiveServices.add(Service.COHERENCE)
             biodataSubscribeParams = BiodataSubscribeParams.Builder()
-                .requestBCG()
-                .requestMCEEG()
+                .requestPEPR()
                 .build()
 
             affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
-                .requestAttention()
-                .requestRelaxation()
                 .requestPressure()
-                .requestPleasure()
-                .requestArousal()
                 .requestCoherence()
                 .build()
-            var algorithmParamsMCEEG =
-                AlgorithmParamsMCEEG.Builder()
-                    .filterMode(AlgorithmParams.FilterMode.SMART)
-                    .powerMode(AlgorithmParams.PowerMode.DB)
-                    .channelPowerVerbose(false)
-                    .channelNum(AlgorithmParams.ChannelNum.CHANNEL_NUM_8)
-                    .build()
             var algorithmParams = AlgorithmParams.Builder()
-                .mceeg(algorithmParamsMCEEG)
                 .build()
             var storageSettings =
                 StorageSettings.Builder().channelNum(AlgorithmParams.ChannelNum.CHANNEL_NUM_8)
@@ -263,7 +265,6 @@ class EnterAffectiveCloudManagerTestMultichannel {
                     .affectiveSubscribeParams(affectiveSubscribeParams!!)
                     .biodataSubscribeParams(biodataSubscribeParams!!)
                     .algorithmParams(algorithmParams)
-                    .storageSettings(storageSettings)
                     .build()
             enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig!!)
             rawJsonResponseFunction = fun(s: String): Unit {

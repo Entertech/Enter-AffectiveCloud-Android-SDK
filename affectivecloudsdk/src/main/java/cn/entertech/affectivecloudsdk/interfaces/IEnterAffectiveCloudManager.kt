@@ -25,6 +25,8 @@ interface IEnterAffectiveCloudManager {
 
     fun appendMCEEGData(brainData: ByteArray)
 
+    fun appendPEPRData(brainData: ByteArray)
+
     fun appendBCGData(bcgData: ByteArray,packageCount:Int = UPLOAD_BCG_PACKAGE_COUNT)
 
     fun appendGyroData(gyroData:ByteArray,packageCount: Int = UPLOAD_GYRO_PACKAGE_COUNT)

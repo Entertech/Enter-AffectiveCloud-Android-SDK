@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
 
-//        var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
+    //        var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
     var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 
     //    var EEG_TEST_FILE_PATH =
@@ -68,15 +68,10 @@ class MainActivity : AppCompatActivity() {
 
     var availableAffectiveServices =
         listOf(
-            Service.ATTENTION,
             Service.PRESSURE,
-            Service.AROUSAL,
-            Service.RELAXATION,
-            Service.PLEASURE,
-            Service.SLEEP,
             Service.COHERENCE
         )
-    var availableBioServices = listOf(Service.BCG,Service.GYRO)
+    var availableBioServices = listOf(Service.BCG, Service.GYRO, Service.PEPR)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -106,10 +101,10 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
     }
+
     fun initEnterAffectiveCloudManager() {
         biodataSubscribeParams = BiodataSubscribeParams.Builder()
-            .requestBCG()
-            .requestGyro()
+            .requestPEPR()
             .build()
         var storageSettings = StorageSettings.Builder()
             .allowStoreRawData(true)// Whether to allow the raw data to be saved on the server
@@ -130,6 +125,7 @@ class MainActivity : AppCompatActivity() {
             EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
                 .url(websocketAddress)
                 .availableBiodataServices(availableBioServices)
+                .availableAffectiveServices(availableAffectiveServices)
                 .biodataSubscribeParams(biodataSubscribeParams!!)
                 .storageSettings(storageSettings)
                 .algorithmParams(algorithmParams)
@@ -348,11 +344,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    var bcgDataListener = fun(byteArray:ByteArray){
+    var bcgDataListener = fun(byteArray: ByteArray) {
         enterAffectiveCloudManager?.appendBCGData(byteArray)
     }
 
-    var gyroDataListener = fun(byteArray:ByteArray){
+    var gyroDataListener = fun(byteArray: ByteArray) {
         enterAffectiveCloudManager?.appendGyroData(byteArray)
     }
 

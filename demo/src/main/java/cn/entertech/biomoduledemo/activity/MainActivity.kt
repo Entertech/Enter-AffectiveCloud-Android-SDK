@@ -53,6 +53,11 @@ class MainActivity : AppCompatActivity() {
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "eeg" + File.separator
     var saveHRPath: String =
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
+    var saveRealtimeDataPath: String =
+        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "realtime" + File.separator
+    var saveReportDataPath: String =
+        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "report" + File.separator
+
     var fileName: String = ""
 
         var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
@@ -149,9 +154,11 @@ class MainActivity : AppCompatActivity() {
                 .build()
         enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
         enterAffectiveCloudManager!!.addBiodataRealtimeListener {
+            FileHelper.getInstance().writeRealtimeData(getCurrentTime() + "<--" + it.toString() + "\n")
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_biodata) + it.toString())
         }
         enterAffectiveCloudManager!!.addAffectiveDataRealtimeListener {
+            FileHelper.getInstance().writeRealtimeData(getCurrentTime() + "<--" + it.toString() + "\n")
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_affective_data) + it.toString())
         }
         enterAffectiveCloudManager!!.addRawJsonRequestListener {
@@ -182,6 +189,8 @@ class MainActivity : AppCompatActivity() {
                 fileName = "${System.currentTimeMillis()}.txt"
                 FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
                 FileHelper.getInstance().setHRPath(saveHRPath + fileName)
+                FileHelper.getInstance().setRealtimeDataPath(saveRealtimeDataPath + fileName)
+                FileHelper.getInstance().setReportDataPath(saveReportDataPath + fileName)
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_success))
             }
 
@@ -193,6 +202,8 @@ class MainActivity : AppCompatActivity() {
         var file = File(saveRootPath)
         var eegDir = File(saveEEGPath)
         var hrDir = File(saveHRPath)
+        var realtimeDir = File(saveRealtimeDataPath)
+        var reportDir = File(saveReportDataPath)
         if (!file.exists()) {
             file.mkdirs()
         }
@@ -201,6 +212,12 @@ class MainActivity : AppCompatActivity() {
         }
         if (!hrDir.exists()) {
             hrDir.mkdirs()
+        }
+        if (!realtimeDir.exists()) {
+            realtimeDir.mkdirs()
+        }
+        if (!reportDir.exists()) {
+            reportDir.mkdirs()
         }
     }
 
@@ -370,6 +387,7 @@ class MainActivity : AppCompatActivity() {
     fun onReport(@Suppress("UNUSED_PARAMETER") view: View) {
         enterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
+                FileHelper.getInstance().writeReportData(getCurrentTime() + "<--" + t.toString() + "\n")
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_bio_report) + t.toString())
             }
 
@@ -380,6 +398,7 @@ class MainActivity : AppCompatActivity() {
         })
         enterAffectiveCloudManager?.getAffectiveDataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
+                FileHelper.getInstance().writeReportData(getCurrentTime() + "<--" + t.toString() + "\n")
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_get_affective_report) + t.toString())
             }
 

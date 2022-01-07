@@ -33,8 +33,12 @@ public class FileHelper {
 
     private PrintWriter eegPw;
     private PrintWriter hrPw;
+    private PrintWriter realtimeDataPw;
+    private PrintWriter reportDataPw;
     private boolean isFirstWriteEEG = true;
     private boolean isFirstWriteHR = true;
+    private boolean isFirstWriteRealtime = true;
+    private boolean isFirstWriteReport = true;
 
     public void setEEGPath(String filePath) {
         try {
@@ -51,6 +55,20 @@ public class FileHelper {
             e.printStackTrace();
         }
     }
+    public void setRealtimeDataPath(String filePath) {
+        try {
+            realtimeDataPw = new PrintWriter(new FileWriter(filePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void setReportDataPath(String filePath) {
+        try {
+            reportDataPw = new PrintWriter(new FileWriter(filePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void writeEEG(String data) {
         mHandler.post(new Runnable() {
@@ -63,6 +81,34 @@ public class FileHelper {
                     eegPw.append(data);
                 }
                 eegPw.flush();
+            }
+        });
+    }
+    public void writeRealtimeData(String data) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (isFirstWriteRealtime) {
+                    realtimeDataPw.print(data);
+                    isFirstWriteRealtime = false;
+                } else {
+                    realtimeDataPw.append(data);
+                }
+                realtimeDataPw.flush();
+            }
+        });
+    }
+    public void writeReportData(String data) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (isFirstWriteReport) {
+                    reportDataPw.print(data);
+                    isFirstWriteReport = false;
+                } else {
+                    reportDataPw.append(data);
+                }
+                reportDataPw.flush();
             }
         });
     }

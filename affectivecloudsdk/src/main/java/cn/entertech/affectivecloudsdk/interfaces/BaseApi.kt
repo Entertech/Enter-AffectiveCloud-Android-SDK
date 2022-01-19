@@ -91,6 +91,12 @@ interface BaseApi {
     fun appendEEGData(brainData: ByteArray)
 
     /**
+     * Send brain data to affective cloud platform for ssvep
+     * @param brainData ByteArray
+     */
+    fun appendDCEEGData(brainData: ByteArray)
+
+    /**
      * Send heart rate data to affective cloud platform
      * @param heartRateData ByteArray
      */

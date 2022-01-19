@@ -9,9 +9,10 @@ data class SubAffectiveDataFields(
     @SerializedName("subPleasureFields") var subPleasureFields: List<String>? = null,
     @SerializedName("subArousalFields") var subArousalFields: List<String>? = null,
     @SerializedName("subSleepFields") var subSleepFields: List<String>? = null,
-    @SerializedName("subCoherenceFields") var subCoherenceFields: List<String>? = null
+    @SerializedName("subCoherenceFields") var subCoherenceFields: List<String>? = null,
+    @SerializedName("subSsvepMultiClassifyFields") var subSsvepMultiClassifyFields: List<String>? = null
 ){
     override fun toString(): String {
-        return "SubAffectiveDataFields(subAttentionFields=$subAttentionFields, subRelaxationFields=$subRelaxationFields, subPressureFields=$subPressureFields, subPleasureFields=$subPleasureFields, subArousalFields=$subArousalFields, subSleepFields=$subSleepFields, subCoherenceFields=$subCoherenceFields)"
+        return "SubAffectiveDataFields(subAttentionFields=$subAttentionFields, subRelaxationFields=$subRelaxationFields, subPressureFields=$subPressureFields, subPleasureFields=$subPleasureFields, subArousalFields=$subArousalFields, subSleepFields=$subSleepFields, subCoherenceFields=$subCoherenceFields, subSsvepMultiClassifyFields=$subSsvepMultiClassifyFields)"
     }
 }

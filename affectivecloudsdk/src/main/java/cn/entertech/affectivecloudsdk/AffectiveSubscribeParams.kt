@@ -52,6 +52,11 @@ class AffectiveSubscribeParams internal constructor(builder: Builder):OptionalPa
             return this
         }
 
+        fun requestSsvepMultiClassify(): Builder {
+            affectiveSubList.add("ssvep-multi-classify")
+            return this
+        }
+
         fun build(): AffectiveSubscribeParams {
             if (affectiveSubList.isEmpty()) {
                 throw IllegalStateException("no affective data request,call request.. before build")

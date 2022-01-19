@@ -47,6 +47,11 @@ class BiodataSubscribeParams internal constructor(builder: Builder) : OptionalPa
             return this
         }
 
+        fun requestDceegSsvep():Builder{
+            bioSubList.add("dceeg-ssvep")
+            return this
+        }
+
 
         fun build(): BiodataSubscribeParams {
             if (bioSubList.isEmpty()) {

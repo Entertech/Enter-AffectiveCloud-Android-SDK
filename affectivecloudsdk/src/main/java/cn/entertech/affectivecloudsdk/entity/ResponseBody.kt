@@ -175,6 +175,11 @@ class ResponseBody(
             var coherenceFields = data["sub_coherence_fields"] as ArrayList<String>
             subAffectiveDataFields.subCoherenceFields = coherenceFields
         }
+        if (data.containsKey("sub_ssvep-multi-classify_fields") && data["sub_ssvep-multi-classify_fields"] != null) {
+            @Suppress("UNCHECKED_CAST")
+            var subSsvepMultiClassifyFields = data["sub_ssvep-multi-classify_fields"] as ArrayList<String>
+            subAffectiveDataFields.subSsvepMultiClassifyFields = subSsvepMultiClassifyFields
+        }
         return subAffectiveDataFields
     }
 
@@ -335,6 +340,52 @@ class ResponseBody(
             realtimeBioData.realtimePEPRData = realtimePEPRData
 
         }
+        if (data.containsKey("dceeg-ssvep")) {
+            var realtimeDceegSsvepData = RealtimeDceegSsvepData()
+
+            @Suppress("UNCHECKED_CAST")
+            var dceegSsvepMap = data["dceeg-ssvep"] as Map<Any, Any>
+            if (dceegSsvepMap.containsKey("eegl_wave")) {
+                realtimeDceegSsvepData.eeglWave = dceegSsvepMap["eegl_wave"] as ArrayList<Double>
+            }
+            if (dceegSsvepMap.containsKey("eegr_wave")) {
+                realtimeDceegSsvepData.eegrWave = dceegSsvepMap["eegr_wave"] as ArrayList<Double>
+            }
+            if (dceegSsvepMap.containsKey("eeg_quality")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.eegQuality = (dceegSsvepMap["eeg_quality"] as Double).toInt()
+            }
+            if (dceegSsvepMap.containsKey("eeg_alpha_power")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.eegAlphaPower = dceegSsvepMap["eeg_alpha_power"] as Double
+            }
+            if (dceegSsvepMap.containsKey("eeg_beta_power")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.eegBetaPower = dceegSsvepMap["eeg_beta_power"] as Double
+            }
+            if (dceegSsvepMap.containsKey("eeg_theta_power")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.eegThetaPower = dceegSsvepMap["eeg_theta_power"] as Double
+            }
+            if (dceegSsvepMap.containsKey("eeg_delta_power")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.eegDeltaPower = dceegSsvepMap["eeg_delta_power"] as Double
+            }
+            if (dceegSsvepMap.containsKey("eeg_gamma_power")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.eegGammaPower = dceegSsvepMap["eeg_gamma_power"] as Double
+            }
+            if (dceegSsvepMap.containsKey("ssvep_freq_corr")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.ssvepFreqCorr = dceegSsvepMap["ssvep_freq_corr"] as Map<String,Double>
+            }
+            if (dceegSsvepMap.containsKey("ssvep_freq_power")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.ssvepFreqPower =  dceegSsvepMap["ssvep_freq_power"] as Map<String,Double>
+            }
+            realtimeBioData.realtimeDceegSsvepData = realtimeDceegSsvepData
+
+        }
         return realtimeBioData
     }
 
@@ -412,6 +463,19 @@ class ResponseBody(
                 realtimeSleepData.sleepState = attentionMap["sleep_state"] as Double
             }
             realtimeAffectiveData.realtimeSleepData = realtimeSleepData
+        }
+        if (data.containsKey("ssvep-multi-classify")) {
+            var realtimeSsvepMultiClassifyData = RealtimeSsvepMultiClassifyData()
+
+            @Suppress("UNCHECKED_CAST")
+            var ssvepMultiClassifyMap = data["ssvep-multi-classify"] as Map<Any,Any>
+            if (ssvepMultiClassifyMap.containsKey("ssvep_class")) {
+                realtimeSsvepMultiClassifyData.ssvepClass = (ssvepMultiClassifyMap["ssvep_class"] as Double).toInt()
+            }
+            if (ssvepMultiClassifyMap.containsKey("ssvep_prob")) {
+                realtimeSsvepMultiClassifyData.ssvepProb = ssvepMultiClassifyMap["ssvep_prob"] as Map<String,Double>
+            }
+            realtimeAffectiveData.realtimeSsvepMultiClassifyData = realtimeSsvepMultiClassifyData
         }
         return realtimeAffectiveData
     }

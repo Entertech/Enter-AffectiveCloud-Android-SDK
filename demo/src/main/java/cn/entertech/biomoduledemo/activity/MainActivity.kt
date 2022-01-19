@@ -55,16 +55,25 @@ class MainActivity : AppCompatActivity() {
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
 
-    //        var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
-    var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
+        var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
+//    var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 
     //    var EEG_TEST_FILE_PATH =
 //        "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
     var EEG_TEST_FILE_PATH =
         Environment.getExternalStorageDirectory().path + File.separator + "flowtime_eegdata.txt"
 
-    var availableAffectiveServices = listOf(Service.SSVEP_MULTI_CLASSIFY)
-    var availableBioServices = listOf(Service.DCEEG_SSVEP)
+    var availableAffectiveServices =
+        listOf(
+            Service.ATTENTION,
+            Service.PRESSURE,
+            Service.AROUSAL,
+            Service.RELAXATION,
+            Service.PLEASURE,
+            Service.SLEEP,
+            Service.COHERENCE
+        )
+    var availableBioServices = listOf(Service.EEG)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -91,12 +100,26 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
     }
-
     fun initEnterAffectiveCloudManager() {
-        biodataSubscribeParams = BiodataSubscribeParams.Builder()
-            .requestDceegSsvep()
+        if (availableBioServices.contains(Service.EEG)) {
+            biodataSubscribeParams = BiodataSubscribeParams.Builder()
+                .requestEEG()
+                .build()
+        } else {
+            biodataSubscribeParams = BiodataSubscribeParams.Builder()
+                .requestHR()
+                .build()
+        }
+
+        affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
+            .requestAttention()
+            .requestRelaxation()
+            .requestPressure()
+            .requestPleasure()
+            .requestArousal()
+            .requestCoherence()
             .build()
-        affectiveSubscribeParams = AffectiveSubscribeParams.Builder().requestSsvepMultiClassify().build()
+
         var storageSettings = StorageSettings.Builder()
             .allowStoreRawData(true)// Whether to allow the raw data to be saved on the server
             .build()
@@ -161,6 +184,7 @@ class MainActivity : AppCompatActivity() {
                 FileHelper.getInstance().setHRPath(saveHRPath + fileName)
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_success))
             }
+
         })
     }
 
@@ -310,7 +334,7 @@ class MainActivity : AppCompatActivity() {
     var writeFileDataBuffer = ArrayList<Int>()
     var rawListener = fun(bytes: ByteArray) {
         if (currentDataType == "brain") {
-            enterAffectiveCloudManager?.appendDCEEGData(bytes)
+            enterAffectiveCloudManager?.appendEEGData(bytes)
             for (byte in bytes) {
                 var brainData = ConvertUtil.converUnchart(byte)
                 brainDataBuffer.add(brainData)
@@ -332,14 +356,6 @@ class MainActivity : AppCompatActivity() {
             heartRateDataBuffer.add(heartRate)
             enterAffectiveCloudManager?.appendHeartRateData(heartRate)
         }
-    }
-
-    var bcgDataListener = fun(byteArray: ByteArray) {
-        enterAffectiveCloudManager?.appendBCGData(byteArray)
-    }
-
-    var gyroDataListener = fun(byteArray: ByteArray) {
-        enterAffectiveCloudManager?.appendGyroData(byteArray)
     }
 
     fun onInit(@Suppress("UNUSED_PARAMETER") view: View) {

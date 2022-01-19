@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.CpuUsageInfo
 import android.os.Environment
 import androidx.core.app.ActivityCompat
 import android.util.Log
@@ -25,7 +24,6 @@ import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.*
-import cn.entertech.ble.cushion.CushionBleManager
 import cn.entertech.ble.single.BiomoduleBleManager
 import com.orhanobut.logger.Logger
 import kotlinx.android.synthetic.main.activity_main.*
@@ -35,7 +33,6 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() {
-    private var cushionBleManager: CushionBleManager? = null
     private var appSecret: String? = null
     private var appKey: String? = null
     private var currentDataType: String? = "brain"
@@ -66,12 +63,8 @@ class MainActivity : AppCompatActivity() {
     var EEG_TEST_FILE_PATH =
         Environment.getExternalStorageDirectory().path + File.separator + "flowtime_eegdata.txt"
 
-    var availableAffectiveServices =
-        listOf(
-            Service.PRESSURE,
-            Service.COHERENCE
-        )
-    var availableBioServices = listOf(Service.BCG, Service.GYRO, Service.PEPR)
+    var availableAffectiveServices = listOf(Service.SSVEP_MULTI_CLASSIFY)
+    var availableBioServices = listOf(Service.DCEEG_SSVEP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -79,9 +72,6 @@ class MainActivity : AppCompatActivity() {
         biomoduleBleManager = BiomoduleBleManager.getInstance(this)
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
-        cushionBleManager = CushionBleManager.getInstance(this)
-        cushionBleManager?.addBCGDataListener(bcgDataListener)
-        cushionBleManager?.addGyroDataListener(gyroDataListener)
         initView()
         initEnterAffectiveCloudManager()
         initPermission()
@@ -104,8 +94,9 @@ class MainActivity : AppCompatActivity() {
 
     fun initEnterAffectiveCloudManager() {
         biodataSubscribeParams = BiodataSubscribeParams.Builder()
-            .requestPEPR()
+            .requestDceegSsvep()
             .build()
+        affectiveSubscribeParams = AffectiveSubscribeParams.Builder().requestSsvepMultiClassify().build()
         var storageSettings = StorageSettings.Builder()
             .allowStoreRawData(true)// Whether to allow the raw data to be saved on the server
             .build()
@@ -127,6 +118,7 @@ class MainActivity : AppCompatActivity() {
                 .availableBiodataServices(availableBioServices)
                 .availableAffectiveServices(availableAffectiveServices)
                 .biodataSubscribeParams(biodataSubscribeParams!!)
+                .affectiveSubscribeParams(affectiveSubscribeParams!!)
                 .storageSettings(storageSettings)
                 .algorithmParams(algorithmParams)
                 .uploadCycle(1)
@@ -169,9 +161,7 @@ class MainActivity : AppCompatActivity() {
                 FileHelper.getInstance().setHRPath(saveHRPath + fileName)
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_success))
             }
-
         })
-        enterAffectiveCloudManager?.appendBCGData(ByteArray(3))
     }
 
 
@@ -282,7 +272,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onConnectDevice(@Suppress("UNUSED_PARAMETER") view: View) {
         messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_scaning))
-        cushionBleManager?.scanNearDeviceAndConnect(fun() {
+        biomoduleBleManager.scanNearDeviceAndConnect(fun() {
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_scan_success))
             Logger.d("扫描设备成功")
         }, fun(_: Exception) {
@@ -304,7 +294,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onDisconnectDevice(@Suppress("UNUSED_PARAMETER") view: View) {
         messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_connect_failed))
-        cushionBleManager?.disconnect()
+        biomoduleBleManager.disConnect()
     }
 
     fun onClear(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -320,7 +310,7 @@ class MainActivity : AppCompatActivity() {
     var writeFileDataBuffer = ArrayList<Int>()
     var rawListener = fun(bytes: ByteArray) {
         if (currentDataType == "brain") {
-            enterAffectiveCloudManager?.appendEEGData(bytes)
+            enterAffectiveCloudManager?.appendDCEEGData(bytes)
             for (byte in bytes) {
                 var brainData = ConvertUtil.converUnchart(byte)
                 brainDataBuffer.add(brainData)

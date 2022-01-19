@@ -106,4 +106,9 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
             return EnterAffectiveCloudConfig(this)
         }
     }
+
+    override fun toString(): String {
+        return "EnterAffectiveCloudConfig(appKey=$appKey, appSecret=$appSecret, userId=$userId, mAffectiveSubscribeParams=$mAffectiveSubscribeParams, mBiodataSubscribeParams=$mBiodataSubscribeParams, uri=$uri, websocketTimeout=$websocketTimeout, availableBiodataServices=$availableBiodataServices, availableAffectiveServices=$availableAffectiveServices, storageSettings=$storageSettings, algorithmParams=$algorithmParams, biodataTolerance=$biodataTolerance, uploadCycle=$uploadCycle)"
+    }
+
 }

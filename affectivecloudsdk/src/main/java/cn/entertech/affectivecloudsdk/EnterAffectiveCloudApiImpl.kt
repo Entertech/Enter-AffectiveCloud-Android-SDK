@@ -394,6 +394,23 @@ class EnterAffectiveCloudApiImpl internal constructor(
         }
     }
 
+    var brainDataBufferSSVEP = CopyOnWriteArrayList<Int>()
+    override fun appendDCEEGData(brainData: ByteArray) {
+        for (byte in brainData) {
+            var unchart = ConvertUtil.converUnchart(byte)
+            brainDataBufferSSVEP.add(unchart)
+            if (brainDataBufferSSVEP.size >= uploadEEGTriggerCount) {
+                var dataMap = HashMap<Any, Any>()
+                dataMap["dceeg-ssvep"] = brainDataBufferSSVEP.toIntArray()
+                var requestBody =
+                    RequestBody(SERVER_BIO_DATA, "upload", dataMap)
+                var requestJson = Gson().toJson(requestBody)
+                mWebSocketHelper?.sendMessage(requestJson)
+                brainDataBufferSSVEP.clear()
+            }
+        }
+    }
+
     var mceegDataBuffer = CopyOnWriteArrayList<Int>()
     var mceegPackageCount = 0
     override fun appendMCEEGData(mceegData: ByteArray) {

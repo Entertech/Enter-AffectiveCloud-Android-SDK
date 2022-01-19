@@ -21,6 +21,8 @@ interface IEnterAffectiveCloudManager {
 
     fun appendEEGData(brainData: ByteArray)
 
+    fun appendDCEEGData(brainData: ByteArray)
+
     fun appendHeartRateData(heartRateData: Int)
 
     fun appendMCEEGData(brainData: ByteArray)

@@ -1,6 +1,5 @@
 package cn.entertech.affectivecloudsdk.entity
 
-import cn.entertech.affectivecloudsdk.entity.*
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -176,6 +175,11 @@ class ResponseBody(
             var coherenceFields = data["sub_coherence_fields"] as ArrayList<String>
             subAffectiveDataFields.subCoherenceFields = coherenceFields
         }
+        if (data.containsKey("sub_ssvep-multi-classify_fields") && data["sub_ssvep-multi-classify_fields"] != null) {
+            @Suppress("UNCHECKED_CAST")
+            var subSsvepMultiClassifyFields = data["sub_ssvep-multi-classify_fields"] as ArrayList<String>
+            subAffectiveDataFields.subSsvepMultiClassifyFields = subSsvepMultiClassifyFields
+        }
         return subAffectiveDataFields
     }
 
@@ -220,6 +224,7 @@ class ResponseBody(
         }
         if (data.containsKey("hr-v2")) {
             var realtimeHrData = RealtimeHrData()
+
             @Suppress("UNCHECKED_CAST")
             var hrMap = data["hr-v2"] as Map<Any, Any>
             if (hrMap.containsKey("hr")) {
@@ -229,6 +234,156 @@ class ResponseBody(
                 realtimeHrData.hrv = hrMap["hrv"] as Double
             }
             realtimeBioData.realtimeHrData = realtimeHrData
+
+        }
+        if (data.containsKey("mceeg")) {
+            var realtimeMCEEGData = RealtimeMCEEGData()
+
+            @Suppress("UNCHECKED_CAST")
+            var mceegData = data["mceeg"] as Map<Any, Any>
+            if (mceegData.containsKey("mceeg_wave")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeMCEEGData.mceegWave =
+                    MCEEGWaveData(mceegData["mceeg_wave"] as Map<Any, Any>)
+            }
+            if (mceegData.containsKey("mceog_wave")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeMCEEGData.mceogWave =
+                    MCEOGWaveData(mceegData["mceog_wave"] as Map<Any, Any>)
+            }
+            if (mceegData.containsKey("eeg_alpha_power")) {
+                realtimeMCEEGData.eegAlphaPower = mceegData["eeg_alpha_power"] as Double
+            }
+            if (mceegData.containsKey("eeg_beta_power")) {
+                realtimeMCEEGData.eegBetaPower = mceegData["eeg_beta_power"] as Double
+            }
+            if (mceegData.containsKey("eeg_theta_power")) {
+                realtimeMCEEGData.eegThetaPower = mceegData["eeg_theta_power"] as Double
+            }
+            if (mceegData.containsKey("eeg_delta_power")) {
+                realtimeMCEEGData.eegDeltaPower = mceegData["eeg_delta_power"] as Double
+            }
+            if (mceegData.containsKey("eeg_gamma_power")) {
+                realtimeMCEEGData.eegGammaPower = mceegData["eeg_gamma_power"] as Double
+            }
+            if (mceegData.containsKey("mceeg_quality")) {
+                realtimeMCEEGData.mceegQuality =
+                    MCEEGQualityData(mceegData["mceeg_quality"] as Map<Any, Any>)
+            }
+            if (mceegData.containsKey("mceog_quality")) {
+                realtimeMCEEGData.mceogQuality =
+                    MCEOGQualityData(mceegData["mceog_quality"] as Map<Any, Any>)
+            }
+            if (mceegData.containsKey("mceeg_alpha_power")) {
+                realtimeMCEEGData.mceegAlphaPower = mceegData["mceeg_alpha_power"] as Double
+            }
+            if (mceegData.containsKey("mceeg_beta_power")) {
+                realtimeMCEEGData.mceegBetaPower = mceegData["mceeg_beta_power"] as Double
+            }
+            if (mceegData.containsKey("mceeg_theta_power")) {
+                realtimeMCEEGData.mceegThetaPower = mceegData["mceeg_theta_power"] as Double
+            }
+            if (mceegData.containsKey("mceeg_delta_power")) {
+                realtimeMCEEGData.mceegDeltaPower = mceegData["mceeg_delta_power"] as Double
+            }
+            if (mceegData.containsKey("mceeg_gamma_power")) {
+                realtimeMCEEGData.mceegGammaPower = mceegData["mceeg_gamma_power"] as Double
+            }
+            realtimeBioData.realtimeMCEEGData = realtimeMCEEGData
+        }
+        if (data.containsKey("bcg")) {
+            var realtimeBcgData = RealtimeBCGData()
+
+            @Suppress("UNCHECKED_CAST")
+            var bcgMap = data["bcg"] as Map<Any, Any>
+            if (bcgMap.containsKey("hr")) {
+                realtimeBcgData.hr = bcgMap["hr"] as Double
+            }
+            if (bcgMap.containsKey("hrv")) {
+                realtimeBcgData.hrv = bcgMap["hrv"] as Double
+            }
+            if (bcgMap.containsKey("bcg_wave")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeBcgData.bcgWave = bcgMap["bcg_wave"] as ArrayList<Double>
+            }
+            if (bcgMap.containsKey("bcg_quality")) {
+                realtimeBcgData.bcgQuality = bcgMap["bcg_quality"] as Double
+            }
+            realtimeBioData.realtimeBCGData = realtimeBcgData
+
+        }
+        if (data.containsKey("pepr")) {
+            var realtimePEPRData = RealtimePEPRData()
+
+            @Suppress("UNCHECKED_CAST")
+            var peprMap = data["pepr"] as Map<Any, Any>
+            if (peprMap.containsKey("hr")) {
+                realtimePEPRData.hr = peprMap["hr"] as Double
+            }
+            if (peprMap.containsKey("hrv")) {
+                realtimePEPRData.hrv = peprMap["hrv"] as Double
+            }
+            if (peprMap.containsKey("bcg_wave")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimePEPRData.bcgWave = peprMap["bcg_wave"] as ArrayList<Double>
+            }
+            if (peprMap.containsKey("rw_wave")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimePEPRData.rwWave = peprMap["rw_wave"] as ArrayList<Double>
+            }
+            if (peprMap.containsKey("bcg_quality")) {
+                realtimePEPRData.bcgQuality = (peprMap["bcg_quality"] as Double).toInt()
+            }
+            if (peprMap.containsKey("rw_quality")) {
+                realtimePEPRData.rwQuality = (peprMap["rw_quality"] as Double).toInt()
+            }
+            realtimeBioData.realtimePEPRData = realtimePEPRData
+
+        }
+        if (data.containsKey("dceeg-ssvep")) {
+            var realtimeDceegSsvepData = RealtimeDceegSsvepData()
+
+            @Suppress("UNCHECKED_CAST")
+            var dceegSsvepMap = data["dceeg-ssvep"] as Map<Any, Any>
+            if (dceegSsvepMap.containsKey("eegl_wave")) {
+                realtimeDceegSsvepData.eeglWave = dceegSsvepMap["eegl_wave"] as ArrayList<Double>
+            }
+            if (dceegSsvepMap.containsKey("eegr_wave")) {
+                realtimeDceegSsvepData.eegrWave = dceegSsvepMap["eegr_wave"] as ArrayList<Double>
+            }
+            if (dceegSsvepMap.containsKey("eeg_quality")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.eegQuality = (dceegSsvepMap["eeg_quality"] as Double).toInt()
+            }
+            if (dceegSsvepMap.containsKey("eeg_alpha_power")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.eegAlphaPower = dceegSsvepMap["eeg_alpha_power"] as Double
+            }
+            if (dceegSsvepMap.containsKey("eeg_beta_power")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.eegBetaPower = dceegSsvepMap["eeg_beta_power"] as Double
+            }
+            if (dceegSsvepMap.containsKey("eeg_theta_power")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.eegThetaPower = dceegSsvepMap["eeg_theta_power"] as Double
+            }
+            if (dceegSsvepMap.containsKey("eeg_delta_power")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.eegDeltaPower = dceegSsvepMap["eeg_delta_power"] as Double
+            }
+            if (dceegSsvepMap.containsKey("eeg_gamma_power")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.eegGammaPower = dceegSsvepMap["eeg_gamma_power"] as Double
+            }
+            if (dceegSsvepMap.containsKey("ssvep_freq_corr")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.ssvepFreqCorr = dceegSsvepMap["ssvep_freq_corr"] as Map<String,Double>
+            }
+            if (dceegSsvepMap.containsKey("ssvep_freq_power")) {
+                @Suppress("UNCHECKED_CAST")
+                realtimeDceegSsvepData.ssvepFreqPower =  dceegSsvepMap["ssvep_freq_power"] as Map<String,Double>
+            }
+            realtimeBioData.realtimeDceegSsvepData = realtimeDceegSsvepData
 
         }
         return realtimeBioData
@@ -308,6 +463,19 @@ class ResponseBody(
                 realtimeSleepData.sleepState = attentionMap["sleep_state"] as Double
             }
             realtimeAffectiveData.realtimeSleepData = realtimeSleepData
+        }
+        if (data.containsKey("ssvep-multi-classify")) {
+            var realtimeSsvepMultiClassifyData = RealtimeSsvepMultiClassifyData()
+
+            @Suppress("UNCHECKED_CAST")
+            var ssvepMultiClassifyMap = data["ssvep-multi-classify"] as Map<Any,Any>
+            if (ssvepMultiClassifyMap.containsKey("ssvep_class")) {
+                realtimeSsvepMultiClassifyData.ssvepClass = (ssvepMultiClassifyMap["ssvep_class"] as Double).toInt()
+            }
+            if (ssvepMultiClassifyMap.containsKey("ssvep_prob")) {
+                realtimeSsvepMultiClassifyData.ssvepProb = ssvepMultiClassifyMap["ssvep_prob"] as Map<String,Double>
+            }
+            realtimeAffectiveData.realtimeSsvepMultiClassifyData = realtimeSsvepMultiClassifyData
         }
         return realtimeAffectiveData
     }

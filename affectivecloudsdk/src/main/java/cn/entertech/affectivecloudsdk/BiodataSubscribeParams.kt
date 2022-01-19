@@ -27,6 +27,32 @@ class BiodataSubscribeParams internal constructor(builder: Builder) : OptionalPa
             return this
         }
 
+        fun requestMCEEG():Builder{
+            bioSubList.add("mceeg")
+            return this
+        }
+
+        fun requestBCG():Builder{
+            bioSubList.add("bcg")
+            return this
+        }
+
+        fun requestGyro():Builder{
+            bioSubList.add("gyro")
+            return this
+        }
+
+        fun requestPEPR():Builder{
+            bioSubList.add("pepr")
+            return this
+        }
+
+        fun requestDceegSsvep():Builder{
+            bioSubList.add("dceeg-ssvep")
+            return this
+        }
+
+
         fun build(): BiodataSubscribeParams {
             if (bioSubList.isEmpty()) {
                 throw IllegalStateException("no biodata requested,pls call request..method before build")

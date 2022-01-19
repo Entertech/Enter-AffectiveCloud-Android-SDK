@@ -1,5 +1,6 @@
 package cn.entertech.affectivecloudsdk
 
+import android.util.Log
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import org.java_websocket.handshake.ServerHandshake
@@ -150,6 +151,9 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         if (subData.subCoherenceFields != null) {
             affectiveServices.add(Service.COHERENCE)
         }
+        if (subData.subSsvepMultiClassifyFields != null) {
+            affectiveServices.add(Service.SSVEP_MULTI_CLASSIFY)
+        }
         config.availableAffectiveServices = affectiveServices
     }
 
@@ -193,9 +197,27 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
 
         })
     }
+    override fun appendMCEEGData(mceegData: ByteArray) {
+        mApi.appendMCEEGData(mceegData)
+    }
+
+    override fun appendPEPRData(peprData: ByteArray) {
+        mApi.appendPEPRData(peprData)
+    }
+
+    override fun appendBCGData(bcgData: ByteArray,pacakgeCount:Int) {
+        mApi.appendBCGData(bcgData,pacakgeCount)
+    }
+
+    override fun appendGyroData(gyroData: ByteArray,pacakgeCount:Int) {
+        mApi.appendGyroData(gyroData,pacakgeCount)
+    }
 
     override fun appendEEGData(brainData: ByteArray) {
         mApi.appendEEGData(brainData)
+    }
+    override fun appendDCEEGData(brainData: ByteArray) {
+        mApi.appendDCEEGData(brainData)
     }
 
     override fun appendHeartRateData(heartRateData: Int) {

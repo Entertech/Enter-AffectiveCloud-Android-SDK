@@ -1,5 +1,8 @@
 package cn.entertech.affectivecloudsdk.interfaces
 
+import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl
+import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl.Companion.UPLOAD_BCG_PACKAGE_COUNT
+import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl.Companion.UPLOAD_GYRO_PACKAGE_COUNT
 import cn.entertech.affectivecloudsdk.entity.*
 
 /**
@@ -88,10 +91,43 @@ interface BaseApi {
     fun appendEEGData(brainData: ByteArray)
 
     /**
+     * Send brain data to affective cloud platform for ssvep
+     * @param brainData ByteArray
+     */
+    fun appendDCEEGData(brainData: ByteArray)
+
+    /**
      * Send heart rate data to affective cloud platform
      * @param heartRateData ByteArray
      */
     fun appendHeartData(heartRateData: Int)
+
+    /**
+     * Send multi-channel brain data to affective cloud platform.
+     * @param brainData ByteArray
+     */
+    fun appendMCEEGData(brainData: ByteArray)
+
+    /**
+     * ApSendpend pepr data to affective cloud platform.
+     *
+     * @param peprData
+     */
+    fun appendPEPRData(peprData:ByteArray)
+
+    /**
+     * Send bcg data to affective cloud platform
+     *
+     * @param bcgData
+     */
+    fun appendBCGData(bcgData: ByteArray,packageCount:Int)
+
+    /**
+     * Append gyro data
+     *
+     * @param gyroData
+     */
+    fun appendGyroData(gyroData:ByteArray,packageCount:Int)
 
     /**
      * Subscribe biodata. After subscribing, can receive real time analysed biodata from affective cloud platform.

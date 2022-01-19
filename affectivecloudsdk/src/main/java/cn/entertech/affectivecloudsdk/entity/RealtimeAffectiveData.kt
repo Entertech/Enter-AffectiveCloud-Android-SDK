@@ -7,9 +7,10 @@ class RealtimeAffectiveData(
     var realtimePleasureData: RealtimePleasureData? = null,
     var realtimeArousalData: RealtimeArousalData? = null,
     var realtimeSleepData: RealtimeSleepData? = null,
-    var realtimeCoherenceData: RealtimeCoherenceData? = null
+    var realtimeCoherenceData: RealtimeCoherenceData? = null,
+    var realtimeSsvepMultiClassifyData: RealtimeSsvepMultiClassifyData? = null
 ){
     override fun toString(): String {
-        return "RealtimeAffectiveData(realtimeAttentionData=$realtimeAttentionData, realtimeRelaxationData=$realtimeRelaxationData, realtimePressureData=$realtimePressureData, realtimePleasureData=$realtimePleasureData, realtimeArousalData=$realtimeArousalData, realtimeSleepData=$realtimeSleepData, realtimeCoherenceData=$realtimeCoherenceData)"
+        return "RealtimeAffectiveData(realtimeAttentionData=$realtimeAttentionData, realtimeRelaxationData=$realtimeRelaxationData, realtimePressureData=$realtimePressureData, realtimePleasureData=$realtimePleasureData, realtimeArousalData=$realtimeArousalData, realtimeSleepData=$realtimeSleepData, realtimeCoherenceData=$realtimeCoherenceData, realtimeSsvepMultiClassifyData=$realtimeSsvepMultiClassifyData)"
     }
 }

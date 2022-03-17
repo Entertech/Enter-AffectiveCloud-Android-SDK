@@ -147,23 +147,61 @@ class MainActivity : AppCompatActivity() {
                 .uploadCycle(1)
 //                .biodataTolerance(biodataTolerance)
                 .build()
-        enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
-        enterAffectiveCloudManager!!.addBiodataRealtimeListener {
+//        enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
+//        enterAffectiveCloudManager!!.addBiodataRealtimeListener {
+//            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_biodata) + it.toString())
+//        }
+//        enterAffectiveCloudManager!!.addAffectiveDataRealtimeListener {
+//            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_affective_data) + it.toString())
+//        }
+//        enterAffectiveCloudManager!!.addRawJsonRequestListener {
+//            messageSendFragment.appendMessageToScreen(it)
+//        }
+//        enterAffectiveCloudManager!!.addRawJsonResponseListener {
+//
+//        }
+//        enterAffectiveCloudManager?.addWebSocketDisconnectListener {
+//            Log.d("######", "websocket disconnect:$it")
+//        }
+//        enterAffectiveCloudManager?.init(object : Callback {
+//            override fun onError(error: Error?) {
+//                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_failed) + error.toString())
+//                if (error != null && error.code == 1004) {
+//                    runOnUiThread {
+//                        Toast.makeText(
+//                            this@MainActivity,
+//                            getText(R.string.auth_page_title),
+//                            Toast.LENGTH_LONG
+//                        ).show()
+//                        finish()
+//                    }
+//                }
+//            }
+//
+//            override fun onSuccess() {
+//                fileName = "${System.currentTimeMillis()}.txt"
+//                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
+//                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
+//                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_success))
+//            }
+//
+//        })
+//
+        var enterAffectiveCloudSubscriber = EnterAffectiveCloudSubscriber("wss://server-test.affectivecloud.cn/ws/sub/v1/1091c92a-9aa5-11ec-a020-1e00c46c3e02/")
+        enterAffectiveCloudSubscriber.addBiodataRealtimeListener {
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_biodata) + it.toString())
         }
-        enterAffectiveCloudManager!!.addAffectiveDataRealtimeListener {
+        enterAffectiveCloudSubscriber.addAffectiveDataRealtimeListener {
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_affective_data) + it.toString())
         }
-        enterAffectiveCloudManager!!.addRawJsonRequestListener {
-            messageSendFragment.appendMessageToScreen(it)
-        }
-        enterAffectiveCloudManager!!.addRawJsonResponseListener {
+        enterAffectiveCloudSubscriber.init(object:Callback{
+            override fun onSuccess() {
+                fileName = "${System.currentTimeMillis()}.txt"
+                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
+                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
+                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_success))
+            }
 
-        }
-        enterAffectiveCloudManager?.addWebSocketDisconnectListener {
-            Log.d("######", "websocket disconnect:$it")
-        }
-        enterAffectiveCloudManager?.init(object : Callback {
             override fun onError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_failed) + error.toString())
                 if (error != null && error.code == 1004) {
@@ -176,13 +214,6 @@ class MainActivity : AppCompatActivity() {
                         finish()
                     }
                 }
-            }
-
-            override fun onSuccess() {
-                fileName = "${System.currentTimeMillis()}.txt"
-                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
-                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
-                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_success))
             }
 
         })

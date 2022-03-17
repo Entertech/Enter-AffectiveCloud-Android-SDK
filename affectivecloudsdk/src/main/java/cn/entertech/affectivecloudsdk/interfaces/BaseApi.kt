@@ -113,21 +113,21 @@ interface BaseApi {
      *
      * @param peprData
      */
-    fun appendPEPRData(peprData:ByteArray)
+    fun appendPEPRData(peprData: ByteArray)
 
     /**
      * Send bcg data to affective cloud platform
      *
      * @param bcgData
      */
-    fun appendBCGData(bcgData: ByteArray,packageCount:Int)
+    fun appendBCGData(bcgData: ByteArray, packageCount: Int)
 
     /**
      * Append gyro data
      *
      * @param gyroData
      */
-    fun appendGyroData(gyroData:ByteArray,packageCount:Int)
+    fun appendGyroData(gyroData: ByteArray, packageCount: Int)
 
     /**
      * Subscribe biodata. After subscribing, can receive real time analysed biodata from affective cloud platform.
@@ -261,5 +261,9 @@ interface BaseApi {
      * @param listener Function0<Unit>
      */
     fun removeDisconnectListener(listener: (String) -> Unit)
+
+    fun addBioDataCallback(callback: Callback2<RealtimeBioData>)
+
+    fun addAffectiveDataCallback(callback: Callback2<RealtimeAffectiveData>)
 
 }

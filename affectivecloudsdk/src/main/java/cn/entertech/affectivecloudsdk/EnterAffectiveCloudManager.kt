@@ -1,6 +1,5 @@
 package cn.entertech.affectivecloudsdk
 
-import android.util.Log
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import org.java_websocket.handshake.ServerHandshake
@@ -197,6 +196,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
 
         })
     }
+
     override fun appendMCEEGData(mceegData: ByteArray) {
         mApi.appendMCEEGData(mceegData)
     }
@@ -205,17 +205,18 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.appendPEPRData(peprData)
     }
 
-    override fun appendBCGData(bcgData: ByteArray,pacakgeCount:Int) {
-        mApi.appendBCGData(bcgData,pacakgeCount)
+    override fun appendBCGData(bcgData: ByteArray, pacakgeCount: Int) {
+        mApi.appendBCGData(bcgData, pacakgeCount)
     }
 
-    override fun appendGyroData(gyroData: ByteArray,pacakgeCount:Int) {
-        mApi.appendGyroData(gyroData,pacakgeCount)
+    override fun appendGyroData(gyroData: ByteArray, pacakgeCount: Int) {
+        mApi.appendGyroData(gyroData, pacakgeCount)
     }
 
     override fun appendEEGData(brainData: ByteArray) {
         mApi.appendEEGData(brainData)
     }
+
     override fun appendDCEEGData(brainData: ByteArray) {
         mApi.appendDCEEGData(brainData)
     }

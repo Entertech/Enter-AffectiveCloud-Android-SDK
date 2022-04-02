@@ -47,17 +47,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var messageSendFragment: MessageSendFragment
     lateinit var vpContainer: ViewPager
     lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
-    var saveRootPath: String =
-        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata"
-    var saveEEGPath: String =
-        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "eeg" + File.separator
-    var saveHRPath: String =
-        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
-    var saveRealtimeDataPath: String =
-        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "realtime" + File.separator
-    var saveReportDataPath: String =
-        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "report" + File.separator
 
+    var saveRootPath: String =
+       ""
+    var saveEEGPath: String =
+        ""
+    var saveHRPath: String =
+        ""
+    var saveRealtimeDataPath: String =
+        ""
+    var saveReportDataPath: String =
+        ""
     var fileName: String = ""
 
         var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
@@ -199,6 +199,11 @@ class MainActivity : AppCompatActivity() {
 
 
     fun initSaveFiledir() {
+        saveRootPath = getExternalFilesDir("biorawdata").absolutePath
+        saveEEGPath = saveRootPath + File.separator + "eeg" + File.separator
+        saveHRPath = saveRootPath + File.separator + "hr" + File.separator
+        saveRealtimeDataPath = saveRootPath + File.separator + "realtime" + File.separator
+        saveReportDataPath = saveRootPath + File.separator + "report" + File.separator
         var file = File(saveRootPath)
         var eegDir = File(saveEEGPath)
         var hrDir = File(saveHRPath)

@@ -50,24 +50,3 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
 }
-
-//添加
-//apply plugin: 'com.novoda.bintray-release'
-apply plugin: 'com.github.panpf.bintray-publish'
-publish {
-    bintrayUser="hzentertech"
-    bintrayKey="a5c7edd58f68d746817dce405483be33f6b0c219"
-    //bintray.com用户名
-    userOrg = 'hzentertech'
-    //jcenter上的路径
-    groupId = 'cn.entertech'
-    //项目名称
-    artifactId = 'affectivecloud'
-    //版本号
-    publishVersion = '2.0.0'
-    //描述，不重要
-    desc = 'affectivecloud'
-    //网站，不重要
-    website = 'https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK'
-    dryRun = false
-}

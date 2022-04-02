@@ -9,6 +9,7 @@ import cn.entertech.affectivecloudsdk.utils.ReportGenerator
 import com.google.gson.Gson
 import org.java_websocket.handshake.ServerHandshake
 import java.lang.Exception
+import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.HashMap
@@ -16,9 +17,9 @@ import kotlin.collections.HashMap
 class EnterAffectiveCloudApiImpl internal constructor(
     var websocketAddress: String,
     var timeout: Int = 10000,
-    var appKey: String,
-    var appSecret: String,
-    var userId: String, var uploadCycle: Int = DEFAULT_UPLOAD_CYCLE
+    var appKey: String?,
+    var appSecret: String?,
+    var userId: String?, var uploadCycle: Int? = DEFAULT_UPLOAD_CYCLE
 ) : BaseApi {
     private var mSubmitCallback: Callback? = null
     private var mAffectiveReportGenerator: ReportGenerator? = null
@@ -82,6 +83,11 @@ class EnterAffectiveCloudApiImpl internal constructor(
         appKey: String, appSecret: String,
         userId: String, uploadCycle: Int
     ) : this(websocketAddress, 10000, appKey, appSecret, userId, uploadCycle)
+
+    constructor(
+        websocketAddress: String,
+        timeout: Int = 10000
+    ) : this(websocketAddress, timeout, null, null, null)
 
     init {
         initUploadTrigger()
@@ -214,13 +220,13 @@ class EnterAffectiveCloudApiImpl internal constructor(
     fun initUploadTrigger() {
         if (uploadCycle != 0) {
             uploadEEGTriggerCount =
-                BASE_UPLOAD_EEG_PACKAGE_COUNT * EEG_PACKAGE_LENGTH * uploadCycle
+                BASE_UPLOAD_EEG_PACKAGE_COUNT * EEG_PACKAGE_LENGTH * uploadCycle!!
             uploadHRTriggerCount =
-                BASE_UPLOAD_HR_PACKAGE_COUNT * HR_PACKAGE_LENGTH * uploadCycle
-            uploadMCEEGPackageTriggerCount = UPLOAD_MCEEG_PACKAGE_COUNT * uploadCycle
-            uploadBCGPackageTriggerCount = UPLOAD_BCG_PACKAGE_COUNT * uploadCycle
+                BASE_UPLOAD_HR_PACKAGE_COUNT * HR_PACKAGE_LENGTH * uploadCycle!!
+            uploadMCEEGPackageTriggerCount = UPLOAD_MCEEG_PACKAGE_COUNT * uploadCycle!!
+            uploadBCGPackageTriggerCount = UPLOAD_BCG_PACKAGE_COUNT * uploadCycle!!
             uploadPEPRTriggerCount =
-                DEFAULT_UPLOAD_PEPR_PACKAGE_COUNT * PEPR_PACKAGE_LENGTH * uploadCycle
+                DEFAULT_UPLOAD_PEPR_PACKAGE_COUNT * PEPR_PACKAGE_LENGTH * uploadCycle!!
         }
     }
 
@@ -246,21 +252,25 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     override fun createSession(callback2: Callback2<String>) {
-        this.mCreateSessionCallback = callback2
-        var timestamp = "${System.currentTimeMillis()}"
-        var userIdEncoded = MD5Encode(userId).toUpperCase()
-        var md5Params =
-            "app_key=$appKey&app_secret=$appSecret&timestamp=$timestamp&user_id=$userIdEncoded"
-        mSign = MD5Encode(md5Params).toUpperCase()
-        var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["app_key"] = appKey
-        requestBodyMap["sign"] = mSign!!
-        requestBodyMap["user_id"] = userIdEncoded
-        requestBodyMap["timestamp"] = timestamp
-        requestBodyMap["upload_cycle"] = uploadCycle
-        var requestBody = RequestBody(SERVER_SESSION, "create", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(requestJson)
+        if (appKey == null || appSecret == null || userId == null) {
+            throw IllegalArgumentException("constructor invoke error:appKey,appSecret or userId might be null")
+        } else {
+            this.mCreateSessionCallback = callback2
+            var timestamp = "${System.currentTimeMillis()}"
+            var userIdEncoded = MD5Encode(userId!!).toUpperCase()
+            var md5Params =
+                "app_key=$appKey&app_secret=$appSecret&timestamp=$timestamp&user_id=$userIdEncoded"
+            mSign = MD5Encode(md5Params).toUpperCase()
+            var requestBodyMap = HashMap<Any, Any>()
+            requestBodyMap["app_key"] = appKey!!
+            requestBodyMap["sign"] = mSign!!
+            requestBodyMap["user_id"] = userIdEncoded
+            requestBodyMap["timestamp"] = timestamp
+            requestBodyMap["upload_cycle"] = uploadCycle!!
+            var requestBody = RequestBody(SERVER_SESSION, "create", requestBodyMap)
+            var requestJson = Gson().toJson(requestBody)
+            mWebSocketHelper?.sendMessage(requestJson)
+        }
     }
 
     override fun isSessionCreated(): Boolean {
@@ -272,21 +282,25 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     private fun sendRestore() {
-        var userIdEncoded = MD5Encode(userId).toUpperCase()
-        var timestamp = "${System.currentTimeMillis()}"
-        var md5Params =
-            "app_key=$appKey&app_secret=$appSecret&timestamp=$timestamp&user_id=$userIdEncoded"
-        mSign = MD5Encode(md5Params).toUpperCase()
-        var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["session_id"] = mSessionId!!
-        requestBodyMap["app_key"] = appKey
-        requestBodyMap["sign"] = mSign!!
-        requestBodyMap["timestamp"] = timestamp
-        requestBodyMap["user_id"] = MD5Encode(userId).toUpperCase()
-        requestBodyMap["upload_cycle"] = uploadCycle
-        var requestBody = RequestBody(SERVER_SESSION, "restore", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(requestJson)
+        if (appKey == null || appSecret == null || userId == null) {
+            throw IllegalArgumentException("constructor invoke error:appKey,appSecret or userId might be null")
+        } else {
+            var userIdEncoded = MD5Encode(userId!!).toUpperCase()
+            var timestamp = "${System.currentTimeMillis()}"
+            var md5Params =
+                "app_key=$appKey&app_secret=$appSecret&timestamp=$timestamp&user_id=$userIdEncoded"
+            mSign = MD5Encode(md5Params).toUpperCase()
+            var requestBodyMap = HashMap<Any, Any>()
+            requestBodyMap["session_id"] = mSessionId!!
+            requestBodyMap["app_key"] = appKey!!
+            requestBodyMap["sign"] = mSign!!
+            requestBodyMap["timestamp"] = timestamp
+            requestBodyMap["user_id"] = MD5Encode(userId!!).toUpperCase()
+            requestBodyMap["upload_cycle"] = uploadCycle!!
+            var requestBody = RequestBody(SERVER_SESSION, "restore", requestBodyMap)
+            var requestJson = Gson().toJson(requestBody)
+            mWebSocketHelper?.sendMessage(requestJson)
+        }
     }
 
     override fun restore(callback: Callback) {
@@ -459,7 +473,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     var bcgDataBuffer = CopyOnWriteArrayList<Int>()
     var bcgPackageCount = 0
     override fun appendBCGData(bcgData: ByteArray, packageCount: Int) {
-        uploadBCGPackageTriggerCount = packageCount * uploadCycle
+        uploadBCGPackageTriggerCount = packageCount * uploadCycle!!
         bcgDataBuffer.addAll(bcgData.toList().map { ConvertUtil.converUnchart(it) })
         bcgPackageCount++
         if (bcgPackageCount >= uploadBCGPackageTriggerCount) {
@@ -478,7 +492,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     var gyroDataBuffer = CopyOnWriteArrayList<Int>()
     var gyroPackageCount = 0
     override fun appendGyroData(gyroData: ByteArray, packageCount: Int) {
-        uploadGyroPackageTriggerCount = packageCount * uploadCycle
+        uploadGyroPackageTriggerCount = packageCount * uploadCycle!!
         gyroDataBuffer.addAll(gyroData.toList().map { ConvertUtil.converUnchart(it) })
         gyroPackageCount++
         if (gyroPackageCount >= uploadGyroPackageTriggerCount) {
@@ -505,6 +519,14 @@ class EnterAffectiveCloudApiImpl internal constructor(
             RequestBody(SERVER_BIO_DATA, "subscribe", null, mSubscribeBioData)
         var requestJson = Gson().toJson(requestBody)
         mWebSocketHelper?.sendMessage(requestJson)
+    }
+
+    override fun addBioDataCallback(callback: Callback2<RealtimeBioData>){
+        this.mBiodataResponseCallback = callback
+    }
+
+    override fun addAffectiveDataCallback(callback: Callback2<RealtimeAffectiveData>){
+        this.mAffectiveDataResponseCallback = callback
     }
 
     override fun subscribeAffectiveData(

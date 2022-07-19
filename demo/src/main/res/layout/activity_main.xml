@@ -9,28 +9,6 @@
         android:orientation="vertical"
         >
 
-    <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-
-        <RadioButton
-                android:id="@+id/rb_brain"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/brainwave"
-                android:checked="true"
-                />
-
-        <RadioButton
-                android:id="@+id/rb_heart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/heart_rate"
-                />
-
-    </RadioGroup>
 
     <!--导航条-->
     <cn.entertech.biomoduledemo.utils.PagerSlidingTabStrip

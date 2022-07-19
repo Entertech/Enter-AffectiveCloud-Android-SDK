@@ -35,7 +35,6 @@ import kotlin.collections.HashMap
 class MainActivity : AppCompatActivity() {
     private var appSecret: String? = null
     private var appKey: String? = null
-    private var currentDataType: String? = "brain"
     private var enterAffectiveCloudManager: EnterAffectiveCloudManager? = null
     private var affectiveSubscribeParams: AffectiveSubscribeParams? = null
     private var biodataSubscribeParams: BiodataSubscribeParams? = null
@@ -49,7 +48,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
 
     var saveRootPath: String =
-       ""
+        ""
     var saveEEGPath: String =
         ""
     var saveHRPath: String =
@@ -60,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         ""
     var fileName: String = ""
 
-        var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
+    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
 //    var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 
     //    var EEG_TEST_FILE_PATH =
@@ -78,7 +77,7 @@ class MainActivity : AppCompatActivity() {
             Service.SLEEP,
             Service.COHERENCE
         )
-    var availableBioServices = listOf(Service.EEG)
+    var availableBioServices = listOf(Service.EEG, Service.HR)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -90,7 +89,6 @@ class MainActivity : AppCompatActivity() {
         initEnterAffectiveCloudManager()
         initPermission()
         initSaveFiledir()
-
     }
 
     fun verifyAppKeyAndSecret() {
@@ -105,16 +103,12 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
     }
+
     fun initEnterAffectiveCloudManager() {
-        if (availableBioServices.contains(Service.EEG)) {
-            biodataSubscribeParams = BiodataSubscribeParams.Builder()
-                .requestEEG()
-                .build()
-        } else {
-            biodataSubscribeParams = BiodataSubscribeParams.Builder()
-                .requestHR()
-                .build()
-        }
+        biodataSubscribeParams = BiodataSubscribeParams.Builder()
+            .requestEEG()
+            .requestHR()
+            .build()
 
         affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
             .requestAttention()
@@ -154,11 +148,13 @@ class MainActivity : AppCompatActivity() {
                 .build()
         enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
         enterAffectiveCloudManager!!.addBiodataRealtimeListener {
-            FileHelper.getInstance().writeRealtimeData(getCurrentTime() + "<--" + it.toString() + "\n")
+            FileHelper.getInstance()
+                .writeRealtimeData(getCurrentTime() + "<--" + it.toString() + "\n")
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_biodata) + it.toString())
         }
         enterAffectiveCloudManager!!.addAffectiveDataRealtimeListener {
-            FileHelper.getInstance().writeRealtimeData(getCurrentTime() + "<--" + it.toString() + "\n")
+            FileHelper.getInstance()
+                .writeRealtimeData(getCurrentTime() + "<--" + it.toString() + "\n")
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_affective_data) + it.toString())
         }
         enterAffectiveCloudManager!!.addRawJsonRequestListener {
@@ -242,22 +238,6 @@ class MainActivity : AppCompatActivity() {
         )
         vpContainer.adapter = adapter
         pagerSlidingTabStrip.setViewPager(vpContainer)
-
-        rb_brain.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                currentDataType = "brainwave"
-                availableBioServices = listOf(Service.EEG)
-                initEnterAffectiveCloudManager()
-            }
-        }
-
-        rb_heart.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                currentDataType = "heart"
-                availableBioServices = listOf(Service.HR)
-                initEnterAffectiveCloudManager()
-            }
-        }
     }
 
     class MessageAdapter(
@@ -355,29 +335,25 @@ class MainActivity : AppCompatActivity() {
     var brainDataBuffer = ArrayList<Int>()
     var writeFileDataBuffer = ArrayList<Int>()
     var rawListener = fun(bytes: ByteArray) {
-        if (currentDataType == "brain") {
-            enterAffectiveCloudManager?.appendEEGData(bytes)
-            for (byte in bytes) {
-                var brainData = ConvertUtil.converUnchart(byte)
-                brainDataBuffer.add(brainData)
-                writeFileDataBuffer.add((brainData))
-                if (writeFileDataBuffer.size >= 20) {
-                    var writeString = "${Arrays.toString(writeFileDataBuffer.toArray())}"
-                    writeString = writeString.replace("[", "").replace("]", "")
-                    FileHelper.getInstance().writeEEG(writeString + ",")
-                    writeFileDataBuffer.clear()
-                }
+        enterAffectiveCloudManager?.appendEEGData(bytes)
+        for (byte in bytes) {
+            var brainData = ConvertUtil.converUnchart(byte)
+            brainDataBuffer.add(brainData)
+            writeFileDataBuffer.add((brainData))
+            if (writeFileDataBuffer.size >= 20) {
+                var writeString = "${Arrays.toString(writeFileDataBuffer.toArray())}"
+                writeString = writeString.replace("[", "").replace("]", "")
+                FileHelper.getInstance().writeEEG(writeString + ",")
+                writeFileDataBuffer.clear()
             }
         }
     }
 
     var heartRateDataBuffer = ArrayList<Int>()
     var heartRateListener = fun(heartRate: Int) {
-        if (currentDataType == "heart") {
-            FileHelper.getInstance().writeHr("$heartRate,")
-            heartRateDataBuffer.add(heartRate)
-            enterAffectiveCloudManager?.appendHeartRateData(heartRate)
-        }
+        FileHelper.getInstance().writeHr("$heartRate,")
+        heartRateDataBuffer.add(heartRate)
+        enterAffectiveCloudManager?.appendHeartRateData(heartRate)
     }
 
     fun onInit(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -392,7 +368,8 @@ class MainActivity : AppCompatActivity() {
     fun onReport(@Suppress("UNUSED_PARAMETER") view: View) {
         enterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
-                FileHelper.getInstance().writeReportData(getCurrentTime() + "<--" + t.toString() + "\n")
+                FileHelper.getInstance()
+                    .writeReportData(getCurrentTime() + "<--" + t.toString() + "\n")
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_bio_report) + t.toString())
             }
 
@@ -403,7 +380,8 @@ class MainActivity : AppCompatActivity() {
         })
         enterAffectiveCloudManager?.getAffectiveDataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
-                FileHelper.getInstance().writeReportData(getCurrentTime() + "<--" + t.toString() + "\n")
+                FileHelper.getInstance()
+                    .writeReportData(getCurrentTime() + "<--" + t.toString() + "\n")
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_get_affective_report) + t.toString())
             }
 

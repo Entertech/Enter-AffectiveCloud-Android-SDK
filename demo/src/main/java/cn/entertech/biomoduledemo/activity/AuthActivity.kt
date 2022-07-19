@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import cn.entertech.biomoduledemo.R
 import cn.entertech.biomoduledemo.app.Constant
 import cn.entertech.biomoduledemo.utils.SettingManager
+import com.tencent.bugly.crashreport.CrashReport
 import kotlinx.android.synthetic.main.activity_auth.*
 
 class AuthActivity : AppCompatActivity() {

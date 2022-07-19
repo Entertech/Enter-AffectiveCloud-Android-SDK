@@ -1,6 +1,7 @@
 package cn.entertech.biomoduledemo.app
 
 import android.app.Application
+import com.tencent.bugly.crashreport.CrashReport
 
 class Application:android.app.Application() {
 
@@ -13,6 +14,7 @@ class Application:android.app.Application() {
 
     override fun onCreate() {
         super.onCreate()
+        CrashReport.initCrashReport(applicationContext, "9eb2bbf00f", true);
         application = this
     }
 

@@ -17,7 +17,6 @@ import androidx.viewpager.widget.ViewPager
 import cn.entertech.affectivecloudsdk.*
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
-import cn.entertech.affectivecloudsdk.sourcedataapi.AffectiveCloudSourceDataApiFactory
 import cn.entertech.biomoduledemo.R
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_KEY
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
@@ -26,7 +25,6 @@ import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.*
 import cn.entertech.ble.single.BiomoduleBleManager
 import com.orhanobut.logger.Logger
-import kotlinx.android.synthetic.main.activity_main.*
 import java.io.*
 import java.lang.Exception
 import java.util.*

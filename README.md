@@ -35,6 +35,8 @@
 
 [demo.apk](http://fir.entertech.cn/gb3a)
 
+[Pad端Demo](https://github.com/Entertech/Enter-ACDemo-Pad-Android)
+
 **说明**
 
 更多demo的操作说明可以查看[回车生物电采集模块演示 demo](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/tree/master/demo)

@@ -147,8 +147,8 @@ class ApiDetailActivity : AppCompatActivity() {
             override fun onSuccess() {
                 Logger.d("情感云基础服务已初始化成功")
                 fileName = "${System.currentTimeMillis()}.txt"
-                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
-                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
+//                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
+//                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
             }
 
             override fun onError(error: Error?) {

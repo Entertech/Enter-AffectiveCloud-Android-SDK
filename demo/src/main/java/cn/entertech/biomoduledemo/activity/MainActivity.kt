@@ -28,6 +28,7 @@ import com.orhanobut.logger.Logger
 import java.io.*
 import java.lang.Exception
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() {
@@ -45,16 +46,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var vpContainer: ViewPager
     lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
 
-    var saveRootPath: String =
-        ""
-    var saveEEGPath: String =
-        ""
-    var saveHRPath: String =
-        ""
-    var saveRealtimeDataPath: String =
-        ""
-    var saveReportDataPath: String =
-        ""
+
+    var saveRootPath: String = ""
+    var saveRawDataPath: String = ""
+    var saveRealtimeDataPath: String = ""
+    var saveReportDataPath: String = ""
     var fileName: String = ""
 
     var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
@@ -64,7 +60,16 @@ class MainActivity : AppCompatActivity() {
 //        "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
     var EEG_TEST_FILE_PATH =
         Environment.getExternalStorageDirectory().path + File.separator + "flowtime_eegdata.txt"
-
+    var rawEEGFileHelper = FileHelper()
+    var rawHRFileHelper = FileHelper()
+    var realtimeEEGLeftFileHelper = FileHelper()
+    var realtimeEEGRightFileHelper = FileHelper()
+    var realtimeGammaFileHelper = FileHelper()
+    var realtimeBetaFileHelper = FileHelper()
+    var realtimeAlphaFileHelper = FileHelper()
+    var realtimeThetaFileHelper = FileHelper()
+    var realtimeDeltaFileHelper = FileHelper()
+    var reportFileHelper = FileHelper()
     var availableAffectiveServices =
         listOf(
             Service.ATTENTION,
@@ -86,7 +91,6 @@ class MainActivity : AppCompatActivity() {
         initView()
         initEnterAffectiveCloudManager()
         initPermission()
-        initSaveFiledir()
     }
 
     fun verifyAppKeyAndSecret() {
@@ -146,13 +150,18 @@ class MainActivity : AppCompatActivity() {
                 .build()
         enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
         enterAffectiveCloudManager!!.addBiodataRealtimeListener {
-            FileHelper.getInstance()
-                .writeRealtimeData(getCurrentTime() + "<--" + it.toString() + "\n")
+            if (it?.realtimeEEGData != null){
+                realtimeEEGLeftFileHelper.writeData(list2String(it.realtimeEEGData!!.leftwave!!)+",")
+                realtimeEEGRightFileHelper.writeData(list2String(it.realtimeEEGData!!.rightwave!!)+",")
+                realtimeAlphaFileHelper.writeData("${it.realtimeEEGData!!.alphaPower!!},")
+                realtimeBetaFileHelper.writeData("${it.realtimeEEGData!!.betaPower!!},")
+                realtimeGammaFileHelper.writeData("${it.realtimeEEGData!!.gammaPower!!},")
+                realtimeThetaFileHelper.writeData("${it.realtimeEEGData!!.thetaPower!!},")
+                realtimeDeltaFileHelper.writeData("${it.realtimeEEGData!!.deltaPower!!},")
+            }
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_biodata) + it.toString())
         }
         enterAffectiveCloudManager!!.addAffectiveDataRealtimeListener {
-            FileHelper.getInstance()
-                .writeRealtimeData(getCurrentTime() + "<--" + it.toString() + "\n")
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_affective_data) + it.toString())
         }
         enterAffectiveCloudManager!!.addRawJsonRequestListener {
@@ -180,37 +189,38 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSuccess() {
-                fileName = "${System.currentTimeMillis()}.txt"
-                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
-                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
-                FileHelper.getInstance().setRealtimeDataPath(saveRealtimeDataPath + fileName)
-                FileHelper.getInstance().setReportDataPath(saveReportDataPath + fileName)
+                fileName = "${getCurrentTime()}"
+                initSaveFiledir()
+                rawEEGFileHelper.setFilePath(saveRawDataPath + "eeg.txt")
+                rawHRFileHelper.setFilePath(saveRawDataPath + "hr.txt")
+                realtimeEEGLeftFileHelper.setFilePath(saveRealtimeDataPath + "brainwave_left.txt")
+                realtimeEEGRightFileHelper.setFilePath(saveRealtimeDataPath + "brainwave_right.txt")
+                realtimeAlphaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_alpha.txt")
+                realtimeBetaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_beta.txt")
+                realtimeGammaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_gamma.txt")
+                realtimeThetaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_theta.txt")
+                realtimeDeltaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_delta.txt")
+                reportFileHelper.setFilePath(saveReportDataPath+"report.txt")
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_success))
             }
-
         })
     }
 
 
     fun initSaveFiledir() {
-        saveRootPath = getExternalFilesDir("biorawdata").absolutePath
-        saveEEGPath = saveRootPath + File.separator + "eeg" + File.separator
-        saveHRPath = saveRootPath + File.separator + "hr" + File.separator
+        saveRootPath = getExternalFilesDir(fileName).absolutePath
         saveRealtimeDataPath = saveRootPath + File.separator + "realtime" + File.separator
         saveReportDataPath = saveRootPath + File.separator + "report" + File.separator
+        saveRawDataPath = saveRootPath + File.separator + "raw" + File.separator
         var file = File(saveRootPath)
-        var eegDir = File(saveEEGPath)
-        var hrDir = File(saveHRPath)
+        var rawDir = File(saveRawDataPath)
         var realtimeDir = File(saveRealtimeDataPath)
         var reportDir = File(saveReportDataPath)
         if (!file.exists()) {
             file.mkdirs()
         }
-        if (!eegDir.exists()) {
-            eegDir.mkdirs()
-        }
-        if (!hrDir.exists()) {
-            hrDir.mkdirs()
+        if (!rawDir.exists()) {
+            rawDir.mkdirs()
         }
         if (!realtimeDir.exists()) {
             realtimeDir.mkdirs()
@@ -339,9 +349,7 @@ class MainActivity : AppCompatActivity() {
             brainDataBuffer.add(brainData)
             writeFileDataBuffer.add((brainData))
             if (writeFileDataBuffer.size >= 20) {
-                var writeString = "${Arrays.toString(writeFileDataBuffer.toArray())}"
-                writeString = writeString.replace("[", "").replace("]", "")
-                FileHelper.getInstance().writeEEG(writeString + ",")
+                rawEEGFileHelper.writeData("${list2String(writeFileDataBuffer)},")
                 writeFileDataBuffer.clear()
             }
         }
@@ -349,9 +357,13 @@ class MainActivity : AppCompatActivity() {
 
     var heartRateDataBuffer = ArrayList<Int>()
     var heartRateListener = fun(heartRate: Int) {
-        FileHelper.getInstance().writeHr("$heartRate,")
+        rawHRFileHelper.writeData("$heartRate,")
         heartRateDataBuffer.add(heartRate)
         enterAffectiveCloudManager?.appendHeartRateData(heartRate)
+    }
+
+    fun list2String(data:ArrayList<out Number>):String{
+        return "${Arrays.toString(data.toArray())}".replace("[", "").replace("]", "")
     }
 
     fun onInit(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -366,8 +378,7 @@ class MainActivity : AppCompatActivity() {
     fun onReport(@Suppress("UNUSED_PARAMETER") view: View) {
         enterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
-                FileHelper.getInstance()
-                    .writeReportData(getCurrentTime() + "<--" + t.toString() + "\n")
+                reportFileHelper.writeData(getCurrentTime() + "<--" + t.toString() + "\n")
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_bio_report) + t.toString())
             }
 
@@ -378,8 +389,7 @@ class MainActivity : AppCompatActivity() {
         })
         enterAffectiveCloudManager?.getAffectiveDataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
-                FileHelper.getInstance()
-                    .writeReportData(getCurrentTime() + "<--" + t.toString() + "\n")
+                reportFileHelper.writeData(getCurrentTime() + "<--" + t.toString() + "\n")
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_get_affective_report) + t.toString())
             }
 

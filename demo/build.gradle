@@ -18,8 +18,8 @@ android {
         applicationId "cn.entertech.biomoduledemo"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 6
-        versionName "1.6.0"
+        versionCode 9
+        versionName "1.8.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -57,4 +57,5 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation "org.java-websocket:Java-WebSocket:1.4.0"
     implementation project(":affectivecloudsdk")
+    implementation 'com.tencent.bugly:crashreport:latest.release'
 }

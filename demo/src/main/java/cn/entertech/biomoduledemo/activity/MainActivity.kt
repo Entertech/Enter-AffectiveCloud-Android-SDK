@@ -17,7 +17,6 @@ import androidx.viewpager.widget.ViewPager
 import cn.entertech.affectivecloudsdk.*
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
-import cn.entertech.affectivecloudsdk.sourcedataapi.AffectiveCloudSourceDataApiFactory
 import cn.entertech.biomoduledemo.R
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_KEY
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
@@ -26,16 +25,15 @@ import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.*
 import cn.entertech.ble.single.BiomoduleBleManager
 import com.orhanobut.logger.Logger
-import kotlinx.android.synthetic.main.activity_main.*
 import java.io.*
 import java.lang.Exception
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() {
     private var appSecret: String? = null
     private var appKey: String? = null
-    private var currentDataType: String? = "brain"
     private var enterAffectiveCloudManager: EnterAffectiveCloudManager? = null
     private var affectiveSubscribeParams: AffectiveSubscribeParams? = null
     private var biodataSubscribeParams: BiodataSubscribeParams? = null
@@ -47,22 +45,31 @@ class MainActivity : AppCompatActivity() {
     private lateinit var messageSendFragment: MessageSendFragment
     lateinit var vpContainer: ViewPager
     lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
-    var saveRootPath: String =
-        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata"
-    var saveEEGPath: String =
-        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "eeg" + File.separator
-    var saveHRPath: String =
-        Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
+
+
+    var saveRootPath: String = ""
+    var saveRawDataPath: String = ""
+    var saveRealtimeDataPath: String = ""
+    var saveReportDataPath: String = ""
     var fileName: String = ""
 
-        var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
+    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
 //    var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 
     //    var EEG_TEST_FILE_PATH =
 //        "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
     var EEG_TEST_FILE_PATH =
         Environment.getExternalStorageDirectory().path + File.separator + "flowtime_eegdata.txt"
-
+    var rawEEGFileHelper = FileHelper()
+    var rawHRFileHelper = FileHelper()
+    var realtimeEEGLeftFileHelper = FileHelper()
+    var realtimeEEGRightFileHelper = FileHelper()
+    var realtimeGammaFileHelper = FileHelper()
+    var realtimeBetaFileHelper = FileHelper()
+    var realtimeAlphaFileHelper = FileHelper()
+    var realtimeThetaFileHelper = FileHelper()
+    var realtimeDeltaFileHelper = FileHelper()
+    var reportFileHelper = FileHelper()
     var availableAffectiveServices =
         listOf(
             Service.ATTENTION,
@@ -73,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             Service.SLEEP,
             Service.COHERENCE
         )
-    var availableBioServices = listOf(Service.EEG)
+    var availableBioServices = listOf(Service.EEG, Service.HR)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -84,8 +91,6 @@ class MainActivity : AppCompatActivity() {
         initView()
         initEnterAffectiveCloudManager()
         initPermission()
-        initSaveFiledir()
-
     }
 
     fun verifyAppKeyAndSecret() {
@@ -100,16 +105,12 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
     }
+
     fun initEnterAffectiveCloudManager() {
-        if (availableBioServices.contains(Service.EEG)) {
-            biodataSubscribeParams = BiodataSubscribeParams.Builder()
-                .requestEEG()
-                .build()
-        } else {
-            biodataSubscribeParams = BiodataSubscribeParams.Builder()
-                .requestHR()
-                .build()
-        }
+        biodataSubscribeParams = BiodataSubscribeParams.Builder()
+            .requestEEG()
+            .requestHR()
+            .build()
 
         affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
             .requestAttention()
@@ -144,64 +145,35 @@ class MainActivity : AppCompatActivity() {
                 .affectiveSubscribeParams(affectiveSubscribeParams!!)
                 .storageSettings(storageSettings)
                 .algorithmParams(algorithmParams)
-                .uploadCycle(1)
+                .uploadCycle(3)
 //                .biodataTolerance(biodataTolerance)
                 .build()
-//        enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
-//        enterAffectiveCloudManager!!.addBiodataRealtimeListener {
-//            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_biodata) + it.toString())
-//        }
-//        enterAffectiveCloudManager!!.addAffectiveDataRealtimeListener {
-//            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_affective_data) + it.toString())
-//        }
-//        enterAffectiveCloudManager!!.addRawJsonRequestListener {
-//            messageSendFragment.appendMessageToScreen(it)
-//        }
-//        enterAffectiveCloudManager!!.addRawJsonResponseListener {
-//
-//        }
-//        enterAffectiveCloudManager?.addWebSocketDisconnectListener {
-//            Log.d("######", "websocket disconnect:$it")
-//        }
-//        enterAffectiveCloudManager?.init(object : Callback {
-//            override fun onError(error: Error?) {
-//                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_failed) + error.toString())
-//                if (error != null && error.code == 1004) {
-//                    runOnUiThread {
-//                        Toast.makeText(
-//                            this@MainActivity,
-//                            getText(R.string.auth_page_title),
-//                            Toast.LENGTH_LONG
-//                        ).show()
-//                        finish()
-//                    }
-//                }
-//            }
-//
-//            override fun onSuccess() {
-//                fileName = "${System.currentTimeMillis()}.txt"
-//                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
-//                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
-//                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_success))
-//            }
-//
-//        })
-//
-        var enterAffectiveCloudSubscriber = EnterAffectiveCloudSubscriber("wss://server-test.affectivecloud.cn/ws/sub/v1/1091c92a-9aa5-11ec-a020-1e00c46c3e02/")
-        enterAffectiveCloudSubscriber.addBiodataRealtimeListener {
+        enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
+        enterAffectiveCloudManager!!.addBiodataRealtimeListener {
+            if (it?.realtimeEEGData != null){
+                realtimeEEGLeftFileHelper.writeData(list2String(it.realtimeEEGData!!.leftwave!!)+",")
+                realtimeEEGRightFileHelper.writeData(list2String(it.realtimeEEGData!!.rightwave!!)+",")
+                realtimeAlphaFileHelper.writeData("${it.realtimeEEGData!!.alphaPower!!},")
+                realtimeBetaFileHelper.writeData("${it.realtimeEEGData!!.betaPower!!},")
+                realtimeGammaFileHelper.writeData("${it.realtimeEEGData!!.gammaPower!!},")
+                realtimeThetaFileHelper.writeData("${it.realtimeEEGData!!.thetaPower!!},")
+                realtimeDeltaFileHelper.writeData("${it.realtimeEEGData!!.deltaPower!!},")
+            }
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_biodata) + it.toString())
         }
-        enterAffectiveCloudSubscriber.addAffectiveDataRealtimeListener {
+        enterAffectiveCloudManager!!.addAffectiveDataRealtimeListener {
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_affective_data) + it.toString())
         }
-        enterAffectiveCloudSubscriber.init(object:Callback{
-            override fun onSuccess() {
-                fileName = "${System.currentTimeMillis()}.txt"
-                FileHelper.getInstance().setEEGPath(saveEEGPath + fileName)
-                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
-                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_success))
-            }
+        enterAffectiveCloudManager!!.addRawJsonRequestListener {
+            messageSendFragment.appendMessageToScreen(it)
+        }
+        enterAffectiveCloudManager!!.addRawJsonResponseListener {
 
+        }
+        enterAffectiveCloudManager?.addWebSocketDisconnectListener {
+            Log.d("######", "websocket disconnect:$it")
+        }
+        enterAffectiveCloudManager?.init(object : Callback {
             override fun onError(error: Error?) {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_failed) + error.toString())
                 if (error != null && error.code == 1004) {
@@ -216,22 +188,45 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            override fun onSuccess() {
+                fileName = "${getCurrentTime()}"
+                initSaveFiledir()
+                rawEEGFileHelper.setFilePath(saveRawDataPath + "eeg.txt")
+                rawHRFileHelper.setFilePath(saveRawDataPath + "hr.txt")
+                realtimeEEGLeftFileHelper.setFilePath(saveRealtimeDataPath + "brainwave_left.txt")
+                realtimeEEGRightFileHelper.setFilePath(saveRealtimeDataPath + "brainwave_right.txt")
+                realtimeAlphaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_alpha.txt")
+                realtimeBetaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_beta.txt")
+                realtimeGammaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_gamma.txt")
+                realtimeThetaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_theta.txt")
+                realtimeDeltaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_delta.txt")
+                reportFileHelper.setFilePath(saveReportDataPath+"report.txt")
+                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_success))
+            }
         })
     }
 
 
     fun initSaveFiledir() {
+        saveRootPath = getExternalFilesDir(fileName).absolutePath
+        saveRealtimeDataPath = saveRootPath + File.separator + "realtime" + File.separator
+        saveReportDataPath = saveRootPath + File.separator + "report" + File.separator
+        saveRawDataPath = saveRootPath + File.separator + "raw" + File.separator
         var file = File(saveRootPath)
-        var eegDir = File(saveEEGPath)
-        var hrDir = File(saveHRPath)
+        var rawDir = File(saveRawDataPath)
+        var realtimeDir = File(saveRealtimeDataPath)
+        var reportDir = File(saveReportDataPath)
         if (!file.exists()) {
             file.mkdirs()
         }
-        if (!eegDir.exists()) {
-            eegDir.mkdirs()
+        if (!rawDir.exists()) {
+            rawDir.mkdirs()
         }
-        if (!hrDir.exists()) {
-            hrDir.mkdirs()
+        if (!realtimeDir.exists()) {
+            realtimeDir.mkdirs()
+        }
+        if (!reportDir.exists()) {
+            reportDir.mkdirs()
         }
     }
 
@@ -251,22 +246,6 @@ class MainActivity : AppCompatActivity() {
         )
         vpContainer.adapter = adapter
         pagerSlidingTabStrip.setViewPager(vpContainer)
-
-        rb_brain.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                currentDataType = "brainwave"
-                availableBioServices = listOf(Service.EEG)
-                initEnterAffectiveCloudManager()
-            }
-        }
-
-        rb_heart.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                currentDataType = "heart"
-                availableBioServices = listOf(Service.HR)
-                initEnterAffectiveCloudManager()
-            }
-        }
     }
 
     class MessageAdapter(
@@ -364,29 +343,27 @@ class MainActivity : AppCompatActivity() {
     var brainDataBuffer = ArrayList<Int>()
     var writeFileDataBuffer = ArrayList<Int>()
     var rawListener = fun(bytes: ByteArray) {
-        if (currentDataType == "brain") {
-            enterAffectiveCloudManager?.appendEEGData(bytes)
-            for (byte in bytes) {
-                var brainData = ConvertUtil.converUnchart(byte)
-                brainDataBuffer.add(brainData)
-                writeFileDataBuffer.add((brainData))
-                if (writeFileDataBuffer.size >= 20) {
-                    var writeString = "${Arrays.toString(writeFileDataBuffer.toArray())}"
-                    writeString = writeString.replace("[", "").replace("]", "")
-                    FileHelper.getInstance().writeEEG(writeString + ",")
-                    writeFileDataBuffer.clear()
-                }
+        enterAffectiveCloudManager?.appendEEGData(bytes)
+        for (byte in bytes) {
+            var brainData = ConvertUtil.converUnchart(byte)
+            brainDataBuffer.add(brainData)
+            writeFileDataBuffer.add((brainData))
+            if (writeFileDataBuffer.size >= 20) {
+                rawEEGFileHelper.writeData("${list2String(writeFileDataBuffer)},")
+                writeFileDataBuffer.clear()
             }
         }
     }
 
     var heartRateDataBuffer = ArrayList<Int>()
     var heartRateListener = fun(heartRate: Int) {
-        if (currentDataType == "heart") {
-            FileHelper.getInstance().writeHr("$heartRate,")
-            heartRateDataBuffer.add(heartRate)
-            enterAffectiveCloudManager?.appendHeartRateData(heartRate)
-        }
+        rawHRFileHelper.writeData("$heartRate,")
+        heartRateDataBuffer.add(heartRate)
+        enterAffectiveCloudManager?.appendHeartRateData(heartRate)
+    }
+
+    fun list2String(data:ArrayList<out Number>):String{
+        return "${Arrays.toString(data.toArray())}".replace("[", "").replace("]", "")
     }
 
     fun onInit(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -401,6 +378,7 @@ class MainActivity : AppCompatActivity() {
     fun onReport(@Suppress("UNUSED_PARAMETER") view: View) {
         enterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
+                reportFileHelper.writeData(getCurrentTime() + "<--" + t.toString() + "\n")
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_bio_report) + t.toString())
             }
 
@@ -411,6 +389,7 @@ class MainActivity : AppCompatActivity() {
         })
         enterAffectiveCloudManager?.getAffectiveDataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
+                reportFileHelper.writeData(getCurrentTime() + "<--" + t.toString() + "\n")
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_get_affective_report) + t.toString())
             }
 

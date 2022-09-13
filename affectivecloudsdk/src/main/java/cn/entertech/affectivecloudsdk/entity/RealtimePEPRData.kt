@@ -13,4 +13,6 @@ class RealtimePEPRData {
     var hr: Double? = null
     //心率变异性值 单位：毫秒
     var hrv: Double? = null
+    //呼吸率
+    var rr:Double? = null
 }

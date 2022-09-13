@@ -337,6 +337,9 @@ class ResponseBody(
             if (peprMap.containsKey("rw_quality")) {
                 realtimePEPRData.rwQuality = (peprMap["rw_quality"] as Double).toInt()
             }
+            if (peprMap.containsKey("rr")) {
+                realtimePEPRData.rr = peprMap["rr"] as Double
+            }
             realtimeBioData.realtimePEPRData = realtimePEPRData
 
         }

@@ -184,7 +184,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
             override fun onClose(code: Int, reason: String?, remote: Boolean) {
                 isInit = false
                 if (reason != null && reason != "") {
-                    callback.onError(Error(-1, reason.toString()))
+//                    callback.onError(Error(-1, reason.toString()))
                 }
             }
 
@@ -285,7 +285,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
                     isInit = false
                     if (reason != null && reason != "") {
-                        callback.onError(Error(-1, reason.toString()))
+//                        callback.onError(Error(-1, reason.toString()))
                     }
                 }
 

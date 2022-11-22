@@ -392,19 +392,26 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     var brainDataBuffer = CopyOnWriteArrayList<Int>()
+    var lastEEGPackageNum: Int? = null
     override fun appendEEGData(brainData: ByteArray) {
-        for (byte in brainData) {
-            var unchart = ConvertUtil.converUnchart(byte)
-            brainDataBuffer.add(unchart)
-            if (brainDataBuffer.size >= uploadEEGTriggerCount) {
-                var dataMap = HashMap<Any, Any>()
-                dataMap["eeg"] = brainDataBuffer.toIntArray()
-                var requestBody =
-                    RequestBody(SERVER_BIO_DATA, "upload", dataMap)
-                var requestJson = Gson().toJson(requestBody)
-                mWebSocketHelper?.sendMessage(requestJson)
-                brainDataBuffer.clear()
+        if (brainData.size == EEG_PACKAGE_LENGTH) {
+            val curPackageNum = brainData[0] * 256 + brainData[1]
+            if (!(lastEEGPackageNum != null && curPackageNum == lastEEGPackageNum!!)) {
+                for (byte in brainData) {
+                    var unchart = ConvertUtil.converUnchart(byte)
+                    brainDataBuffer.add(unchart)
+                    if (brainDataBuffer.size >= uploadEEGTriggerCount) {
+                        var dataMap = HashMap<Any, Any>()
+                        dataMap["eeg"] = brainDataBuffer.toIntArray()
+                        var requestBody =
+                            RequestBody(SERVER_BIO_DATA, "upload", dataMap)
+                        var requestJson = Gson().toJson(requestBody)
+                        mWebSocketHelper?.sendMessage(requestJson)
+                        brainDataBuffer.clear()
+                    }
+                }
             }
+            lastEEGPackageNum = curPackageNum
         }
     }
 
@@ -457,16 +464,23 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     var peprDataBuffer = CopyOnWriteArrayList<Int>()
+    var lastPEPRPackageNum:Int? = null
     override fun appendPEPRData(peprData: ByteArray) {
-        peprDataBuffer.addAll(peprData.toList().map { ConvertUtil.converUnchart(it) })
-        if (peprDataBuffer.size >= uploadPEPRTriggerCount) {
-            var dataMap = HashMap<Any, Any>()
-            dataMap["pepr"] = peprDataBuffer.toIntArray()
-            var requestBody =
-                RequestBody(SERVER_BIO_DATA, "upload", dataMap)
-            var requestJson = Gson().toJson(requestBody)
-            mWebSocketHelper?.sendMessage(requestJson)
-            peprDataBuffer.clear()
+        if (peprData.size == PEPR_PACKAGE_LENGTH) {
+            val curPackageNum = peprData[0] * 256 + peprData[1]
+            if (!(lastPEPRPackageNum != null && curPackageNum == lastPEPRPackageNum!!)) {
+                peprDataBuffer.addAll(peprData.toList().map { ConvertUtil.converUnchart(it) })
+                if (peprDataBuffer.size >= uploadPEPRTriggerCount) {
+                    var dataMap = HashMap<Any, Any>()
+                    dataMap["pepr"] = peprDataBuffer.toIntArray()
+                    var requestBody =
+                        RequestBody(SERVER_BIO_DATA, "upload", dataMap)
+                    var requestJson = Gson().toJson(requestBody)
+                    mWebSocketHelper?.sendMessage(requestJson)
+                    peprDataBuffer.clear()
+                }
+            }
+            lastPEPRPackageNum = curPackageNum
         }
     }
 
@@ -521,11 +535,11 @@ class EnterAffectiveCloudApiImpl internal constructor(
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun addBioDataCallback(callback: Callback2<RealtimeBioData>){
+    override fun addBioDataCallback(callback: Callback2<RealtimeBioData>) {
         this.mBiodataResponseCallback = callback
     }
 
-    override fun addAffectiveDataCallback(callback: Callback2<RealtimeAffectiveData>){
+    override fun addAffectiveDataCallback(callback: Callback2<RealtimeAffectiveData>) {
         this.mAffectiveDataResponseCallback = callback
     }
 

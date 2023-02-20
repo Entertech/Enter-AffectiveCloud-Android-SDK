@@ -175,6 +175,11 @@ class ResponseBody(
             var coherenceFields = data["sub_coherence_fields"] as ArrayList<String>
             subAffectiveDataFields.subCoherenceFields = coherenceFields
         }
+        if (data.containsKey("sub_meditation_fields") && data["sub_meditation_fields"] != null) {
+            @Suppress("UNCHECKED_CAST")
+            var meditationFields = data["sub_meditation_fields"] as ArrayList<String>
+            subAffectiveDataFields.subFlowFields = meditationFields
+        }
         if (data.containsKey("sub_ssvep-multi-classify_fields") && data["sub_ssvep-multi-classify_fields"] != null) {
             @Suppress("UNCHECKED_CAST")
             var subSsvepMultiClassifyFields = data["sub_ssvep-multi-classify_fields"] as ArrayList<String>
@@ -453,6 +458,20 @@ class ResponseBody(
                 realtimeCoherenceData.coherence = map["coherence"] as Double
                 realtimeAffectiveData.realtimeCoherenceData = realtimeCoherenceData
             }
+        }
+        if (data.containsKey("meditation")) {
+            var realtimeFlowData = RealtimeFlowData()
+
+            @Suppress("UNCHECKED_CAST")
+            var map = data["meditation"] as Map<Any, Any>
+            if (map.containsKey("meditation")) {
+                realtimeFlowData.meditation = map["meditation"] as Double
+            }
+            if (map.containsKey("meditation_tips")) {
+                realtimeFlowData.meditationTips = map["meditation_tips"] as Double
+            }
+
+            realtimeAffectiveData.realtimeFlowData = realtimeFlowData
         }
         if (data.containsKey("sleep")) {
             var realtimeSleepData = RealtimeSleepData()

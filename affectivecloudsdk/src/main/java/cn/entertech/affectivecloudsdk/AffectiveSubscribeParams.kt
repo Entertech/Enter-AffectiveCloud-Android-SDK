@@ -47,6 +47,12 @@ class AffectiveSubscribeParams internal constructor(builder: Builder):OptionalPa
             return this
         }
 
+        fun requestFlow():Builder{
+            affectiveSubList.add("meditation")
+            return this
+        }
+
+
         fun requestSleep(): Builder {
             affectiveSubList.add("sleep")
             return this

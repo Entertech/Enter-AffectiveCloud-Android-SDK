@@ -7,5 +7,5 @@ enum class Service(@SerializedName("value") var value: String) {
     PEPR("pepr"), DCEEG_SSVEP("dceeg-ssvep"), SSVEP_MULTI_CLASSIFY("ssvep-multi-classify"),
     ATTENTION("attention"), RELAXATION("relaxation"),
     PRESSURE("pressure"), PLEASURE("pleasure"),
-    AROUSAL("arousal"), SLEEP("sleep"), COHERENCE("coherence")
+    AROUSAL("arousal"), SLEEP("sleep"), COHERENCE("coherence"),FLOW("meditation")
 }

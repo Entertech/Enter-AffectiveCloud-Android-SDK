@@ -53,8 +53,8 @@ class MainActivity : AppCompatActivity() {
     var saveReportDataPath: String = ""
     var fileName: String = ""
 
-    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
-//    var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
+//    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
+    var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 
     //    var EEG_TEST_FILE_PATH =
 //        "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
@@ -78,7 +78,8 @@ class MainActivity : AppCompatActivity() {
             Service.RELAXATION,
             Service.PLEASURE,
             Service.SLEEP,
-            Service.COHERENCE
+            Service.COHERENCE,
+            Service.FLOW
         )
     var availableBioServices = listOf(Service.EEG, Service.HR)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,6 +120,7 @@ class MainActivity : AppCompatActivity() {
             .requestPleasure()
             .requestArousal()
             .requestCoherence()
+            .requestFlow()
             .build()
 
         var storageSettings = StorageSettings.Builder()

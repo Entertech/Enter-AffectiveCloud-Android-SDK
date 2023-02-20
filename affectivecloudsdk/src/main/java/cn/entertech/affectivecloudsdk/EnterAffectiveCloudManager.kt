@@ -150,6 +150,9 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         if (subData.subCoherenceFields != null) {
             affectiveServices.add(Service.COHERENCE)
         }
+        if (subData.subFlowFields != null) {
+            affectiveServices.add(Service.FLOW)
+        }
         if (subData.subSsvepMultiClassifyFields != null) {
             affectiveServices.add(Service.SSVEP_MULTI_CLASSIFY)
         }

@@ -4,13 +4,16 @@ import android.util.Log
 import cn.entertech.affectivecloudsdk.interfaces.IWebSocketHelper
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import cn.entertech.affectivecloudsdk.utils.ConvertUtil
+import org.java_websocket.WebSocket
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.drafts.Draft_6455
+import org.java_websocket.enums.ReadyState
 import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
 import java.nio.ByteBuffer
 import java.security.SecureRandom
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManager
@@ -45,6 +48,119 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
                             it.invoke("$code:$reason")
                         }
                         Log.d("WebSocketHelper", "onClose :$code::reason is $reason")
+                    }
+
+                    override fun isClosed(): Boolean {
+                        val isClosed = super.isClosed()
+                        mOpenCallback?.isClosed(isClosed)
+                        return isClosed
+                    }
+
+                    override fun getReadyState(): ReadyState {
+                        val readyState = super.getReadyState()
+                        mOpenCallback?.getReadyState(readyState)
+                        return readyState
+                    }
+
+                    override fun reconnectBlocking(): Boolean {
+                        val reconnectBlocking = super.reconnectBlocking()
+                        mOpenCallback?.reconnectBlocking(reconnectBlocking)
+                        return reconnectBlocking
+                    }
+
+                    override fun reconnect() {
+                        mOpenCallback?.reconnect()
+                        super.reconnect()
+                    }
+
+                    override fun connect() {
+                        mOpenCallback?.connect()
+                        super.connect()
+                    }
+
+                    override fun connectBlocking(): Boolean {
+
+                        val connectBlocking = super.connectBlocking()
+                        mOpenCallback?.connectBlocking(connectBlocking)
+                        return connectBlocking
+                    }
+
+                    override fun connectBlocking(timeout: Long, timeUnit: TimeUnit?): Boolean {
+                        val connectBlocking = super.connectBlocking(timeout, timeUnit)
+                        mOpenCallback?.connectBlocking(timeout, timeUnit, connectBlocking)
+                        return connectBlocking
+                    }
+
+                    override fun closeBlocking() {
+                        mOpenCallback?.closeBlocking()
+                        super.closeBlocking()
+                    }
+
+                    override fun onCloseInitiated(code: Int, reason: String?) {
+                        mOpenCallback?.onCloseInitiated(code, reason)
+                        super.onCloseInitiated(code, reason)
+                    }
+
+                    override fun onClosing(code: Int, reason: String?, remote: Boolean) {
+                        mOpenCallback?.onClosing(code, reason, remote)
+                        super.onClosing(code, reason, remote)
+                    }
+
+                    override fun isClosing(): Boolean {
+                        val isClose = super.isClosing()
+                        mOpenCallback?.isClosing(isClose)
+                        return isClose
+                    }
+
+                    override fun isOpen(): Boolean {
+                        val isOpen = super.isOpen()
+                        mOpenCallback?.isOpen(isOpen)
+                        return isOpen
+                    }
+
+                    override fun onWebsocketClosing(
+                        conn: WebSocket?,
+                        code: Int,
+                        reason: String?,
+                        remote: Boolean
+                    ) {
+                        mOpenCallback?.onWebsocketClosing(conn, code, reason, remote)
+                        super.onWebsocketClosing(conn, code, reason, remote)
+                    }
+
+                    override fun close() {
+                        mOpenCallback?.close()
+                        super.close()
+                    }
+
+                    override fun close(code: Int) {
+                        mOpenCallback?.close(code)
+                        super.close(code)
+                    }
+
+                    override fun close(code: Int, message: String?) {
+                        mOpenCallback?.close(code, message)
+                        super.close(code, message)
+                    }
+
+                    override fun closeConnection(code: Int, message: String?) {
+                        mOpenCallback?.closeConnection(code, message)
+                        super.closeConnection(code, message)
+                    }
+
+                    override fun onWebsocketCloseInitiated(
+                        conn: WebSocket?,
+                        code: Int,
+                        reason: String?
+                    ) {
+                        mOpenCallback?.onWebsocketCloseInitiated(conn, code, reason)
+                        super.onWebsocketCloseInitiated(conn, code, reason)
+                    }
+
+                    override fun isFlushAndClose(): Boolean {
+                        val isFlushAndClose = super.isFlushAndClose()
+                        mOpenCallback?.isFlushAndClose(isFlushAndClose)
+                        return super.isFlushAndClose()
                     }
 
                     override fun onMessage(message: String?) {

@@ -82,7 +82,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
             }
 
             override fun onError(error: Error?) {
-                isInit = true
+                isInit = false
                 callback.onError(error)
             }
         }, optionsMap)
@@ -127,7 +127,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         })
     }
 
-    fun selectAvailableAffectiveServicesInRemote(subData: SubAffectiveDataFields) {
+    private fun selectAvailableAffectiveServicesInRemote(subData: SubAffectiveDataFields) {
         var affectiveServices = mutableListOf<Service>()
         if (subData.subAttentionFields != null) {
             affectiveServices.add(Service.ATTENTION)
@@ -165,39 +165,36 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         return isInit
     }
 
+    private val mEnterWebSocketCallback by lazy {
+        EnterWebSocketCallback()
+    }
 
     override fun init(callback: Callback) {
-        mApi.openWebSocket(object : WebSocketCallback {
-            override fun onOpen(serverHandshake: ServerHandshake?) {
-                mApi.createSession(object : Callback2<String> {
-                    override fun onSuccess(t: String?) {
-                        initBiodata(callback)
-                        if (config.availableAffectiveServices != null) {
-                            initAffective(callback)
-                        }
+        mEnterWebSocketCallback.callback = callback
+        mEnterWebSocketCallback.onOpen = {
+            mApi.createSession(object : Callback2<String> {
+                override fun onSuccess(t: String?) {
+                    initBiodata(callback)
+                    if (config.availableAffectiveServices != null) {
+                        initAffective(callback)
                     }
-
-                    override fun onError(error: Error?) {
-                        callback.onError(error)
-                        isInit = false
-                    }
-                })
-            }
-
-            override fun onClose(code: Int, reason: String?, remote: Boolean) {
-                isInit = false
-                if (reason != null && reason != "") {
-//                    callback.onError(Error(-1, reason.toString()))
                 }
-            }
 
-            override fun onError(e: Exception?) {
-                isInit = false
-                e?.printStackTrace()
-                callback.onError(Error(-1, e.toString()))
-            }
-
-        })
+                override fun onError(error: Error?) {
+                    callback.onError(error)
+                    isInit = false
+                }
+            })
+        }
+        mEnterWebSocketCallback.onError = { e ->
+            isInit = false
+            e?.printStackTrace()
+            callback.onError(Error(-1, e.toString()))
+        }
+        mEnterWebSocketCallback.onClose = {
+            isInit = false
+        }
+        mApi.openWebSocket(mEnterWebSocketCallback)
     }
 
     override fun appendMCEEGData(mceegData: ByteArray) {
@@ -268,37 +265,32 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 }
             })
         } else {
-            mApi.openWebSocket(object : WebSocketCallback {
-                override fun onOpen(serverHandshake: ServerHandshake?) {
-                    mApi.restore(object : Callback {
-                        override fun onSuccess() {
-                            initBiodata(callback)
-                            if (config.availableAffectiveServices != null) {
-                                initAffective(callback)
-                            }
+            mEnterWebSocketCallback.callback = callback
+            mEnterWebSocketCallback.onOpen = {
+                mApi.restore(object : Callback {
+                    override fun onSuccess() {
+                        initBiodata(callback)
+                        if (config.availableAffectiveServices != null) {
+                            initAffective(callback)
                         }
-
-                        override fun onError(error: Error?) {
-                            isInit = false
-                            callback.onError(error)
-                        }
-                    })
-                }
-
-                override fun onClose(code: Int, reason: String?, remote: Boolean) {
-                    isInit = false
-                    if (reason != null && reason != "") {
-//                        callback.onError(Error(-1, reason.toString()))
                     }
-                }
 
-                override fun onError(e: Exception?) {
-                    isInit = false
-                    e?.printStackTrace()
-                    callback.onError(Error(-1, e.toString()))
-                }
+                    override fun onError(error: Error?) {
+                        isInit = false
+                        callback.onError(error)
+                    }
+                })
+            }
+            mEnterWebSocketCallback.onClose = {
+                isInit = false
+            }
+            mEnterWebSocketCallback.onError = { e ->
+                isInit = false
+                e?.printStackTrace()
+                callback.onError(Error(-1, e.toString()))
+            }
 
-            })
+            mApi.openWebSocket(mEnterWebSocketCallback)
         }
     }
 

@@ -1,5 +1,5 @@
 apply plugin: 'maven'
-
+//https://s01.oss.sonatype.org/content/repositories/releases/cn/entertech/android/affectivecloud/
 //任务名
 uploadArchives{
     repositories {
@@ -22,7 +22,7 @@ uploadArchives{
             // library的项目名
             pom.artifactId = 'affectivecloud'
             // library的版本号
-            pom.version = '2.6.5-alpha01'
+            pom.version = '2.6.6'
 
             pom.project {
                 licenses {

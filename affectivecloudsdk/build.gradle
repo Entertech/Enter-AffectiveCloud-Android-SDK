@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply from: './nexus-push.gradle'
 apply from: './push.gradle'
+apply plugin:'custom.android.plugin'
 android {
     compileSdkVersion 28
 
@@ -31,6 +32,12 @@ android {
 //    }
 
 }
+PublishInfo {
+    groupId = 'cn.entertech.android' // 库的组织，使用域名表示
+    artifactId = 'affectivecloud' // 库名称
+    version = '3.3.5-LOCAL' // 库版本
+}
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

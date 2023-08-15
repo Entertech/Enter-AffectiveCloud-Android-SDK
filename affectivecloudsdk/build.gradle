@@ -1,8 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply from: './nexus-push.gradle'
-apply from: './push.gradle'
 apply plugin:'custom.android.plugin'
 android {
     compileSdkVersion 28
@@ -43,6 +41,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation project(path: ':affective_sdk_api')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'

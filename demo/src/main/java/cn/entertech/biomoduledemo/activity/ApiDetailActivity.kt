@@ -10,11 +10,10 @@ import cn.entertech.affectivecloudsdk.BiodataSubscribeParams
 import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiFactory
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.BaseApi
-import cn.entertech.affectivecloudsdk.interfaces.Callback
-import cn.entertech.affectivecloudsdk.interfaces.Callback2
+import cn.entertech.affective.sdk.api.Callback
+import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import cn.entertech.biomoduledemo.R
-import cn.entertech.biomoduledemo.utils.FileHelper
 import cn.entertech.ble.single.BiomoduleBleManager
 import com.orhanobut.logger.Logger
 import org.java_websocket.handshake.ServerHandshake
@@ -100,12 +99,13 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.createSession(object : Callback2<String> {
+        mEnterAffectiveCloudApi?.createSession(object :
+            cn.entertech.affective.sdk.api.Callback2<String> {
             override fun onSuccess(t: String?) {
                 Logger.d("情感云Session已创建，session id:$t")
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 Logger.d("情感云Session创建异常:${error.toString()}")
             }
         })
@@ -115,24 +115,25 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.destroySessionAndCloseWebSocket(object : Callback {
+        mEnterAffectiveCloudApi?.destroySessionAndCloseWebSocket(object :
+            cn.entertech.affective.sdk.api.Callback {
             override fun onSuccess() {
                 Logger.d("情感云会话已关闭")
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 Logger.d("情感云会话失败：${error.toString()}")
             }
         })
     }
 
     fun onSessionRestore(@Suppress("UNUSED_PARAMETER")view: View) {
-        mEnterAffectiveCloudApi?.restore(object : Callback {
+        mEnterAffectiveCloudApi?.restore(object : cn.entertech.affective.sdk.api.Callback {
             override fun onSuccess() {
                 Logger.d("情感云会话已重连")
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 Logger.d("情感云会话重连失败：${error.toString()}")
             }
 
@@ -143,7 +144,8 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.initBiodataServices(availableBioServices, object : Callback {
+        mEnterAffectiveCloudApi?.initBiodataServices(availableBioServices, object :
+            cn.entertech.affective.sdk.api.Callback {
             override fun onSuccess() {
                 Logger.d("情感云基础服务已初始化成功")
                 fileName = "${System.currentTimeMillis()}.txt"
@@ -151,7 +153,7 @@ class ApiDetailActivity : AppCompatActivity() {
 //                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 Logger.d("情感云基础服务初始化失败：${error.toString()}")
             }
 
@@ -185,21 +187,22 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.subscribeBioData(biodataSubscribeParams!!, object : Callback2<RealtimeBioData> {
-            override fun onSuccess(t: RealtimeBioData?) {
+        mEnterAffectiveCloudApi?.subscribeBioData(biodataSubscribeParams!!, object :
+            cn.entertech.affective.sdk.api.Callback2<cn.entertech.affective.sdk.bean.RealtimeBioData> {
+            override fun onSuccess(t: cn.entertech.affective.sdk.bean.RealtimeBioData?) {
                 Logger.d("基础服务实时数据：${t.toString()}")
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 Logger.d("实时数据返回异常：${error.toString()}")
             }
 
-        }, object : Callback2<SubBiodataFields> {
+        }, object : cn.entertech.affective.sdk.api.Callback2<SubBiodataFields> {
             override fun onSuccess(t: SubBiodataFields?) {
                 Logger.d("基础服务订阅成功，当前已订阅内容：${t.toString()}")
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 Logger.d("基础服务订阅失败：${error.toString()}")
             }
 
@@ -210,12 +213,13 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.getBiodataReport(availableBioServices, object : Callback2<HashMap<Any, Any?>> {
+        mEnterAffectiveCloudApi?.getBiodataReport(availableBioServices, object :
+            cn.entertech.affective.sdk.api.Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
                 Logger.d("基础服务报表：${t.toString()}")
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 Logger.d("获取基础服务报表：${error.toString()}")
             }
 
@@ -226,12 +230,13 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk() || biodataSubscribeParams == null) {
             return
         }
-        mEnterAffectiveCloudApi?.unsubscribeBioData(biodataSubscribeParams!!, object : Callback2<SubBiodataFields> {
+        mEnterAffectiveCloudApi?.unsubscribeBioData(biodataSubscribeParams!!, object :
+            cn.entertech.affective.sdk.api.Callback2<SubBiodataFields> {
             override fun onSuccess(t: SubBiodataFields?) {
                 Logger.d("基础服务取消订阅成功，当前已订阅内容：${t.toString()}")
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 Logger.d("基础服务取消订阅失败：${error.toString()}")
             }
         })
@@ -242,12 +247,12 @@ class ApiDetailActivity : AppCompatActivity() {
             return
         }
         mEnterAffectiveCloudApi?.initAffectiveDataServices(availableAffectiveServices,
-            object : Callback {
+            object : cn.entertech.affective.sdk.api.Callback {
                 override fun onSuccess() {
                     Logger.d("情感服务已开启")
                 }
 
-                override fun onError(error: Error?) {
+                override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                     Logger.d("情感服务开启失败：$error")
                 }
 
@@ -260,22 +265,23 @@ class ApiDetailActivity : AppCompatActivity() {
             return
         }
         mEnterAffectiveCloudApi?.subscribeAffectiveData(affectiveSubscribeParams!!,
-            object : Callback2<RealtimeAffectiveData> {
-                override fun onSuccess(t: RealtimeAffectiveData?) {
+            object :
+                cn.entertech.affective.sdk.api.Callback2<cn.entertech.affective.sdk.bean.RealtimeAffectiveData> {
+                override fun onSuccess(t: cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) {
                     Logger.d("实时情感数据：${t.toString()}")
                 }
 
-                override fun onError(error: Error?) {
+                override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                     Logger.d("情感数据返回异常：${error.toString()}")
                 }
 
             },
-            object : Callback2<SubAffectiveDataFields> {
+            object : cn.entertech.affective.sdk.api.Callback2<SubAffectiveDataFields> {
                 override fun onSuccess(t: SubAffectiveDataFields?) {
                     Logger.d("情感服务订阅成功，当前已订阅内容：${t.toString()}")
                 }
 
-                override fun onError(error: Error?) {
+                override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                     Logger.d("情感服务订阅失败：${error.toString()}")
                 }
 
@@ -288,12 +294,12 @@ class ApiDetailActivity : AppCompatActivity() {
             return
         }
         mEnterAffectiveCloudApi?.getAffectivedataReport(availableAffectiveServices,
-            object : Callback2<HashMap<Any, Any?>> {
+            object : cn.entertech.affective.sdk.api.Callback2<HashMap<Any, Any?>> {
                 override fun onSuccess(t: HashMap<Any, Any?>?) {
                     Logger.d("情感报表数据：${t.toString()}")
                 }
 
-                override fun onError(error: Error?) {
+                override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                     Logger.d("获取情感报表数据失败：${error.toString()}")
                 }
 
@@ -306,12 +312,12 @@ class ApiDetailActivity : AppCompatActivity() {
             return
         }
         mEnterAffectiveCloudApi?.unsubscribeAffectiveData(affectiveSubscribeParams!!,
-            object : Callback2<SubAffectiveDataFields> {
+            object : cn.entertech.affective.sdk.api.Callback2<SubAffectiveDataFields> {
                 override fun onSuccess(t: SubAffectiveDataFields?) {
                     Logger.d("情感服务取消订阅成功，当前已订阅内容：${t.toString()}")
                 }
 
-                override fun onError(error: Error?) {
+                override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                     Logger.d("情感服务取消订阅失败：${error.toString()}")
                 }
             })
@@ -321,12 +327,13 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.finishAllAffectiveDataServices(object : Callback {
+        mEnterAffectiveCloudApi?.finishAllAffectiveDataServices(object :
+            cn.entertech.affective.sdk.api.Callback {
             override fun onSuccess() {
                 Logger.d("情感服务已结束")
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 Logger.d("情感服务结束失败")
             }
 

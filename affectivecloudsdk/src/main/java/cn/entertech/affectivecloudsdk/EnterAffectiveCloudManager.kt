@@ -1,17 +1,21 @@
 package cn.entertech.affectivecloudsdk
 
+import cn.entertech.affective.sdk.api.Callback
+import cn.entertech.affective.sdk.api.Callback2
+import cn.entertech.affective.sdk.bean.Error
+import cn.entertech.affective.sdk.api.IEnterAffectiveCloudManager
+import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
+import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
-import org.java_websocket.handshake.ServerHandshake
-import java.lang.Exception
 import java.lang.IllegalStateException
 import java.util.concurrent.CopyOnWriteArrayList
 
 class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     IEnterAffectiveCloudManager {
     var mApi: BaseApi
-    var mBiodataRealtimeListener = CopyOnWriteArrayList<(RealtimeBioData?) -> Unit>()
-    var mAffectiveRealtimeListener = CopyOnWriteArrayList<(RealtimeAffectiveData?) -> Unit>()
+    var mBiodataRealtimeListener = CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit>()
+    var mAffectiveRealtimeListener = CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit>()
 
 
     init {
@@ -38,7 +42,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         }
     }
 
-    override fun openWebSocket(webSocketCallback: WebSocketCallback) {
+    private fun openWebSocket(webSocketCallback: WebSocketCallback) {
         mApi.openWebSocket(webSocketCallback)
     }
 
@@ -53,7 +57,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 if (config.mBiodataSubscribeParams != null) {
                     mApi.subscribeBioData(config.mBiodataSubscribeParams!!,
                         object : Callback2<RealtimeBioData> {
-                            override fun onSuccess(t: RealtimeBioData?) {
+                            override fun onSuccess(t: cn.entertech.affective.sdk.bean.RealtimeBioData?) {
                                 mBiodataRealtimeListener.forEach {
                                     it.invoke(t)
                                 }
@@ -94,7 +98,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 if (config.mAffectiveSubscribeParams != null) {
                     mApi.subscribeAffectiveData(config.mAffectiveSubscribeParams!!,
                         object : Callback2<RealtimeAffectiveData> {
-                            override fun onSuccess(t: RealtimeAffectiveData?) {
+                            override fun onSuccess(t: cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) {
                                 mAffectiveRealtimeListener.forEach {
                                     it.invoke(t)
                                 }
@@ -225,19 +229,19 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.appendHeartData(heartRateData)
     }
 
-    override fun addBiodataRealtimeListener(listener: (RealtimeBioData?) -> Unit) {
+    override fun addBiodataRealtimeListener(listener: (cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit) {
         mBiodataRealtimeListener.add(listener)
     }
 
-    override fun addAffectiveDataRealtimeListener(listener: (RealtimeAffectiveData?) -> Unit) {
+    override fun addAffectiveDataRealtimeListener(listener: (cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit) {
         mAffectiveRealtimeListener.add(listener)
     }
 
-    override fun removeBiodataRealtimeListener(listener: (RealtimeBioData?) -> Unit) {
+    override fun removeBiodataRealtimeListener(listener: (cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit) {
         mBiodataRealtimeListener.remove(listener)
     }
 
-    override fun removeAffectiveRealtimeListener(listener: (RealtimeAffectiveData?) -> Unit) {
+    override fun removeAffectiveRealtimeListener(listener: (cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit) {
         mAffectiveRealtimeListener.remove(listener)
     }
 
@@ -363,7 +367,4 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.closeConnection(code, message)
     }
 
-    override fun submit(remark: List<RecData>, callback: Callback) {
-        mApi.submit(remark, callback)
-    }
 }

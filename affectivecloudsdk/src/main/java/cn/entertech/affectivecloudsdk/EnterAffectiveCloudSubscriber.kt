@@ -1,19 +1,19 @@
 package cn.entertech.affectivecloudsdk
 
-import cn.entertech.affectivecloudsdk.entity.Error
-import cn.entertech.affectivecloudsdk.entity.RealtimeAffectiveData
-import cn.entertech.affectivecloudsdk.entity.RealtimeBioData
+import cn.entertech.affective.sdk.bean.Error
+import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
+import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affectivecloudsdk.interfaces.BaseApi
-import cn.entertech.affectivecloudsdk.interfaces.Callback
-import cn.entertech.affectivecloudsdk.interfaces.Callback2
+import cn.entertech.affective.sdk.api.Callback
+import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import org.java_websocket.handshake.ServerHandshake
 import java.util.concurrent.CopyOnWriteArrayList
 
 class EnterAffectiveCloudSubscriber(var url: String, var timeout: Int = 10000) {
     var mApi: BaseApi
-    var mBiodataRealtimeListener = CopyOnWriteArrayList<(RealtimeBioData?) -> Unit>()
-    var mAffectiveRealtimeListener = CopyOnWriteArrayList<(RealtimeAffectiveData?) -> Unit>()
+    var mBiodataRealtimeListener = CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit>()
+    var mAffectiveRealtimeListener = CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit>()
 
 
     init {
@@ -50,8 +50,8 @@ class EnterAffectiveCloudSubscriber(var url: String, var timeout: Int = 10000) {
     }
 
     fun addRealtimeDataCallback() {
-        mApi.addBioDataCallback(object:Callback2<RealtimeBioData>{
-            override fun onSuccess(t: RealtimeBioData?) {
+        mApi.addBioDataCallback(object: Callback2<RealtimeBioData> {
+            override fun onSuccess(t: cn.entertech.affective.sdk.bean.RealtimeBioData?) {
                 mBiodataRealtimeListener.forEach {
                     it.invoke(t)
                 }
@@ -62,8 +62,8 @@ class EnterAffectiveCloudSubscriber(var url: String, var timeout: Int = 10000) {
             }
 
         })
-        mApi.addAffectiveDataCallback(object:Callback2<RealtimeAffectiveData>{
-            override fun onSuccess(t: RealtimeAffectiveData?) {
+        mApi.addAffectiveDataCallback(object: Callback2<RealtimeAffectiveData> {
+            override fun onSuccess(t: cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) {
                 mAffectiveRealtimeListener.forEach {
                     it.invoke(t)
                 }
@@ -76,19 +76,19 @@ class EnterAffectiveCloudSubscriber(var url: String, var timeout: Int = 10000) {
         })
     }
 
-    fun addBiodataRealtimeListener(listener: (RealtimeBioData?) -> Unit) {
+    fun addBiodataRealtimeListener(listener: (cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit) {
         mBiodataRealtimeListener.add(listener)
     }
 
-    fun addAffectiveDataRealtimeListener(listener: (RealtimeAffectiveData?) -> Unit) {
+    fun addAffectiveDataRealtimeListener(listener: (cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit) {
         mAffectiveRealtimeListener.add(listener)
     }
 
-    fun removeBiodataRealtimeListener(listener: (RealtimeBioData?) -> Unit) {
+    fun removeBiodataRealtimeListener(listener: (cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit) {
         mBiodataRealtimeListener.remove(listener)
     }
 
-    fun removeAffectiveRealtimeListener(listener: (RealtimeAffectiveData?) -> Unit) {
+    fun removeAffectiveRealtimeListener(listener: (cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit) {
         mAffectiveRealtimeListener.remove(listener)
     }
 

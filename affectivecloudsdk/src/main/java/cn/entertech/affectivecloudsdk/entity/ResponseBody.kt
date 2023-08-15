@@ -1,5 +1,6 @@
 package cn.entertech.affectivecloudsdk.entity
 
+import cn.entertech.affective.sdk.bean.*
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -487,7 +488,8 @@ class ResponseBody(
             realtimeAffectiveData.realtimeSleepData = realtimeSleepData
         }
         if (data.containsKey("ssvep-multi-classify")) {
-            var realtimeSsvepMultiClassifyData = RealtimeSsvepMultiClassifyData()
+            var realtimeSsvepMultiClassifyData =
+                RealtimeSsvepMultiClassifyData()
 
             @Suppress("UNCHECKED_CAST")
             var ssvepMultiClassifyMap = data["ssvep-multi-classify"] as Map<Any,Any>

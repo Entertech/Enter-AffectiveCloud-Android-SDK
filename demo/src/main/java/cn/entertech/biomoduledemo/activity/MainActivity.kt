@@ -175,8 +175,8 @@ class MainActivity : AppCompatActivity() {
         enterAffectiveCloudManager?.addWebSocketDisconnectListener {
             Log.d("######", "websocket disconnect:$it")
         }
-        enterAffectiveCloudManager?.init(object : Callback {
-            override fun onError(error: Error?) {
+        enterAffectiveCloudManager?.init(object : cn.entertech.affective.sdk.api.Callback {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_failed) + error.toString())
                 if (error != null && error.code == 1004) {
                     runOnUiThread {
@@ -378,24 +378,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onReport(@Suppress("UNUSED_PARAMETER") view: View) {
-        enterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
+        enterAffectiveCloudManager?.getBiodataReport(object :
+            cn.entertech.affective.sdk.api.Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
                 reportFileHelper.writeData(getCurrentTime() + "<--" + t.toString() + "\n")
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_bio_report) + t.toString())
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_get_bio_report_failed) + error.toString())
             }
 
         })
-        enterAffectiveCloudManager?.getAffectiveDataReport(object : Callback2<HashMap<Any, Any?>> {
+        enterAffectiveCloudManager?.getAffectiveDataReport(object :
+            cn.entertech.affective.sdk.api.Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
                 reportFileHelper.writeData(getCurrentTime() + "<--" + t.toString() + "\n")
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_get_affective_report) + t.toString())
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.mian_get_affective_report_failed) + error?.msg)
             }
 
@@ -403,12 +405,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onFinish(@Suppress("UNUSED_PARAMETER") view: View) {
-        enterAffectiveCloudManager?.release(object : Callback {
+        enterAffectiveCloudManager?.release(object : cn.entertech.affective.sdk.api.Callback {
             override fun onSuccess() {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_disconnected_from_cloud))
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_disconnected_from_cloud_failed) + error?.msg)
             }
 
@@ -427,12 +429,12 @@ class MainActivity : AppCompatActivity() {
         datas.add(recData)
         enterAffectiveCloudManager?.submit(
             datas,
-            object : Callback {
+            object : cn.entertech.affective.sdk.api.Callback {
                 override fun onSuccess() {
                     messageReceiveFragment.appendMessageToScreen(getString(R.string.main_submit_comment_success))
                 }
 
-                override fun onError(error: Error?) {
+                override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                     messageReceiveFragment.appendMessageToScreen(getString(R.string.main_submit_comment_failed) + error?.msg)
                 }
 
@@ -440,12 +442,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onRestore(@Suppress("UNUSED_PARAMETER") view: View) {
-        enterAffectiveCloudManager?.restore(object : Callback {
+        enterAffectiveCloudManager?.restore(object : cn.entertech.affective.sdk.api.Callback {
             override fun onSuccess() {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.mian_cloud_restore_success))
             }
 
-            override fun onError(error: Error?) {
+            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_cloud_restore_failed) + error?.msg)
             }
 

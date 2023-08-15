@@ -3,8 +3,11 @@ package cn.entertech.affectivecloudsdk
 import android.util.Log
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.BaseApi
-import cn.entertech.affectivecloudsdk.interfaces.Callback
-import cn.entertech.affectivecloudsdk.interfaces.Callback2
+import cn.entertech.affective.sdk.api.Callback
+import cn.entertech.affective.sdk.api.Callback2
+import cn.entertech.affective.sdk.bean.Error
+import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
+import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -96,7 +99,7 @@ class EnterAffectiveCloudApiTest {
             PowerMockito.mockStatic(Log::class.java)
             val results = BooleanArray(2)
             val countDownLatch = CountDownLatch(2)
-            mEnterAffectiveCloudApi?.finishAllAffectiveDataServices(object:Callback{
+            mEnterAffectiveCloudApi?.finishAllAffectiveDataServices(object: Callback {
                 override fun onSuccess() {
                     results[0] = true
                     countDownLatch.countDown()
@@ -244,8 +247,9 @@ class EnterAffectiveCloudApiTest {
         PowerMockito.mockStatic(Log::class.java)
         val results = BooleanArray(1)
         val countDownLatch = CountDownLatch(1)
-        mEnterAffectiveCloudApi?.subscribeBioData(biodataSubscribeParams!!, object : Callback2<RealtimeBioData> {
-            override fun onSuccess(t: RealtimeBioData?) {
+        mEnterAffectiveCloudApi?.subscribeBioData(biodataSubscribeParams!!, object :
+            Callback2<RealtimeBioData> {
+            override fun onSuccess(t: cn.entertech.affective.sdk.bean.RealtimeBioData?) {
 
             }
 
@@ -280,7 +284,7 @@ class EnterAffectiveCloudApiTest {
         val countDownLatch = CountDownLatch(1)
         mEnterAffectiveCloudApi?.subscribeAffectiveData(affectiveSubscribeParams!!,
             object : Callback2<RealtimeAffectiveData> {
-                override fun onSuccess(t: RealtimeAffectiveData?) {
+                override fun onSuccess(t: cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) {
                 }
 
                 override fun onError(error: Error?) {
@@ -329,7 +333,8 @@ class EnterAffectiveCloudApiTest {
         val results = BooleanArray(2)
         val countDownLatch = CountDownLatch(2)
 
-        mEnterAffectiveCloudApi!!.getBiodataReport(availableBioServices, object : Callback2<HashMap<Any, Any?>> {
+        mEnterAffectiveCloudApi!!.getBiodataReport(availableBioServices, object :
+            Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(objectObjectHashMap: HashMap<Any, Any?>?) {
                 val hrMap: Map<Any, Any>
                 if (objectObjectHashMap != null && objectObjectHashMap.containsKey("hr")) {

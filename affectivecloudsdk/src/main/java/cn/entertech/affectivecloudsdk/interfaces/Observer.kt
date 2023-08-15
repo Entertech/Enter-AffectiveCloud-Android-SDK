@@ -1,6 +1,6 @@
 package cn.entertech.affectivecloudsdk.interfaces
 
-import cn.entertech.affectivecloudsdk.entity.Error
+import cn.entertech.affective.sdk.bean.Error
 
 interface Observer<T, K> {
     fun onRealtimeDataResponseSuccess(data: T?)

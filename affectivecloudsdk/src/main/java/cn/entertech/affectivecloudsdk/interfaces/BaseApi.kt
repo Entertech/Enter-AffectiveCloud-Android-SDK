@@ -1,8 +1,9 @@
 package cn.entertech.affectivecloudsdk.interfaces
 
-import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl
-import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl.Companion.UPLOAD_BCG_PACKAGE_COUNT
-import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl.Companion.UPLOAD_GYRO_PACKAGE_COUNT
+import cn.entertech.affective.sdk.api.Callback
+import cn.entertech.affective.sdk.api.Callback2
+import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
+import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affectivecloudsdk.entity.*
 
 /**

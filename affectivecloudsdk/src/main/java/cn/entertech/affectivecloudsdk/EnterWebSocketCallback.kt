@@ -1,6 +1,6 @@
 package cn.entertech.affectivecloudsdk
 
-import cn.entertech.affectivecloudsdk.interfaces.Callback
+import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import org.java_websocket.WebSocket
 import org.java_websocket.enums.ReadyState

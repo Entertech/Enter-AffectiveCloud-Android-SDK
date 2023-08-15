@@ -1,10 +1,10 @@
 package cn.entertech.affectivecloudsdk
 
 import android.util.Log
-import cn.entertech.affectivecloudsdk.entity.Error
+import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affectivecloudsdk.entity.Service
-import cn.entertech.affectivecloudsdk.interfaces.Callback
-import cn.entertech.affectivecloudsdk.interfaces.Callback2
+import cn.entertech.affective.sdk.api.Callback
+import cn.entertech.affective.sdk.api.Callback2
 import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters

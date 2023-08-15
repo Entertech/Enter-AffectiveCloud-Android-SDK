@@ -1,1 +1,2 @@
 include ':demo', ':affectivecloudsdk'
+include ':affective_sdk_api'

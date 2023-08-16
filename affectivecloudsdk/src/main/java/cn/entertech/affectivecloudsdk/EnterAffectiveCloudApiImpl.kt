@@ -3,7 +3,8 @@ package cn.entertech.affectivecloudsdk
 import android.util.Log
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
-import cn.entertech.affectivecloudsdk.IEnterAffectiveCloudManager.Companion.UPLOAD_GYRO_PACKAGE_COUNT
+import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService.Companion.UPLOAD_BCG_PACKAGE_COUNT
+import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService.Companion.UPLOAD_GYRO_PACKAGE_COUNT
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
@@ -66,7 +67,6 @@ class EnterAffectiveCloudApiImpl internal constructor(
         const val BASE_UPLOAD_EEG_PACKAGE_COUNT = 50
         const val BASE_UPLOAD_HR_PACKAGE_COUNT = 3
         const val UPLOAD_MCEEG_PACKAGE_COUNT = 30
-        const val UPLOAD_BCG_PACKAGE_COUNT = 10
         const val EEG_PACKAGE_LENGTH = 20
         const val HR_PACKAGE_LENGTH = 1
         const val PEPR_PACKAGE_LENGTH = 15

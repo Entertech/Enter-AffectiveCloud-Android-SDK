@@ -4,34 +4,73 @@ import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 
 interface IAffectiveDataAnalysisService {
+    companion object {
+        const val UPLOAD_BCG_PACKAGE_COUNT = 10
+        const val UPLOAD_GYRO_PACKAGE_COUNT = 5
+
+    }
+    fun addServiceConnectStatueListener(connectionListener: () -> Unit,disconnectListener: (String) -> Unit)
+    fun removeServiceConnectStatueListener(connectionListener: () -> Unit,disconnectListener: (String) -> Unit)
+
+
+    fun hasStartBioDataService():Boolean
 
     /**
      * 启动情感服务
      * */
-    fun startAffectiveService()
+    fun startAffectiveService(callback: Callback2<String>)
 
     /**
      * 重启情感服务
      * */
-    fun restoreAffectiveService()
+    fun restoreAffectiveService(callback: Callback)
 
     /**
      * 订阅数据
      * */
-    fun subscribeData()
+    fun subscribeData(
+        bdListener: ((RealtimeBioData?) -> Unit)? = null,
+        listener: ((RealtimeAffectiveData?) -> Unit)? = null
+    )
 
     /**
      * 取消订阅
      * */
-    fun unSubscribeData()
+    fun unSubscribeData(
+        bdListener: ((RealtimeBioData?) -> Unit)? = null,
+        listener: ((RealtimeAffectiveData?) -> Unit)? = null
+    )
+
     /**
      * 发送数据
      * */
-    fun uploadData()
+
+    fun appendEEGData(brainData: ByteArray)
+
+    fun appendDCEEGData(brainData: ByteArray)
+
+    /**
+     * 单通道数据
+     * */
+    fun appendSCEEGData(brainData: ByteArray)
+
+    fun appendHeartRateData(heartRateData: Int)
+
+    fun appendMCEEGData(mceegData: ByteArray)
+
+    /**
+     * 坐垫数据
+     * */
+    fun appendPEPRData(peprData: ByteArray)
+
+    fun appendBCGData(bcgData: ByteArray, packageCount: Int = UPLOAD_BCG_PACKAGE_COUNT)
+
+    fun appendGyroData(gyroData: ByteArray, packageCount: Int = UPLOAD_GYRO_PACKAGE_COUNT)
+
     /**
      * 结束情感服务
      * */
-    fun closeAffectiveService()
+    fun closeAffectiveService(callback: Callback)
 
 
 }

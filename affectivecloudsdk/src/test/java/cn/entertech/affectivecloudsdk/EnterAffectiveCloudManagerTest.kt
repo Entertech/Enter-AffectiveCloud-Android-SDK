@@ -264,8 +264,8 @@ class EnterAffectiveCloudManagerTest {
             val countDownLatch = CountDownLatch(1)
             val isSuccess = booleanArrayOf(false)
 
-            enterAffectiveCloudManager!!.init(object : Callback {
-                override fun onSuccess() {
+            enterAffectiveCloudManager!!.init(object : Callback2<String> {
+                override fun onSuccess(t:String?) {
                     isSuccess[0] = true
                     countDownLatch.countDown()
                 }

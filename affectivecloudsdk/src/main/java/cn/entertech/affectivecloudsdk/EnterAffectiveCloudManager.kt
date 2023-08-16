@@ -182,7 +182,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         config.availableAffectiveServices = affectiveServices
     }
 
-    var isInit = false
+    private var isInit = false
 
     override fun isInited(): Boolean {
         return isInit
@@ -196,14 +196,28 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         EnterWebSocketCallback()
     }
 
-    override fun init(callback: Callback) {
-        mEnterWebSocketCallback.callback = callback
+    override fun init(callback: Callback2<String>) {
+        val cb=object :Callback{
+            override fun onSuccess() {
+                callback.onSuccess(mApi.getSessionId())
+            }
+
+            override fun onError(error: Error?) {
+                callback.onError(error)
+            }
+
+            override fun log(msg: String) {
+                callback.log(msg)
+            }
+        }
+        mEnterWebSocketCallback.callback = cb
         mEnterWebSocketCallback.onOpen = {
             mApi.createSession(object : Callback2<String> {
                 override fun onSuccess(t: String?) {
-                    initBiodata(callback)
+                    callback.onSuccess(t)
+                    initBiodata(cb)
                     if (config.availableAffectiveServices != null) {
-                        initAffective(callback)
+                        initAffective(cb)
                     }
                 }
 
@@ -349,13 +363,28 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 })
         }
     }
+    private var disconnectListeners = CopyOnWriteArrayList<(String) -> Unit>()
+
+    /**
+     * 为了不把isInit暴露出去，只能获取，不能设置
+     * */
+    private val realDisconnectListener = { msg: String ->
+        disconnectListeners.forEach {
+            isInit = false
+            it(msg)
+        }
+    }
 
     override fun addWebSocketConnectListener(listener: () -> Unit) {
         mApi.addConnectListener(listener)
     }
 
     override fun addWebSocketDisconnectListener(listener: (String) -> Unit) {
-        mApi.addDisconnectListener(listener)
+        disconnectListeners.add(listener)
+        if (disconnectListeners.size == 1) {
+            mApi.addDisconnectListener(realDisconnectListener)
+        }
+
     }
 
     override fun removeWebSocketConnectListener(listener: () -> Unit) {
@@ -363,7 +392,10 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     override fun removeWebSocketDisconnectListener(listener: (String) -> Unit) {
-        mApi.removeDisconnectListener(listener)
+        disconnectListeners.remove(listener)
+        if (disconnectListeners.isEmpty()) {
+            mApi.removeDisconnectListener(realDisconnectListener)
+        }
     }
 
     override fun addRawJsonRequestListener(listener: (String) -> Unit) {

@@ -2,6 +2,8 @@ package cn.entertech.affectivecloudsdk
 
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
+import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService.Companion.UPLOAD_BCG_PACKAGE_COUNT
+import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService.Companion.UPLOAD_GYRO_PACKAGE_COUNT
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 
@@ -10,26 +12,14 @@ import cn.entertech.affective.sdk.bean.RealtimeBioData
  * https://docs.affectivecloud.cn/%F0%9F%8E%99%E6%8E%A5%E5%8F%A3%E5%8D%8F%E8%AE%AE/%E7%94%9F%E7%89%A9%E6%95%B0%E6%8D%AE%E5%9F%BA%E7%A1%80%E5%88%86%E6%9E%90%E6%9C%8D%E5%8A%A1%E5%8D%8F%E8%AE%AE
  * https://docs.affectivecloud.cn/%F0%9F%8E%99%E6%8E%A5%E5%8F%A3%E5%8D%8F%E8%AE%AE/%E6%83%85%E6%84%9F%E8%AE%A1%E7%AE%97%E6%9C%8D%E5%8A%A1%E5%8D%8F%E8%AE%AE
  *
- * 对于业务来说 只需要
- * 启动服务
- * 重启服务
- * 订阅数据
- * 发送数据
- * 取消订阅
- * 关闭服务
  * */
 interface IEnterAffectiveCloudManager {
 
-    companion object {
-        const val UPLOAD_BCG_PACKAGE_COUNT = 10
-        const val UPLOAD_GYRO_PACKAGE_COUNT = 5
-
-    }
 
     /**
      * 初始化分析服务
      * */
-    fun init(callback: Callback)
+    fun init(callback: Callback2<String>)
 
     /**
      * 是否启动了生物数据基础分析服务

@@ -32,10 +32,21 @@ import java.util.concurrent.CopyOnWriteArrayList
  * */
 class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     IEnterAffectiveCloudManager {
-    var mApi: BaseApi
-    var mBiodataRealtimeListener = CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit>()
-    var mAffectiveRealtimeListener = CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit>()
+    private var mApi: BaseApi
+    private var mBiodataRealtimeListener = CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit>()
+    private var mAffectiveRealtimeListener = CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit>()
+    private var disconnectListeners = CopyOnWriteArrayList<(String) -> Unit>()
+    private var isInit = false
 
+    /**
+     * 为了不把isInit暴露出去，只能获取，不能设置
+     * */
+    private val realDisconnectListener = { msg: String ->
+        disconnectListeners.forEach {
+            isInit = false
+            it(msg)
+        }
+    }
 
     init {
         if (config.websocketTimeout == null) {
@@ -182,7 +193,6 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         config.availableAffectiveServices = affectiveServices
     }
 
-    private var isInit = false
 
     override fun isInited(): Boolean {
         return isInit
@@ -363,17 +373,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 })
         }
     }
-    private var disconnectListeners = CopyOnWriteArrayList<(String) -> Unit>()
 
-    /**
-     * 为了不把isInit暴露出去，只能获取，不能设置
-     * */
-    private val realDisconnectListener = { msg: String ->
-        disconnectListeners.forEach {
-            isInit = false
-            it(msg)
-        }
-    }
 
     override fun addWebSocketConnectListener(listener: () -> Unit) {
         mApi.addConnectListener(listener)

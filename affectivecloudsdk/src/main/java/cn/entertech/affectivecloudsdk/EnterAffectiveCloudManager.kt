@@ -3,7 +3,6 @@ package cn.entertech.affectivecloudsdk
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.bean.Error
-import cn.entertech.affective.sdk.api.IEnterAffectiveCloudManager
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affectivecloudsdk.entity.*
@@ -185,7 +184,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
 
     var isInit = false
 
-    override fun hasInitBioDataService(): Boolean {
+    override fun isInited(): Boolean {
         return isInit
     }
 
@@ -197,7 +196,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         EnterWebSocketCallback()
     }
 
-    override fun initAnalysisService(callback: Callback) {
+    override fun init(callback: Callback) {
         mEnterWebSocketCallback.callback = callback
         mEnterWebSocketCallback.onOpen = {
             mApi.createSession(object : Callback2<String> {
@@ -281,7 +280,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.getAffectivedataReport(config.availableAffectiveServices!!, callback)
     }
 
-    override fun restoreAnalysisService(callback: Callback) {
+    override fun restore(callback: Callback) {
         if (mApi.isWebSocketOpen()) {
             mApi.restore(object : Callback {
                 override fun onSuccess() {
@@ -326,7 +325,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         }
     }
 
-    override fun releaseAnalysisService(callback: Callback) {
+    override fun release(callback: Callback) {
         if (config.availableAffectiveServices != null) {
             mApi.finishAffectiveDataServices(
                 config.availableAffectiveServices!!,
@@ -383,11 +382,11 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.removeRawJsonResponseListener(listener)
     }
 
-    override fun affectiveAnalysisIsAvailable(): Boolean {
+    override fun isWebSocketOpen(): Boolean {
         return mApi.isWebSocketOpen()
     }
 
-    override fun closeAnalysisService() {
+    override fun closeWebSocket() {
         mApi.closeWebSocket()
     }
 

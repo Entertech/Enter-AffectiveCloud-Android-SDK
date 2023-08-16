@@ -3,7 +3,7 @@ package cn.entertech.affectivecloudsdk
 import android.util.Log
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
-import cn.entertech.affective.sdk.api.IEnterAffectiveCloudManager.Companion.UPLOAD_GYRO_PACKAGE_COUNT
+import cn.entertech.affectivecloudsdk.IEnterAffectiveCloudManager.Companion.UPLOAD_GYRO_PACKAGE_COUNT
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData

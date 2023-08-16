@@ -4,35 +4,34 @@ import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 
 interface IAffectiveDataAnalysisService {
-    //==================append data==========================
-    /**
-     * 坐垫数据
-     * */
-    fun appendPEPR(pepr: ByteArray)
 
     /**
-     * 双通道数据
+     * 启动情感服务
      * */
-    fun appendEEGData(brainData: ByteArray)
-    fun appendBCGData(brainData: ByteArray)
-    fun appendDCEEGData(brainData: ByteArray)
-    fun appendGyroData(brainData: ByteArray)
-    fun appendMCEEGData(brainData: ByteArray)
+    fun startAffectiveService()
 
     /**
-     * 单通道数据
+     * 重启情感服务
      * */
-    fun appendSCEEGData(brainData: ByteArray)
+    fun restoreAffectiveService()
 
     /**
-     * 心率相关数据
+     * 订阅数据
      * */
-    fun appendHeartRateData(heartRateData: Int)
+    fun subscribeData()
 
-    //==================listener==========================
-    fun addAffectiveDataRealtimeListener(listener: (RealtimeAffectiveData?) -> (Unit))
-    fun addBiodataRealtimeListener(listener: (RealtimeBioData?) -> (Unit))
-
+    /**
+     * 取消订阅
+     * */
+    fun unSubscribeData()
+    /**
+     * 发送数据
+     * */
+    fun uploadData()
+    /**
+     * 结束情感服务
+     * */
+    fun closeAffectiveService()
 
 
 }

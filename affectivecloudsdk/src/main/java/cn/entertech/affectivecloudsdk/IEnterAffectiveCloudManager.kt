@@ -1,5 +1,7 @@
-package cn.entertech.affective.sdk.api
+package cn.entertech.affectivecloudsdk
 
+import cn.entertech.affective.sdk.api.Callback
+import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 
@@ -24,20 +26,15 @@ interface IEnterAffectiveCloudManager {
 
     }
 
-
-
-
-
-
     /**
      * 初始化分析服务
      * */
-    fun initAnalysisService(callback: Callback)
+    fun init(callback: Callback)
 
     /**
      * 是否启动了生物数据基础分析服务
      * */
-    fun hasInitBioDataService(): Boolean
+    fun isInited(): Boolean
 
     /**
      * 获取会话id
@@ -47,16 +44,16 @@ interface IEnterAffectiveCloudManager {
     /**
      * 情感分析服务是否可用
      * */
-    fun affectiveAnalysisIsAvailable(): Boolean
+    fun isWebSocketOpen(): Boolean
 
     /**
      * 恢复
      * */
-    fun restoreAnalysisService(callback: Callback)
+    fun restore(callback: Callback)
 
-    fun closeAnalysisService()
+    fun closeWebSocket()
 
-    fun releaseAnalysisService(callback: Callback)
+    fun release(callback: Callback)
 
     fun getBiodataReport(callback: Callback2<HashMap<Any, Any?>>)
     fun getAffectiveDataReport(callback: Callback2<HashMap<Any, Any?>>)

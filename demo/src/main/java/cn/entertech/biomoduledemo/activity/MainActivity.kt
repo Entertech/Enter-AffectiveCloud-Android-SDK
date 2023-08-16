@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity() {
         enterAffectiveCloudManager?.addWebSocketDisconnectListener {
             Log.d("######", "websocket disconnect:$it")
         }
-        enterAffectiveCloudManager?.initAnalysisService(object : cn.entertech.affective.sdk.api.Callback {
+        enterAffectiveCloudManager?.init(object : cn.entertech.affective.sdk.api.Callback {
             override fun onError(error: cn.entertech.affective.sdk.bean.Error?) {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_failed) + error.toString())
                 if (error != null && error.code == 1004) {
@@ -405,7 +405,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onFinish(@Suppress("UNUSED_PARAMETER") view: View) {
-        enterAffectiveCloudManager?.releaseAnalysisService(object : cn.entertech.affective.sdk.api.Callback {
+        enterAffectiveCloudManager?.release(object : cn.entertech.affective.sdk.api.Callback {
             override fun onSuccess() {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_disconnected_from_cloud))
             }
@@ -442,7 +442,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onRestore(@Suppress("UNUSED_PARAMETER") view: View) {
-        enterAffectiveCloudManager?.restoreAnalysisService(object : cn.entertech.affective.sdk.api.Callback {
+        enterAffectiveCloudManager?.restore(object : cn.entertech.affective.sdk.api.Callback {
             override fun onSuccess() {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.mian_cloud_restore_success))
             }

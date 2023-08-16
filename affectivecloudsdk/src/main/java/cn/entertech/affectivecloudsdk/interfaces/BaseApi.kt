@@ -61,6 +61,7 @@ interface BaseApi {
      * @param serviceList List<String>
      * @param callback Callback
      */
+    @Deprecated("")
     fun initBiodataServices(serviceList: List<Service>, callback: Callback)
 
 

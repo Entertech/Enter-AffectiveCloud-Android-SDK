@@ -20,6 +20,7 @@ import org.java_websocket.handshake.ServerHandshake
 import java.io.File
 import java.lang.Exception
 import java.util.*
+import cn.entertech.affective.sdk.bean.Error
 
 class ApiDetailActivity : AppCompatActivity() {
 
@@ -105,7 +106,7 @@ class ApiDetailActivity : AppCompatActivity() {
                 Logger.d("情感云Session已创建，session id:$t")
             }
 
-            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+            override fun onError(error: Error?) {
                 Logger.d("情感云Session创建异常:${error.toString()}")
             }
         })
@@ -121,7 +122,7 @@ class ApiDetailActivity : AppCompatActivity() {
                 Logger.d("情感云会话已关闭")
             }
 
-            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+            override fun onError(error: Error?) {
                 Logger.d("情感云会话失败：${error.toString()}")
             }
         })
@@ -133,7 +134,7 @@ class ApiDetailActivity : AppCompatActivity() {
                 Logger.d("情感云会话已重连")
             }
 
-            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+            override fun onError(error: Error?) {
                 Logger.d("情感云会话重连失败：${error.toString()}")
             }
 
@@ -153,7 +154,7 @@ class ApiDetailActivity : AppCompatActivity() {
 //                FileHelper.getInstance().setHRPath(saveHRPath + fileName)
             }
 
-            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+            override fun onError(error: Error?) {
                 Logger.d("情感云基础服务初始化失败：${error.toString()}")
             }
 
@@ -193,7 +194,7 @@ class ApiDetailActivity : AppCompatActivity() {
                 Logger.d("基础服务实时数据：${t.toString()}")
             }
 
-            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+            override fun onError(error: Error?) {
                 Logger.d("实时数据返回异常：${error.toString()}")
             }
 
@@ -202,7 +203,7 @@ class ApiDetailActivity : AppCompatActivity() {
                 Logger.d("基础服务订阅成功，当前已订阅内容：${t.toString()}")
             }
 
-            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+            override fun onError(error: Error?) {
                 Logger.d("基础服务订阅失败：${error.toString()}")
             }
 
@@ -219,7 +220,7 @@ class ApiDetailActivity : AppCompatActivity() {
                 Logger.d("基础服务报表：${t.toString()}")
             }
 
-            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+            override fun onError(error: Error?) {
                 Logger.d("获取基础服务报表：${error.toString()}")
             }
 
@@ -236,7 +237,7 @@ class ApiDetailActivity : AppCompatActivity() {
                 Logger.d("基础服务取消订阅成功，当前已订阅内容：${t.toString()}")
             }
 
-            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+            override fun onError(error: Error?) {
                 Logger.d("基础服务取消订阅失败：${error.toString()}")
             }
         })
@@ -252,7 +253,7 @@ class ApiDetailActivity : AppCompatActivity() {
                     Logger.d("情感服务已开启")
                 }
 
-                override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+                override fun onError(error: Error?) {
                     Logger.d("情感服务开启失败：$error")
                 }
 
@@ -271,7 +272,7 @@ class ApiDetailActivity : AppCompatActivity() {
                     Logger.d("实时情感数据：${t.toString()}")
                 }
 
-                override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+                override fun onError(error: Error?) {
                     Logger.d("情感数据返回异常：${error.toString()}")
                 }
 
@@ -281,7 +282,7 @@ class ApiDetailActivity : AppCompatActivity() {
                     Logger.d("情感服务订阅成功，当前已订阅内容：${t.toString()}")
                 }
 
-                override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+                override fun onError(error: Error?) {
                     Logger.d("情感服务订阅失败：${error.toString()}")
                 }
 
@@ -299,7 +300,7 @@ class ApiDetailActivity : AppCompatActivity() {
                     Logger.d("情感报表数据：${t.toString()}")
                 }
 
-                override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+                override fun onError(error: Error?) {
                     Logger.d("获取情感报表数据失败：${error.toString()}")
                 }
 
@@ -317,7 +318,7 @@ class ApiDetailActivity : AppCompatActivity() {
                     Logger.d("情感服务取消订阅成功，当前已订阅内容：${t.toString()}")
                 }
 
-                override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+                override fun onError(error: Error?) {
                     Logger.d("情感服务取消订阅失败：${error.toString()}")
                 }
             })
@@ -333,7 +334,7 @@ class ApiDetailActivity : AppCompatActivity() {
                 Logger.d("情感服务已结束")
             }
 
-            override fun onError(error: cn.entertech.affective.sdk.api.Error?) {
+            override fun onError(error: Error?) {
                 Logger.d("情感服务结束失败")
             }
 

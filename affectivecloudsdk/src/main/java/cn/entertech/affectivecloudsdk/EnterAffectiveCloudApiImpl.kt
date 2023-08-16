@@ -338,12 +338,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     override fun initBiodataServices(serviceList: List<Service>, callback: Callback) {
-        this.mBiodataInitCallback = callback
-        var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["bio_data_type"] = serviceList.map { it.value }
-        var requestBody = RequestBody(SERVER_BIO_DATA, "init", requestBodyMap)
-        var requestJson = Gson().toJson(requestBody)
-        mWebSocketHelper?.sendMessage(requestJson)
+        initBiodataServices(serviceList, callback,null)
     }
 
     override fun initBiodataServices(

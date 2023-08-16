@@ -58,4 +58,5 @@ dependencies {
     implementation "org.java-websocket:Java-WebSocket:1.4.0"
     implementation project(":affectivecloudsdk")
     implementation 'com.tencent.bugly:crashreport:latest.release'
+    implementation project(path: ':affective_sdk_api')
 }

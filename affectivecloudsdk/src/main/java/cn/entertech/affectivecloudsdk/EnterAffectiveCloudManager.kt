@@ -11,6 +11,26 @@ import cn.entertech.affectivecloudsdk.interfaces.*
 import java.lang.IllegalStateException
 import java.util.concurrent.CopyOnWriteArrayList
 
+
+
+/**
+ * 步骤：
+ * 1.建立webSocket连接
+ * 2.启动、初始化生物数据基础分析服务&& 若配置感云计算服务，则启动情感云计算服务
+ * 3.启动服务成功后，各自订阅自己的数据
+ * 4.取消订阅----不必须
+ * 5.结束服务
+ * 6.关闭webSocket连接
+ *
+ *
+ *
+ * 对于业务来说 只需要
+ * 启动服务
+ * 订阅数据
+ * 发送数据
+ * 取消订阅
+ * 关闭服务
+ * */
 class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     IEnterAffectiveCloudManager {
     var mApi: BaseApi
@@ -165,15 +185,19 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
 
     var isInit = false
 
-    override fun isInited(): Boolean {
+    override fun hasInitBioDataService(): Boolean {
         return isInit
+    }
+
+    override fun getSessionId(): String? {
+        return mApi.getSessionId()
     }
 
     private val mEnterWebSocketCallback by lazy {
         EnterWebSocketCallback()
     }
 
-    override fun init(callback: Callback) {
+    override fun initAnalysisService(callback: Callback) {
         mEnterWebSocketCallback.callback = callback
         mEnterWebSocketCallback.onOpen = {
             mApi.createSession(object : Callback2<String> {
@@ -209,12 +233,12 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.appendPEPRData(peprData)
     }
 
-    override fun appendBCGData(bcgData: ByteArray, pacakgeCount: Int) {
-        mApi.appendBCGData(bcgData, pacakgeCount)
+    override fun appendBCGData(bcgData: ByteArray, packageCount: Int) {
+        mApi.appendBCGData(bcgData, packageCount)
     }
 
-    override fun appendGyroData(gyroData: ByteArray, pacakgeCount: Int) {
-        mApi.appendGyroData(gyroData, pacakgeCount)
+    override fun appendGyroData(gyroData: ByteArray, packageCount: Int) {
+        mApi.appendGyroData(gyroData, packageCount)
     }
 
     override fun appendEEGData(brainData: ByteArray) {
@@ -223,6 +247,10 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
 
     override fun appendDCEEGData(brainData: ByteArray) {
         mApi.appendDCEEGData(brainData)
+    }
+
+    override fun appendSCEEGData(brainData: ByteArray) {
+
     }
 
     override fun appendHeartRateData(heartRateData: Int) {
@@ -253,7 +281,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.getAffectivedataReport(config.availableAffectiveServices!!, callback)
     }
 
-    override fun restore(callback: Callback) {
+    override fun restoreAnalysisService(callback: Callback) {
         if (mApi.isWebSocketOpen()) {
             mApi.restore(object : Callback {
                 override fun onSuccess() {
@@ -298,7 +326,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         }
     }
 
-    override fun release(callback: Callback) {
+    override fun releaseAnalysisService(callback: Callback) {
         if (config.availableAffectiveServices != null) {
             mApi.finishAffectiveDataServices(
                 config.availableAffectiveServices!!,
@@ -355,16 +383,25 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.removeRawJsonResponseListener(listener)
     }
 
-    override fun isWebSocketOpen(): Boolean {
+    override fun affectiveAnalysisIsAvailable(): Boolean {
         return mApi.isWebSocketOpen()
     }
 
-    override fun closeWebSocket() {
+    override fun closeAnalysisService() {
         mApi.closeWebSocket()
     }
 
-    override fun closeConnection(code: Int, message: String) {
+    fun closeConnection(code: Int, message: String) {
         mApi.closeConnection(code, message)
+    }
+
+    /**
+     * 无效指令
+     * @see https://docs.affectivecloud.cn/%F0%9F%8E%99%E6%8E%A5%E5%8F%A3%E5%8D%8F%E8%AE%AE/%E7%94%9F%E7%89%A9%E6%95%B0%E6%8D%AE%E5%9F%BA%E7%A1%80%E5%88%86%E6%9E%90%E6%9C%8D%E5%8A%A1%E5%8D%8F%E8%AE%AE
+     * */
+    @Deprecated("")
+    fun submit(remark: List<RecData>, callback: Callback) {
+        mApi.submit(remark, callback)
     }
 
 }

@@ -278,7 +278,7 @@ class EnterAffectiveCloudManagerTestMultichannel {
             val countDownLatch = CountDownLatch(1)
             val isSuccess = booleanArrayOf(false)
 
-            enterAffectiveCloudManager!!.init(object : Callback {
+            enterAffectiveCloudManager!!.initAnalysisService(object : Callback {
                 override fun onSuccess() {
                     isSuccess[0] = true
                     countDownLatch.countDown()
@@ -303,7 +303,7 @@ class EnterAffectiveCloudManagerTestMultichannel {
             PowerMockito.mockStatic(Log::class.java)
             val results = BooleanArray(1)
             val countDownLatch = CountDownLatch(1)
-            enterAffectiveCloudManager!!.release(object : Callback {
+            enterAffectiveCloudManager!!.releaseAnalysisService(object : Callback {
                 override fun onSuccess() {
                     results[0] = true
                     countDownLatch.countDown()

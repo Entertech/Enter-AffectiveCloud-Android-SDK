@@ -70,7 +70,11 @@ interface IAffectiveDataAnalysisService {
     /**
      * 结束情感服务
      * */
-    fun closeAffectiveService(callback: Callback)
+    fun finishAffectiveService(callback: Callback)
 
+    fun hasAffectiveServiceBaseSupport():Boolean
 
+    fun closeAffectiveServiceBaseSupport()
+
+    fun getReport(callback: Callback)
 }

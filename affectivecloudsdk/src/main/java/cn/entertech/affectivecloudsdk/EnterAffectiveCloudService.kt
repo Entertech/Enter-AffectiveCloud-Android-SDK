@@ -106,11 +106,11 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         return mEnterAffectiveCloudManager.isInited()
     }
 
-    override fun hasAffectiveServiceBaseSupport(): Boolean {
+    override fun isAffectiveServiceConnect(): Boolean {
         return mEnterAffectiveCloudManager.isWebSocketOpen()
     }
 
-    override fun closeAffectiveServiceBaseSupport() {
+    override fun closeAffectiveServiceConnection() {
         mEnterAffectiveCloudManager.closeWebSocket()
     }
 

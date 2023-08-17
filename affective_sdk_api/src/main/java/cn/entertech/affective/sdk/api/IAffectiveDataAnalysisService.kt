@@ -9,11 +9,9 @@ interface IAffectiveDataAnalysisService {
         const val UPLOAD_GYRO_PACKAGE_COUNT = 5
 
     }
-    fun addServiceConnectStatueListener(connectionListener: () -> Unit,disconnectListener: (String) -> Unit)
-    fun removeServiceConnectStatueListener(connectionListener: () -> Unit,disconnectListener: (String) -> Unit)
 
 
-    fun hasStartBioDataService():Boolean
+    fun hasStartBioDataService(): Boolean
 
     /**
      * 启动情感服务
@@ -72,9 +70,19 @@ interface IAffectiveDataAnalysisService {
      * */
     fun finishAffectiveService(callback: Callback)
 
-    fun hasAffectiveServiceBaseSupport():Boolean
+    fun addServiceConnectStatueListener(
+        connectionListener: () -> Unit,
+        disconnectListener: (String) -> Unit
+    )
 
-    fun closeAffectiveServiceBaseSupport()
+    fun removeServiceConnectStatueListener(
+        connectionListener: () -> Unit,
+        disconnectListener: (String) -> Unit
+    )
+
+    fun isAffectiveServiceConnect(): Boolean
+
+    fun closeAffectiveServiceConnection()
 
     fun getReport(callback: Callback)
 }

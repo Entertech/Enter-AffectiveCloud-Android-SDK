@@ -10,7 +10,7 @@ import java.util.HashMap
 import cn.entertech.affective.sdk.bean.Error
 
 class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
-    private lateinit var mEnterAffectiveCloudManager: EnterAffectiveCloudManager
+    private  var mEnterAffectiveCloudManager: EnterAffectiveCloudManager?=null
 
     /**
      * 启动webSocket
@@ -23,11 +23,11 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         callback: Callback2<String>,builder: EnterAffectiveConfigProxy
     ) {
         mEnterAffectiveCloudManager = EnterAffectiveCloudManager(EnterAffectiveCloudConfig.proxyInstance(builder))
-        mEnterAffectiveCloudManager.init(callback)
+        mEnterAffectiveCloudManager?.init(callback)
     }
 
     override fun restoreAffectiveService(callback: Callback) {
-        mEnterAffectiveCloudManager.restore(callback)
+        mEnterAffectiveCloudManager?.restore(callback)
     }
 
     override fun subscribeData(
@@ -35,10 +35,10 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         listener: ((RealtimeAffectiveData?) -> Unit)?
     ) {
         bdListener?.apply {
-            mEnterAffectiveCloudManager.addBiodataRealtimeListener(this)
+            mEnterAffectiveCloudManager?.addBiodataRealtimeListener(this)
         }
         listener?.apply {
-            mEnterAffectiveCloudManager.addAffectiveDataRealtimeListener(this)
+            mEnterAffectiveCloudManager?.addAffectiveDataRealtimeListener(this)
         }
     }
 
@@ -47,79 +47,79 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         listener: ((RealtimeAffectiveData?) -> Unit)?
     ) {
         bdListener?.apply {
-            mEnterAffectiveCloudManager.removeBiodataRealtimeListener(this)
+            mEnterAffectiveCloudManager?.removeBiodataRealtimeListener(this)
         }
         listener?.apply {
-            mEnterAffectiveCloudManager.removeAffectiveRealtimeListener(this)
+            mEnterAffectiveCloudManager?.removeAffectiveRealtimeListener(this)
         }
     }
 
     override fun appendEEGData(brainData: ByteArray) {
-        mEnterAffectiveCloudManager.appendEEGData(brainData)
+        mEnterAffectiveCloudManager?.appendEEGData(brainData)
     }
 
     override fun appendDCEEGData(brainData: ByteArray) {
-        mEnterAffectiveCloudManager.appendDCEEGData(brainData)
+        mEnterAffectiveCloudManager?.appendDCEEGData(brainData)
     }
 
     override fun appendSCEEGData(brainData: ByteArray) {
-        mEnterAffectiveCloudManager.appendSCEEGData(brainData)
+        mEnterAffectiveCloudManager?.appendSCEEGData(brainData)
     }
 
     override fun appendHeartRateData(heartRateData: Int) {
-        mEnterAffectiveCloudManager.appendHeartRateData(heartRateData)
+        mEnterAffectiveCloudManager?.appendHeartRateData(heartRateData)
     }
 
     override fun appendMCEEGData(mceegData: ByteArray) {
-        mEnterAffectiveCloudManager.appendMCEEGData(mceegData)
+        mEnterAffectiveCloudManager?.appendMCEEGData(mceegData)
     }
 
     override fun appendPEPRData(peprData: ByteArray) {
-        mEnterAffectiveCloudManager.appendPEPRData(peprData)
+        mEnterAffectiveCloudManager?.appendPEPRData(peprData)
     }
 
     override fun appendBCGData(bcgData: ByteArray, packageCount: Int) {
-        mEnterAffectiveCloudManager.appendBCGData(bcgData, packageCount)
+        mEnterAffectiveCloudManager?.appendBCGData(bcgData, packageCount)
     }
 
     override fun appendGyroData(gyroData: ByteArray, packageCount: Int) {
-        mEnterAffectiveCloudManager.appendGyroData(gyroData, packageCount)
+        mEnterAffectiveCloudManager?.appendGyroData(gyroData, packageCount)
     }
 
     override fun finishAffectiveService(callback: Callback) {
-        mEnterAffectiveCloudManager.release(callback)
+        mEnterAffectiveCloudManager?.release(callback)
     }
 
     override fun addServiceConnectStatueListener(
         connectionListener: () -> Unit,
         disconnectListener: (String) -> Unit
     ) {
-        mEnterAffectiveCloudManager.addWebSocketConnectListener(connectionListener)
-        mEnterAffectiveCloudManager.addWebSocketDisconnectListener(disconnectListener)
+        mEnterAffectiveCloudManager?.addWebSocketConnectListener(connectionListener)
+        mEnterAffectiveCloudManager?.addWebSocketDisconnectListener(disconnectListener)
     }
 
     override fun removeServiceConnectStatueListener(
         connectionListener: () -> Unit,
         disconnectListener: (String) -> Unit
     ) {
-        mEnterAffectiveCloudManager.removeWebSocketConnectListener(connectionListener)
-        mEnterAffectiveCloudManager.removeWebSocketDisconnectListener(disconnectListener)
+        mEnterAffectiveCloudManager?.removeWebSocketConnectListener(connectionListener)
+        mEnterAffectiveCloudManager?.removeWebSocketDisconnectListener(disconnectListener)
     }
 
     override fun hasStartBioDataService(): Boolean {
-        return mEnterAffectiveCloudManager.isInited()
+        return mEnterAffectiveCloudManager?.isInited()?:false
     }
 
     override fun isAffectiveServiceConnect(): Boolean {
-        return mEnterAffectiveCloudManager.isWebSocketOpen()
+        return mEnterAffectiveCloudManager?.isWebSocketOpen()?:false
     }
 
     override fun closeAffectiveServiceConnection() {
-        mEnterAffectiveCloudManager.closeWebSocket()
+        mEnterAffectiveCloudManager?.closeWebSocket()
     }
 
     override fun getReport(callback: Callback) {
-        mEnterAffectiveCloudManager.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
+        mEnterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onError(error: Error?) {
                 callback.onError(error)
             }
@@ -128,7 +128,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
                 if (t == null) {
                     return
                 }
-                mEnterAffectiveCloudManager.getAffectiveDataReport(object :
+                mEnterAffectiveCloudManager?.getAffectiveDataReport(object :
                     Callback2<HashMap<Any, Any?>> {
                     override fun onError(error: Error?) {
                         callback.onError(error)

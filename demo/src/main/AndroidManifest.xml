@@ -19,7 +19,8 @@
             android:theme="@style/AppTheme"
             android:networkSecurityConfig="@xml/https_config"
             android:name=".app.Application">
-        <activity android:name=".activity.AuthActivity">
+        <activity android:name=".activity.AuthActivity"
+            android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,11 +28,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.ApiDetailActivity"></activity>
+        <activity android:name=".activity.ApiDetailActivity"
+            android:exported="false"></activity>
         <activity
-                android:name=".activity.MainActivity"
-                android:label="@string/title_activity_main"
-                android:theme="@style/AppTheme.NoActionBar">
+            android:name=".activity.MainActivity"
+            android:label="@string/title_activity_main"
+            android:exported="false"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 

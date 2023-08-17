@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
+import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.bean.Service
 import cn.entertech.affectivecloudsdk.*
 import cn.entertech.affectivecloudsdk.entity.*
@@ -176,7 +177,7 @@ class MainActivity : AppCompatActivity() {
         enterAffectiveCloudManager?.addWebSocketDisconnectListener {
             Log.d("######", "websocket disconnect:$it")
         }
-        enterAffectiveCloudManager?.init(object : cn.entertech.affective.sdk.api.Callback {
+        enterAffectiveCloudManager?.init(object : Callback2<String> {
             override fun onError(error: cn.entertech.affective.sdk.bean.Error?) {
                 messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_failed) + error.toString())
                 if (error != null && error.code == 1004) {
@@ -191,7 +192,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onSuccess() {
+            override fun onSuccess(t:String?) {
                 fileName = "${getCurrentTime()}"
                 initSaveFiledir()
                 rawEEGFileHelper.setFilePath(saveRawDataPath + "eeg.txt")

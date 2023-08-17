@@ -13,10 +13,10 @@ PublishInfo {
 
 android {
     namespace = "cn.entertech.affective.sdk.api"
-    compileSdk = 33
+    compileSdk = 32
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 23
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -42,9 +42,7 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("androidx.core:core-ktx:1.6.0")
     testImplementation("junit:junit:4.13.2")
     implementation("com.google.code.gson:gson:2.8.5")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

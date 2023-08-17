@@ -3,14 +3,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin:'custom.android.plugin'
 android {
-    compileSdkVersion 28
+    compileSdkVersion 32
 
 
 
     defaultConfig {
         multiDexEnabled true
-        minSdkVersion 21
-        targetSdkVersion 28
+        minSdkVersion 23
+        targetSdkVersion 32
         versionCode 1
         versionName "1.0"
 

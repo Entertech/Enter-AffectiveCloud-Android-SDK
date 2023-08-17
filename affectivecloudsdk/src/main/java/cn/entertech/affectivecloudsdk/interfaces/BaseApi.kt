@@ -4,6 +4,7 @@ import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
+import cn.entertech.affective.sdk.bean.Service
 import cn.entertech.affectivecloudsdk.entity.*
 
 /**

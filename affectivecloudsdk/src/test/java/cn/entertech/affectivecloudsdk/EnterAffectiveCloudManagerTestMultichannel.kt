@@ -2,7 +2,7 @@ package cn.entertech.affectivecloudsdk
 
 import android.util.Log
 import cn.entertech.affective.sdk.bean.Error
-import cn.entertech.affectivecloudsdk.entity.Service
+import cn.entertech.affective.sdk.bean.Service
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
 import org.junit.*
@@ -278,8 +278,8 @@ class EnterAffectiveCloudManagerTestMultichannel {
             val countDownLatch = CountDownLatch(1)
             val isSuccess = booleanArrayOf(false)
 
-            enterAffectiveCloudManager!!.init(object : Callback {
-                override fun onSuccess() {
+            enterAffectiveCloudManager!!.init(object : Callback2<String> {
+                override fun onSuccess(session:String?) {
                     isSuccess[0] = true
                     countDownLatch.countDown()
                 }

@@ -10,8 +10,6 @@ import cn.entertech.affectivecloudsdk.BiodataSubscribeParams
 import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiFactory
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.BaseApi
-import cn.entertech.affective.sdk.api.Callback
-import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import cn.entertech.biomoduledemo.R
 import cn.entertech.ble.single.BiomoduleBleManager
@@ -21,6 +19,7 @@ import java.io.File
 import java.lang.Exception
 import java.util.*
 import cn.entertech.affective.sdk.bean.Error
+import cn.entertech.affective.sdk.bean.Service
 
 class ApiDetailActivity : AppCompatActivity() {
 

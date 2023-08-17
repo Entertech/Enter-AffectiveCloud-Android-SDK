@@ -1,5 +1,6 @@
 package cn.entertech.affective.sdk.api
 
+import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 
@@ -16,7 +17,10 @@ interface IAffectiveDataAnalysisService {
     /**
      * 启动情感服务
      * */
-    fun startAffectiveService(callback: Callback2<String>)
+    fun startAffectiveService(
+        callback: Callback2<String>,
+        builder: EnterAffectiveConfigProxy
+    )
 
     /**
      * 重启情感服务

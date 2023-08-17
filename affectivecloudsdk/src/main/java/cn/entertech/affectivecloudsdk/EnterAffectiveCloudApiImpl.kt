@@ -8,6 +8,7 @@ import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService.Companion.UP
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
+import cn.entertech.affective.sdk.bean.Service
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import cn.entertech.affectivecloudsdk.utils.ConvertUtil

@@ -1,5 +1,6 @@
 package cn.entertech.affectivecloudsdk
 
+import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService
@@ -18,7 +19,10 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
      * 启动AffectiveService ，启动成功后订阅数据
      *
      * */
-    override fun startAffectiveService(callback: Callback2<String>) {
+    override fun startAffectiveService(
+        callback: Callback2<String>,builder: EnterAffectiveConfigProxy
+    ) {
+        mEnterAffectiveCloudManager = EnterAffectiveCloudManager(EnterAffectiveCloudConfig.proxyInstance(builder))
         mEnterAffectiveCloudManager.init(callback)
     }
 
@@ -129,6 +133,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
                     override fun onError(error: Error?) {
                         callback.onError(error)
                     }
+
                     override fun onSuccess(t: HashMap<Any, Any?>?) {
                         if (t == null) {
                             return

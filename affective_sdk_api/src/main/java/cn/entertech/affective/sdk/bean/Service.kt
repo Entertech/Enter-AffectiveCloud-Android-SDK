@@ -1,4 +1,4 @@
-package cn.entertech.affectivecloudsdk.entity
+package cn.entertech.affective.sdk.bean
 
 import com.google.gson.annotations.SerializedName
 

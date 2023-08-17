@@ -8,6 +8,7 @@ import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
+import cn.entertech.affective.sdk.bean.Service
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import org.junit.AfterClass
 import org.junit.BeforeClass

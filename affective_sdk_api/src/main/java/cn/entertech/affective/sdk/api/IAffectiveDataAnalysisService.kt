@@ -1,5 +1,6 @@
 package cn.entertech.affective.sdk.api
 
+import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
@@ -89,4 +90,6 @@ interface IAffectiveDataAnalysisService {
     fun closeAffectiveServiceConnection()
 
     fun getReport(callback: Callback)
+
+    fun getAffectiveWay():AffectiveServiceWay
 }

@@ -9,6 +9,7 @@ import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affective.sdk.bean.Service
+import cn.entertech.affective.sdk.utils.LogUtil
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import cn.entertech.affectivecloudsdk.utils.ConvertUtil
@@ -188,6 +189,8 @@ class EnterAffectiveCloudApiImpl internal constructor(
                     var report = mBiodataReprotGenerator?.appendResponse(response)
                     if (report != null) {
                         mBiodataReportCallback?.onSuccess(report)
+                    }else{
+                        mBiodataReportCallback?.onError(Error(response.code, "report is null"))
                     }
                 } else {
                     mBiodataReportCallback?.onError(Error(response.code, response.msg))
@@ -199,6 +202,8 @@ class EnterAffectiveCloudApiImpl internal constructor(
                     var report = mAffectiveReportGenerator?.appendResponse(response)
                     if (report != null) {
                         mAffectiveReportCallback?.onSuccess(report)
+                    }else{
+                        mAffectiveReportCallback?.onError(Error(response.code, "report is null"))
                     }
                 } else {
                     mAffectiveReportCallback?.onError(Error(response.code, response.msg))
@@ -252,6 +257,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
 
     override fun isWebSocketOpen(): Boolean {
         if (mWebSocketHelper == null) {
+            LogUtil.e(TAG,"mWebSocketHelper is null")
             return false
         }
         return mWebSocketHelper!!.isOpen()

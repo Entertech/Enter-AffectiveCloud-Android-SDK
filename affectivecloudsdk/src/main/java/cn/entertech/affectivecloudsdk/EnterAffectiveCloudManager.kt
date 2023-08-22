@@ -6,6 +6,7 @@ import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affective.sdk.bean.Service
+import cn.entertech.affective.sdk.utils.LogUtil
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import java.lang.IllegalStateException
@@ -33,9 +34,14 @@ import java.util.concurrent.CopyOnWriteArrayList
  * */
 class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     IEnterAffectiveCloudManager {
+    companion object{
+        private const val TAG="EnterAffectiveCloudManager"
+    }
     private var mApi: BaseApi
-    private var mBiodataRealtimeListener = CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit>()
-    private var mAffectiveRealtimeListener = CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit>()
+    private var mBiodataRealtimeListener =
+        CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit>()
+    private var mAffectiveRealtimeListener =
+        CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit>()
     private var disconnectListeners = CopyOnWriteArrayList<(String) -> Unit>()
     private var isInit = false
 

@@ -4,12 +4,19 @@ import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService
+import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import java.util.HashMap
 import cn.entertech.affective.sdk.bean.Error
+import cn.entertech.affective.sdk.utils.LogUtil
 
 class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
+
+    companion object{
+        private const val TAG="EnterAffectiveCloudService"
+    }
+
     private  var mEnterAffectiveCloudManager: EnterAffectiveCloudManager?=null
 
     /**
@@ -22,11 +29,13 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
     override fun startAffectiveService(
         callback: Callback2<String>,builder: EnterAffectiveConfigProxy
     ) {
+        LogUtil.d(TAG,"startAffectiveService")
         mEnterAffectiveCloudManager = EnterAffectiveCloudManager(EnterAffectiveCloudConfig.proxyInstance(builder))
         mEnterAffectiveCloudManager?.init(callback)
     }
 
     override fun restoreAffectiveService(callback: Callback) {
+        LogUtil.d(TAG,"restoreAffectiveService")
         mEnterAffectiveCloudManager?.restore(callback)
     }
 
@@ -34,6 +43,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         bdListener: ((RealtimeBioData?) -> Unit)?,
         listener: ((RealtimeAffectiveData?) -> Unit)?
     ) {
+        LogUtil.d(TAG,"subscribeData")
         bdListener?.apply {
             mEnterAffectiveCloudManager?.addBiodataRealtimeListener(this)
         }
@@ -46,6 +56,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         bdListener: ((RealtimeBioData?) -> Unit)?,
         listener: ((RealtimeAffectiveData?) -> Unit)?
     ) {
+        LogUtil.d(TAG,"unSubscribeData")
         bdListener?.apply {
             mEnterAffectiveCloudManager?.removeBiodataRealtimeListener(this)
         }
@@ -87,6 +98,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
     }
 
     override fun finishAffectiveService(callback: Callback) {
+        LogUtil.d(TAG,"finishAffectiveService")
         mEnterAffectiveCloudManager?.release(callback)
     }
 
@@ -107,10 +119,12 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
     }
 
     override fun hasStartBioDataService(): Boolean {
+        LogUtil.d(TAG,"hasStartBioDataService")
         return mEnterAffectiveCloudManager?.isInited()?:false
     }
 
     override fun isAffectiveServiceConnect(): Boolean {
+        LogUtil.d(TAG,"isAffectiveServiceConnect $mEnterAffectiveCloudManager")
         return mEnterAffectiveCloudManager?.isWebSocketOpen()?:false
     }
 
@@ -118,6 +132,10 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         mEnterAffectiveCloudManager?.closeWebSocket()
     }
 
+    /**
+     * 上传report指令，失败不做处理，成功开始释放资源
+     * 释放资源之后不管成功还是失败，关闭websocket，然后http请求报表数据
+     * */
     override fun getReport(callback: Callback) {
         mEnterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onError(error: Error?) {
@@ -125,9 +143,6 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
             }
 
             override fun onSuccess(t: HashMap<Any, Any?>?) {
-                if (t == null) {
-                    return
-                }
                 mEnterAffectiveCloudManager?.getAffectiveDataReport(object :
                     Callback2<HashMap<Any, Any?>> {
                     override fun onError(error: Error?) {
@@ -135,10 +150,18 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
                     }
 
                     override fun onSuccess(t: HashMap<Any, Any?>?) {
-                        if (t == null) {
-                            return
-                        }
-                        finishAffectiveService(callback)
+                        finishAffectiveService(object :Callback{
+                            override fun onSuccess() {
+                                closeAffectiveServiceConnection()
+                                callback.onSuccess()
+                            }
+
+                            override fun onError(error: Error?) {
+                                closeAffectiveServiceConnection()
+                                //释放失败也是同样操作，所以也是success
+                                callback.onSuccess()
+                            }
+                        })
                     }
 
                 })
@@ -146,4 +169,6 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
 
         })
     }
+
+    override fun getAffectiveWay()= AffectiveServiceWay.AffectiveCloudService
 }

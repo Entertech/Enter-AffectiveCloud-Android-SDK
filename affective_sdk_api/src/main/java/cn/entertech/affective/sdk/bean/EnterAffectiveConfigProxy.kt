@@ -1,5 +1,7 @@
 package cn.entertech.affective.sdk.bean
 
+import android.content.Context
+
 
 data class EnterAffectiveConfigProxy(
     val availableAffectiveServices: List<Service>,
@@ -9,5 +11,7 @@ data class EnterAffectiveConfigProxy(
     val appSecret: String = "",
     val appKey: String = "",
     val age: Int = 0,
+    val context: Context?=null
+
 )
 

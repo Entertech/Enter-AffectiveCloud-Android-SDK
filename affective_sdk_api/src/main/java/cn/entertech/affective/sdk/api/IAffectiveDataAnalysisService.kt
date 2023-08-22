@@ -4,12 +4,24 @@ import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
+import java.util.ServiceLoader
 
 interface IAffectiveDataAnalysisService {
+
     companion object {
         const val UPLOAD_BCG_PACKAGE_COUNT = 10
         const val UPLOAD_GYRO_PACKAGE_COUNT = 5
 
+
+        fun getService(way: AffectiveServiceWay): IAffectiveDataAnalysisService? {
+            ServiceLoader.load(IAffectiveDataAnalysisService::class.java)
+                .forEach {
+                    if (it.getAffectiveWay() == way) {
+                        return it
+                    }
+                }
+            return null
+        }
     }
 
 
@@ -91,5 +103,5 @@ interface IAffectiveDataAnalysisService {
 
     fun getReport(callback: Callback)
 
-    fun getAffectiveWay():AffectiveServiceWay
+    fun getAffectiveWay(): AffectiveServiceWay
 }

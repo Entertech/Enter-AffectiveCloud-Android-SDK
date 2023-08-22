@@ -10,7 +10,9 @@ import cn.entertech.affective.sdk.bean.RealtimeBioData
 import java.util.HashMap
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.utils.LogUtil
+import com.google.auto.service.AutoService
 
+@AutoService(IAffectiveDataAnalysisService::class)
 class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
 
     companion object{

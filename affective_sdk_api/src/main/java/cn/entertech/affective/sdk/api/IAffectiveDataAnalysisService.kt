@@ -27,6 +27,10 @@ interface IAffectiveDataAnalysisService {
 
     fun hasStartBioDataService(): Boolean
 
+    fun checkInitStatue(){
+
+    }
+
     /**
      * 启动情感服务
      * */

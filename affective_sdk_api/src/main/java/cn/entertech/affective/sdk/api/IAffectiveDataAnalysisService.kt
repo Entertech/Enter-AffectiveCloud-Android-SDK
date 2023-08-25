@@ -4,6 +4,7 @@ import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
+import cn.entertech.affective.sdk.bean.UploadReportEntity
 import java.util.ServiceLoader
 
 interface IAffectiveDataAnalysisService {
@@ -105,7 +106,7 @@ interface IAffectiveDataAnalysisService {
 
     fun closeAffectiveServiceConnection()
 
-    fun getReport(callback: Callback)
+    fun getReport(callback: Callback2<UploadReportEntity>)
 
     fun getAffectiveWay(): AffectiveServiceWay
 }

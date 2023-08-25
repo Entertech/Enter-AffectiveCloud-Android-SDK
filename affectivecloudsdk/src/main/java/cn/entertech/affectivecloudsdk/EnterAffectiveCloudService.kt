@@ -9,6 +9,7 @@ import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import java.util.HashMap
 import cn.entertech.affective.sdk.bean.Error
+import cn.entertech.affective.sdk.bean.UploadReportEntity
 import cn.entertech.affective.sdk.utils.LogUtil
 import com.google.auto.service.AutoService
 
@@ -138,7 +139,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
      * 上传report指令，失败不做处理，成功开始释放资源
      * 释放资源之后不管成功还是失败，关闭websocket，然后http请求报表数据
      * */
-    override fun getReport(callback: Callback) {
+    override fun getReport(callback: Callback2<UploadReportEntity>) {
         mEnterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onError(error: Error?) {
                 callback.onError(error)
@@ -155,13 +156,13 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
                         finishAffectiveService(object :Callback{
                             override fun onSuccess() {
                                 closeAffectiveServiceConnection()
-                                callback.onSuccess()
+                                callback.onSuccess(null)
                             }
 
                             override fun onError(error: Error?) {
                                 closeAffectiveServiceConnection()
                                 //释放失败也是同样操作，所以也是success
-                                callback.onSuccess()
+                                callback.onSuccess(null)
                             }
                         })
                     }

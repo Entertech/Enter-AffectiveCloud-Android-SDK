@@ -4,13 +4,17 @@ import com.google.gson.annotations.SerializedName
 
 data class UploadReportEntity(
     val code: Int,
+    @SerializedName("data")
     val `data`: Data? = null,
     val msg: String,
 
     //写死
+    @SerializedName("report_version")
     val reportVersion: String="3",
-    val sessionId: String,
+    @SerializedName("session_id")
+    var sessionId: String,
     var start: String,
+    @SerializedName("time_points")
     var timePoints: TimePoints?=null,
     val user_id: Int,
     /**
@@ -46,6 +50,7 @@ data class Affective(
 
 data class Biodata(
     val eeg: Eeg,
+    @SerializedName("hr-v2")
     val hr: HrV2,
     val pepr: PEPR?
 )
@@ -148,7 +153,7 @@ data class Eeg(
     @SerializedName("eeg_theta_curve")
     val eegThetaCurve: List<Double>,
     @SerializedName("eeg_quality_rec")
-    val eegQualityRec: List<Double>
+    val eegQualityRec: List<Int>
 )
 
 data class HrV2(

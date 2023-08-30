@@ -20,7 +20,10 @@ data class UploadReportEntity(
     /**
      * 算法版本
      * */
-    val version: Version
+    val version: Version,
+
+    var deviceString: String? = null,
+    var MAC: String? = null
 )
 
 data class Data(

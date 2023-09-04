@@ -106,7 +106,8 @@ interface IAffectiveDataAnalysisService {
 
     fun closeAffectiveServiceConnection()
 
-    fun getReport(callback: Callback2<UploadReportEntity>)
+    fun getReport(callback: Callback2<UploadReportEntity>,needFinishService:Boolean)
+
 
     fun getAffectiveWay(): AffectiveServiceWay
 }

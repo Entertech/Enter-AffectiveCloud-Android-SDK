@@ -139,7 +139,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
      * 上传report指令，失败不做处理，成功开始释放资源
      * 释放资源之后不管成功还是失败，关闭websocket，然后http请求报表数据
      * */
-    override fun getReport(callback: Callback2<UploadReportEntity>) {
+    override fun getReport(callback: Callback2<UploadReportEntity>,needFinishService:Boolean) {
         mEnterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onError(error: Error?) {
                 callback.onError(error)
@@ -153,6 +153,10 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
                     }
 
                     override fun onSuccess(t: HashMap<Any, Any?>?) {
+                        if (!needFinishService) {
+                            callback.onSuccess(null)
+                            return
+                        }
                         finishAffectiveService(object :Callback{
                             override fun onSuccess() {
                                 closeAffectiveServiceConnection()

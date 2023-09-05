@@ -12,6 +12,8 @@ import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.UploadReportEntity
 import cn.entertech.affective.sdk.utils.LogUtil
 import com.google.auto.service.AutoService
+import java.io.File
+import java.io.InputStream
 
 @AutoService(IAffectiveDataAnalysisService::class)
 class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
@@ -66,6 +68,18 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         listener?.apply {
             mEnterAffectiveCloudManager?.removeAffectiveRealtimeListener(this)
         }
+    }
+
+    override fun <T> readFileAnalysisData(filePath: String, callback: Callback2<T>,case:(Int)->T?) {
+        callback.onError(Error(-1,"not support this method"))
+    }
+
+    override fun <T> readFileAnalysisData(inputStream: InputStream, callback: Callback2<T>,case:(Int)->T?) {
+        callback.onError(Error(-1,"not support this method"))
+    }
+
+    override fun <T> readFileAnalysisData(file: File, callback: Callback2<T>,case:(Int)->T?) {
+        callback.onError(Error(-1,"not support this method"))
     }
 
     override fun appendEEGData(brainData: ByteArray) {

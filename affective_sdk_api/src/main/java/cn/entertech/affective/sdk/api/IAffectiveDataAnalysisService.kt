@@ -5,6 +5,8 @@ import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affective.sdk.bean.UploadReportEntity
+import java.io.File
+import java.io.InputStream
 import java.util.ServiceLoader
 
 interface IAffectiveDataAnalysisService {
@@ -60,6 +62,15 @@ interface IAffectiveDataAnalysisService {
         bdListener: ((RealtimeBioData?) -> Unit)? = null,
         listener: ((RealtimeAffectiveData?) -> Unit)? = null
     )
+
+    fun <T> readFileAnalysisData(filePath: String, callback: Callback2<T>,case:(Int)->T?)
+
+    fun <T> readFileAnalysisData(inputStream: InputStream, callback: Callback2<T>,case:(Int)->T?)
+
+    /**
+     * @param file 待分析的文件
+     * */
+    fun <T> readFileAnalysisData(file: File, callback: Callback2<T>,case:(Int)->T?)
 
     /**
      * 发送数据

@@ -7,7 +7,7 @@ plugins {
 PublishInfo {
     groupId = "cn.entertech.affective_sdk_api" // 库的组织，使用域名表示
     artifactId = "affective_sdk_api" // 库名称
-    version = "1.0.0-LOCAL" // 库版本
+    version = "1.0.1-LOCAL" // 库版本
 }
 
 

@@ -59,7 +59,7 @@ data class Biodata(
 )
 
 data class PEPR(
-    val hrAvg: Double,
+    val hrAvg: Int,
     val hrMax: Int,
     val hrMin: Int,
     val hrRec: List<Int>,
@@ -72,9 +72,9 @@ data class PEPR(
     @SerializedName("rr_rec")
     val rrRec: List<Double>,
     @SerializedName("bcg_quality_rec")
-    val bcgQualityRec: List<Double>,
+    val bcgQualityRec: List<Int>,
     @SerializedName("rw_quality_rec")
-    val rwQualityRec: List<Double>
+    val rwQualityRec: List<Int>
 )
 
 

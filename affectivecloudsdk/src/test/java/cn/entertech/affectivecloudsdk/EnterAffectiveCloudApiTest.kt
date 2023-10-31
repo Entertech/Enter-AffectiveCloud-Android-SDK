@@ -8,7 +8,7 @@ import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
-import cn.entertech.affective.sdk.bean.Service
+import cn.entertech.affective.sdk.bean.BioOrAffectiveDataCategory
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -46,8 +46,8 @@ class EnterAffectiveCloudApiTest {
         var HR_TEST_FILE_PATH =
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_hrdata.txt"
         var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v2/"
-        internal var availableAffectiveServices: MutableList<Service> = ArrayList()
-        internal var availableBioServices: MutableList<Service> = ArrayList()
+        internal var availableAffectiveBioOrAffectiveDataCategories: MutableList<BioOrAffectiveDataCategory> = ArrayList()
+        internal var availableBioBioOrAffectiveDataCategories: MutableList<BioOrAffectiveDataCategory> = ArrayList()
         private var biodataSubscribeParams: BiodataSubscribeParams? = null
         private var affectiveSubscribeParams: AffectiveSubscribeParams? = null
         private var rawJsonResponseFunction: Function1<String, Unit>? = null
@@ -60,13 +60,13 @@ class EnterAffectiveCloudApiTest {
         @JvmStatic
         fun init() {
             PowerMockito.mockStatic(Log::class.java)
-            availableAffectiveServices.add(Service.ATTENTION)
-            availableAffectiveServices.add(Service.PRESSURE)
-            availableAffectiveServices.add(Service.AROUSAL)
-            availableAffectiveServices.add(Service.RELAXATION)
-            availableAffectiveServices.add(Service.PLEASURE)
-            availableBioServices.add(Service.EEG)
-            availableBioServices.add(Service.HR)
+            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.ATTENTION)
+            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.PRESSURE)
+            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.AROUSAL)
+            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.RELAXATION)
+            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.PLEASURE)
+            availableBioBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.EEG)
+            availableBioBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.HR)
             biodataSubscribeParams = BiodataSubscribeParams.Builder()
                 .requestHR()
                 .requestEEG()
@@ -194,7 +194,7 @@ class EnterAffectiveCloudApiTest {
         PowerMockito.mockStatic(Log::class.java)
         val results = BooleanArray(1)
         val countDownLatch = CountDownLatch(1)
-        mEnterAffectiveCloudApi?.initBiodataServices(availableBioServices, object : Callback {
+        mEnterAffectiveCloudApi?.initBiodataServices(availableBioBioOrAffectiveDataCategories, object : Callback {
             override fun onSuccess() {
                 results[0] = true
                 countDownLatch.countDown()
@@ -220,7 +220,7 @@ class EnterAffectiveCloudApiTest {
         PowerMockito.mockStatic(Log::class.java)
         val results = BooleanArray(1)
         val countDownLatch = CountDownLatch(1)
-        mEnterAffectiveCloudApi?.initAffectiveDataServices(availableAffectiveServices,
+        mEnterAffectiveCloudApi?.initAffectiveDataServices(availableAffectiveBioOrAffectiveDataCategories,
             object : Callback {
                 override fun onSuccess() {
                     results[0] = true
@@ -334,7 +334,7 @@ class EnterAffectiveCloudApiTest {
         val results = BooleanArray(2)
         val countDownLatch = CountDownLatch(2)
 
-        mEnterAffectiveCloudApi!!.getBiodataReport(availableBioServices, object :
+        mEnterAffectiveCloudApi!!.getBiodataReport(availableBioBioOrAffectiveDataCategories, object :
             Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(objectObjectHashMap: HashMap<Any, Any?>?) {
                 val hrMap: Map<Any, Any>
@@ -353,7 +353,7 @@ class EnterAffectiveCloudApiTest {
                 countDownLatch.countDown()
             }
         })
-        mEnterAffectiveCloudApi?.getAffectivedataReport(availableAffectiveServices,
+        mEnterAffectiveCloudApi?.getAffectivedataReport(availableAffectiveBioOrAffectiveDataCategories,
             object : Callback2<HashMap<Any, Any?>> {
                 override fun onSuccess(objectObjectHashMap: HashMap<Any, Any?>?) {
                     val attentionMap: Map<Any, Any>

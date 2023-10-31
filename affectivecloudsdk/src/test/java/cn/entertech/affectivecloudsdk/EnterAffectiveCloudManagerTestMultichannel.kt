@@ -2,7 +2,7 @@ package cn.entertech.affectivecloudsdk
 
 import android.util.Log
 import cn.entertech.affective.sdk.bean.Error
-import cn.entertech.affective.sdk.bean.Service
+import cn.entertech.affective.sdk.bean.BioOrAffectiveDataCategory
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
 import org.junit.*
@@ -227,8 +227,8 @@ class EnterAffectiveCloudManagerTestMultichannel {
         var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 
         //        var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
-        internal var availableAffectiveServices: MutableList<Service> = ArrayList()
-        internal var availableBioServices: MutableList<Service> = ArrayList()
+        internal var availableAffectiveBioOrAffectiveDataCategories: MutableList<BioOrAffectiveDataCategory> = ArrayList()
+        internal var availableBioBioOrAffectiveDataCategories: MutableList<BioOrAffectiveDataCategory> = ArrayList()
         private var biodataSubscribeParams: BiodataSubscribeParams? = null
         private var enterAffectiveCloudConfig: EnterAffectiveCloudConfig? = null
         private var enterAffectiveCloudManager: EnterAffectiveCloudManager? = null
@@ -240,10 +240,10 @@ class EnterAffectiveCloudManagerTestMultichannel {
         @JvmStatic
         fun init() {
             PowerMockito.mockStatic(Log::class.java)
-            availableBioServices.add(Service.PEPR)
+            availableBioBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.PEPR)
 
-            availableAffectiveServices.add(Service.PRESSURE)
-            availableAffectiveServices.add(Service.COHERENCE)
+            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.PRESSURE)
+            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.COHERENCE)
             biodataSubscribeParams = BiodataSubscribeParams.Builder()
                 .requestPEPR()
                 .build()
@@ -260,8 +260,8 @@ class EnterAffectiveCloudManagerTestMultichannel {
             enterAffectiveCloudConfig =
                 EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
                     .url(websocketAddress)
-                    .availableBiodataServices(availableBioServices)
-                    .availableAffectiveServices(availableAffectiveServices)
+                    .availableBiodataServices(availableBioBioOrAffectiveDataCategories)
+                    .availableAffectiveServices(availableAffectiveBioOrAffectiveDataCategories)
                     .affectiveSubscribeParams(affectiveSubscribeParams!!)
                     .biodataSubscribeParams(biodataSubscribeParams!!)
                     .algorithmParams(algorithmParams)

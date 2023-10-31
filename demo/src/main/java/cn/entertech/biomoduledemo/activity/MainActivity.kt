@@ -15,7 +15,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import cn.entertech.affective.sdk.api.Callback2
-import cn.entertech.affective.sdk.bean.Service
+import cn.entertech.affective.sdk.bean.BioOrAffectiveDataCategory
 import cn.entertech.affectivecloudsdk.*
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
@@ -72,18 +72,18 @@ class MainActivity : AppCompatActivity() {
     var realtimeThetaFileHelper = FileHelper()
     var realtimeDeltaFileHelper = FileHelper()
     var reportFileHelper = FileHelper()
-    var availableAffectiveServices =
+    var availableAffectiveBioOrAffectiveDataCategories =
         listOf(
-            Service.ATTENTION,
-            Service.PRESSURE,
-            Service.AROUSAL,
-            Service.RELAXATION,
-            Service.PLEASURE,
-            Service.SLEEP,
-            Service.COHERENCE,
-            Service.FLOW
+            BioOrAffectiveDataCategory.ATTENTION,
+            BioOrAffectiveDataCategory.PRESSURE,
+            BioOrAffectiveDataCategory.AROUSAL,
+            BioOrAffectiveDataCategory.RELAXATION,
+            BioOrAffectiveDataCategory.PLEASURE,
+            BioOrAffectiveDataCategory.SLEEP,
+            BioOrAffectiveDataCategory.COHERENCE,
+            BioOrAffectiveDataCategory.FLOW
         )
-    var availableBioServices = listOf(Service.EEG, Service.HR)
+    var availableBioBioOrAffectiveDataCategories = listOf(BioOrAffectiveDataCategory.EEG, BioOrAffectiveDataCategory.HR)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -143,8 +143,8 @@ class MainActivity : AppCompatActivity() {
         var enterAffectiveCloudConfig =
             EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
                 .url(websocketAddress)
-                .availableBiodataServices(availableBioServices)
-                .availableAffectiveServices(availableAffectiveServices)
+                .availableBiodataServices(availableBioBioOrAffectiveDataCategories)
+                .availableAffectiveServices(availableAffectiveBioOrAffectiveDataCategories)
                 .biodataSubscribeParams(biodataSubscribeParams!!)
                 .affectiveSubscribeParams(affectiveSubscribeParams!!)
                 .storageSettings(storageSettings)

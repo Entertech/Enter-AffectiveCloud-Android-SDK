@@ -5,8 +5,7 @@ import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
-import cn.entertech.affective.sdk.bean.Service
-import cn.entertech.affective.sdk.utils.LogUtil
+import cn.entertech.affective.sdk.bean.BioOrAffectiveDataCategory
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import java.lang.IllegalStateException
@@ -74,7 +73,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 config.uploadCycle
             )
         }
-        if (config.availableBiodataServices == null) {
+        if (config.availableBiodataBioOrAffectiveDataCategories == null) {
             throw IllegalStateException("biodata services must not be null")
         }
     }
@@ -88,7 +87,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         optionsMap["storage_settings"] = config.storageSettings?.body()
         optionsMap["bio_data_tolerance"] = config.biodataTolerance?.body()
         optionsMap["algorithm_params"] = config.algorithmParams?.body()
-        mApi.initBiodataServices(config.availableBiodataServices!!, object : Callback {
+        mApi.initBiodataServices(config.availableBiodataBioOrAffectiveDataCategories!!, object : Callback {
             override fun onSuccess() {
                 isInit = true
                 if (config.mBiodataSubscribeParams != null) {
@@ -107,7 +106,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                         },
                         object : Callback2<SubBiodataFields> {
                             override fun onSuccess(t: SubBiodataFields?) {
-                                if (config.availableAffectiveServices == null) {
+                                if (config.availableAffectiveBioOrAffectiveDataCategories == null) {
                                     callback.onSuccess()
                                 }
                             }
@@ -117,7 +116,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                             }
 
                         })
-                } else if (config.availableAffectiveServices == null) {
+                } else if (config.availableAffectiveBioOrAffectiveDataCategories == null) {
                     callback.onSuccess()
                 }
             }
@@ -130,7 +129,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     private fun initAffective(callback: Callback) {
-        mApi.initAffectiveDataServices(config.availableAffectiveServices!!, object : Callback {
+        mApi.initAffectiveDataServices(config.availableAffectiveBioOrAffectiveDataCategories!!, object : Callback {
             override fun onSuccess() {
                 if (config.mAffectiveSubscribeParams != null) {
                     mApi.subscribeAffectiveData(config.mAffectiveSubscribeParams!!,
@@ -169,35 +168,35 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     private fun selectAvailableAffectiveServicesInRemote(subData: SubAffectiveDataFields) {
-        var affectiveServices = mutableListOf<Service>()
+        var affectiveBioOrAffectiveDataCategories = mutableListOf<BioOrAffectiveDataCategory>()
         if (subData.subAttentionFields != null) {
-            affectiveServices.add(Service.ATTENTION)
+            affectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.ATTENTION)
         }
         if (subData.subRelaxationFields != null) {
-            affectiveServices.add(Service.RELAXATION)
+            affectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.RELAXATION)
         }
         if (subData.subPressureFields != null) {
-            affectiveServices.add(Service.PRESSURE)
+            affectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.PRESSURE)
         }
         if (subData.subPleasureFields != null) {
-            affectiveServices.add(Service.PLEASURE)
+            affectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.PLEASURE)
         }
         if (subData.subArousalFields != null) {
-            affectiveServices.add(Service.AROUSAL)
+            affectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.AROUSAL)
         }
         if (subData.subSleepFields != null) {
-            affectiveServices.add(Service.SLEEP)
+            affectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.SLEEP)
         }
         if (subData.subCoherenceFields != null) {
-            affectiveServices.add(Service.COHERENCE)
+            affectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.COHERENCE)
         }
         if (subData.subFlowFields != null) {
-            affectiveServices.add(Service.FLOW)
+            affectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.FLOW)
         }
         if (subData.subSsvepMultiClassifyFields != null) {
-            affectiveServices.add(Service.SSVEP_MULTI_CLASSIFY)
+            affectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.SSVEP_MULTI_CLASSIFY)
         }
-        config.availableAffectiveServices = affectiveServices
+        config.availableAffectiveBioOrAffectiveDataCategories = affectiveBioOrAffectiveDataCategories
     }
 
 
@@ -233,7 +232,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 override fun onSuccess(t: String?) {
                     callback.onSuccess(t)
                     initBiodata(cb)
-                    if (config.availableAffectiveServices != null) {
+                    if (config.availableAffectiveBioOrAffectiveDataCategories != null) {
                         initAffective(cb)
                     }
                 }
@@ -304,11 +303,11 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     override fun getBiodataReport(callback: Callback2<HashMap<Any, Any?>>) {
-        mApi.getBiodataReport(config.availableBiodataServices!!, callback)
+        mApi.getBiodataReport(config.availableBiodataBioOrAffectiveDataCategories!!, callback)
     }
 
     override fun getAffectiveDataReport(callback: Callback2<HashMap<Any, Any?>>) {
-        mApi.getAffectivedataReport(config.availableAffectiveServices!!, callback)
+        mApi.getAffectivedataReport(config.availableAffectiveBioOrAffectiveDataCategories!!, callback)
     }
 
     override fun restore(callback: Callback) {
@@ -316,7 +315,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
             mApi.restore(object : Callback {
                 override fun onSuccess() {
                     initBiodata(callback)
-                    if (config.availableAffectiveServices != null) {
+                    if (config.availableAffectiveBioOrAffectiveDataCategories != null) {
                         initAffective(callback)
                     }
                 }
@@ -332,7 +331,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 mApi.restore(object : Callback {
                     override fun onSuccess() {
                         initBiodata(callback)
-                        if (config.availableAffectiveServices != null) {
+                        if (config.availableAffectiveBioOrAffectiveDataCategories != null) {
                             initAffective(callback)
                         }
                     }
@@ -357,9 +356,9 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     override fun release(callback: Callback) {
-        if (config.availableAffectiveServices != null) {
+        if (config.availableAffectiveBioOrAffectiveDataCategories != null) {
             mApi.finishAffectiveDataServices(
-                config.availableAffectiveServices!!,
+                config.availableAffectiveBioOrAffectiveDataCategories!!,
                 object : Callback {
                     override fun onSuccess() {
                         mApi.destroySessionAndCloseWebSocket(object : Callback {

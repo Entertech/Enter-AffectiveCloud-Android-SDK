@@ -1,7 +1,7 @@
 package cn.entertech.affectivecloudsdk
 
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
-import cn.entertech.affective.sdk.bean.Service
+import cn.entertech.affective.sdk.bean.BioOrAffectiveDataCategory
 import cn.entertech.affectivecloudsdk.EnterAffectiveCloudApiImpl.Companion.DEFAULT_UPLOAD_CYCLE
 import java.lang.IllegalStateException
 
@@ -13,8 +13,8 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
     var mBiodataSubscribeParams: BiodataSubscribeParams? = null
     var uri: String? = null
     var websocketTimeout: Int? = null
-    var availableBiodataServices: List<Service>? = null
-    var availableAffectiveServices: List<Service>? = null
+    var availableBiodataBioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>? = null
+    var availableAffectiveBioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>? = null
     var storageSettings: StorageSettings? = null
     var algorithmParams: AlgorithmParams? = null
     var biodataTolerance: BiodataTolerance? = null
@@ -24,34 +24,34 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
         private const val AFFECTIVE_CLOUD_ADDRESS = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
 
         fun proxyInstance(proxy: EnterAffectiveConfigProxy): EnterAffectiveCloudConfig {
-            val availableAffectiveServices = proxy.availableAffectiveServices
-            val availableBiodataServices = proxy.availableBiodataServices
+            val availableAffectiveServices = proxy.availableAffectiveBioOrAffectiveDataCategories
+            val availableBiodataServices = proxy.availableBiodataBioOrAffectiveDataCategories
             val biodataSubscribeParamsBuilder = BiodataSubscribeParams.Builder()
             val affectiveSubscribeParamsBuilder = AffectiveSubscribeParams.Builder()
             val storageSettingsBuild = StorageSettings.Builder()
             availableAffectiveServices.forEach {
                 when (it) {
-                    Service.ATTENTION -> {
+                    BioOrAffectiveDataCategory.ATTENTION -> {
                         affectiveSubscribeParamsBuilder.requestAttention()
                     }
 
-                    Service.PRESSURE -> {
+                    BioOrAffectiveDataCategory.PRESSURE -> {
                         affectiveSubscribeParamsBuilder.requestPressure()
                     }
 
-                    Service.RELAXATION -> {
+                    BioOrAffectiveDataCategory.RELAXATION -> {
                         affectiveSubscribeParamsBuilder.requestRelaxation()
                     }
 
-                    Service.PLEASURE -> {
+                    BioOrAffectiveDataCategory.PLEASURE -> {
                         affectiveSubscribeParamsBuilder.requestPleasure()
                     }
 
-                    Service.COHERENCE -> {
+                    BioOrAffectiveDataCategory.COHERENCE -> {
                         affectiveSubscribeParamsBuilder.requestCoherence()
                     }
 
-                    Service.FLOW -> {
+                    BioOrAffectiveDataCategory.FLOW -> {
                         affectiveSubscribeParamsBuilder.requestFlow()
                     }
 
@@ -62,15 +62,15 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
             }
             availableBiodataServices.forEach {
                 when (it) {
-                    Service.EEG -> {
+                    BioOrAffectiveDataCategory.EEG -> {
                         biodataSubscribeParamsBuilder.requestEEG()
                     }
 
-                    Service.PEPR -> {
+                    BioOrAffectiveDataCategory.PEPR -> {
                         biodataSubscribeParamsBuilder.requestPEPR()
                     }
 
-                    Service.HR -> {
+                    BioOrAffectiveDataCategory.HR -> {
                         biodataSubscribeParamsBuilder.requestHR()
                     }
 
@@ -128,8 +128,8 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
         this.mAffectiveSubscribeParams = builder.mAffectiveSubscribeParams
         this.uri = builder.uri
         this.websocketTimeout = builder.websocketTimeout
-        this.availableBiodataServices = builder.availableBiodataServices
-        this.availableAffectiveServices = builder.availableAffectiveServices
+        this.availableBiodataBioOrAffectiveDataCategories = builder.availableBiodataBioOrAffectiveDataCategories
+        this.availableAffectiveBioOrAffectiveDataCategories = builder.availableAffectiveBioOrAffectiveDataCategories
         this.storageSettings = builder.storageSettings
         this.algorithmParams = builder.algorithmParams
         this.biodataTolerance = builder.biodataTolerance
@@ -143,8 +143,8 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
         var mBiodataSubscribeParams: BiodataSubscribeParams? = null
         var uri: String? = null
         var websocketTimeout: Int? = null
-        var availableBiodataServices: List<Service>? = null
-        var availableAffectiveServices: List<Service>? = null
+        var availableBiodataBioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>? = null
+        var availableAffectiveBioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>? = null
         var biodataTolerance: BiodataTolerance? = null
         var uploadCycle = DEFAULT_UPLOAD_CYCLE
         fun url(url: String): Builder {
@@ -157,8 +157,8 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
             return this
         }
 
-        fun availableBiodataServices(services: List<Service>): Builder {
-            this.availableBiodataServices = services
+        fun availableBiodataServices(bioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>): Builder {
+            this.availableBiodataBioOrAffectiveDataCategories = bioOrAffectiveDataCategories
             return this
         }
 
@@ -168,8 +168,8 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
         }
 
 
-        fun availableAffectiveServices(services: List<Service>): Builder {
-            this.availableAffectiveServices = services
+        fun availableAffectiveServices(bioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>): Builder {
+            this.availableAffectiveBioOrAffectiveDataCategories = bioOrAffectiveDataCategories
             return this
         }
 
@@ -207,7 +207,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
     }
 
     override fun toString(): String {
-        return "EnterAffectiveCloudConfig(appKey=$appKey, appSecret=$appSecret, userId=$userId, mAffectiveSubscribeParams=$mAffectiveSubscribeParams, mBiodataSubscribeParams=$mBiodataSubscribeParams, uri=$uri, websocketTimeout=$websocketTimeout, availableBiodataServices=$availableBiodataServices, availableAffectiveServices=$availableAffectiveServices, storageSettings=$storageSettings, algorithmParams=$algorithmParams, biodataTolerance=$biodataTolerance, uploadCycle=$uploadCycle)"
+        return "EnterAffectiveCloudConfig(appKey=$appKey, appSecret=$appSecret, userId=$userId, mAffectiveSubscribeParams=$mAffectiveSubscribeParams, mBiodataSubscribeParams=$mBiodataSubscribeParams, uri=$uri, websocketTimeout=$websocketTimeout, availableBiodataServices=$availableBiodataBioOrAffectiveDataCategories, availableAffectiveServices=$availableAffectiveBioOrAffectiveDataCategories, storageSettings=$storageSettings, algorithmParams=$algorithmParams, biodataTolerance=$biodataTolerance, uploadCycle=$uploadCycle)"
     }
 
 }

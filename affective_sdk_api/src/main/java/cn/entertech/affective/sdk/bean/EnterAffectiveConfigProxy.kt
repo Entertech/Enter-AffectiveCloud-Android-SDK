@@ -4,8 +4,8 @@ import android.content.Context
 
 
 data class EnterAffectiveConfigProxy(
-    val availableAffectiveServices: List<Service>,
-    val availableBiodataServices: List<Service>,
+    val availableAffectiveBioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>,
+    val availableBiodataBioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>,
     val sex: String = "",
     val userId: String = "",
     val appSecret: String = "",

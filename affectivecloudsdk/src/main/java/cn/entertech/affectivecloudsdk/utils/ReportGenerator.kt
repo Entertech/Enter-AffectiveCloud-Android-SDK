@@ -1,30 +1,30 @@
 package cn.entertech.affectivecloudsdk.utils
 
 import cn.entertech.affectivecloudsdk.entity.ResponseBody
-import cn.entertech.affective.sdk.bean.Service
+import cn.entertech.affective.sdk.bean.BioOrAffectiveDataCategory
 import java.lang.IllegalStateException
 
 class ReportGenerator {
-    private var reportServiceList: List<Service>? = null
+    private var reportBioOrAffectiveDataCategoryList: List<BioOrAffectiveDataCategory>? = null
     private var item: HashMap<Any, Any?> = HashMap()
 
-    fun init(services: List<Service>) {
-        this.reportServiceList = services
+    fun init(bioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>) {
+        this.reportBioOrAffectiveDataCategoryList = bioOrAffectiveDataCategories
     }
 
     fun appendResponse(responseBody: ResponseBody): HashMap<Any, Any?>? {
-        if (reportServiceList == null || reportServiceList!!.isEmpty()) {
+        if (reportBioOrAffectiveDataCategoryList == null || reportBioOrAffectiveDataCategoryList!!.isEmpty()) {
             throw IllegalStateException("please init ReportGenerator first")
         }
         var data = responseBody.data
         var keys = responseBody.data.keys
         keys.forEach {
-            for (service in reportServiceList!!) {
+            for (service in reportBioOrAffectiveDataCategoryList!!) {
                 if (it == service.value)
                     item[it] = data[it]
             }
         }
-        for (service in reportServiceList!!) {
+        for (service in reportBioOrAffectiveDataCategoryList!!) {
             if (!item.containsKey(service.value)) {
                 return null
             }

@@ -38,6 +38,7 @@ interface IAffectiveDataAnalysisService {
      * 启动情感服务
      * */
     fun startAffectiveService(
+        authenticationInputStream: InputStream?,
         callback: Callback2<String>,
         builder: EnterAffectiveConfigProxy
     )

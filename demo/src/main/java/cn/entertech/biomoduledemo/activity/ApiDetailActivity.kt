@@ -19,7 +19,7 @@ import java.io.File
 import java.lang.Exception
 import java.util.*
 import cn.entertech.affective.sdk.bean.Error
-import cn.entertech.affective.sdk.bean.Service
+import cn.entertech.affective.sdk.bean.BioOrAffectiveDataCategory
 
 class ApiDetailActivity : AppCompatActivity() {
 
@@ -40,8 +40,8 @@ class ApiDetailActivity : AppCompatActivity() {
     var saveHRPath: String =
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "hr" + File.separator
     var fileName: String = ""
-    var availableAffectiveServices = listOf(Service.ATTENTION, Service.PRESSURE, Service.AROUSAL, Service.SLEEP)
-    var availableBioServices = listOf(Service.EEG, Service.HR)
+    var availableAffectiveBioOrAffectiveDataCategories = listOf(BioOrAffectiveDataCategory.ATTENTION, BioOrAffectiveDataCategory.PRESSURE, BioOrAffectiveDataCategory.AROUSAL, BioOrAffectiveDataCategory.SLEEP)
+    var availableBioBioOrAffectiveDataCategories = listOf(BioOrAffectiveDataCategory.EEG, BioOrAffectiveDataCategory.HR)
     var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v1/"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,7 +144,7 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.initBiodataServices(availableBioServices, object :
+        mEnterAffectiveCloudApi?.initBiodataServices(availableBioBioOrAffectiveDataCategories, object :
             cn.entertech.affective.sdk.api.Callback {
             override fun onSuccess() {
                 Logger.d("情感云基础服务已初始化成功")
@@ -213,7 +213,7 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.getBiodataReport(availableBioServices, object :
+        mEnterAffectiveCloudApi?.getBiodataReport(availableBioBioOrAffectiveDataCategories, object :
             cn.entertech.affective.sdk.api.Callback2<HashMap<Any, Any?>> {
             override fun onSuccess(t: HashMap<Any, Any?>?) {
                 Logger.d("基础服务报表：${t.toString()}")
@@ -246,7 +246,7 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.initAffectiveDataServices(availableAffectiveServices,
+        mEnterAffectiveCloudApi?.initAffectiveDataServices(availableAffectiveBioOrAffectiveDataCategories,
             object : cn.entertech.affective.sdk.api.Callback {
                 override fun onSuccess() {
                     Logger.d("情感服务已开启")
@@ -293,7 +293,7 @@ class ApiDetailActivity : AppCompatActivity() {
         if (!isStatusOk()) {
             return
         }
-        mEnterAffectiveCloudApi?.getAffectivedataReport(availableAffectiveServices,
+        mEnterAffectiveCloudApi?.getAffectivedataReport(availableAffectiveBioOrAffectiveDataCategories,
             object : cn.entertech.affective.sdk.api.Callback2<HashMap<Any, Any?>> {
                 override fun onSuccess(t: HashMap<Any, Any?>?) {
                     Logger.d("情感报表数据：${t.toString()}")

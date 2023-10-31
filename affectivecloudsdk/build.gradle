@@ -34,7 +34,7 @@ android {
 PublishInfo {
     groupId = 'cn.entertech.android' // 库的组织，使用域名表示
     artifactId = 'affectivecloud' // 库名称
-    version = '3.3.5-LOCAL' // 库版本
+    version = '3.3.6-LOCAL' // 库版本
 }
 
 

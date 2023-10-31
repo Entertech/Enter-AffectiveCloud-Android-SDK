@@ -31,7 +31,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
      * 启动AffectiveService ，启动成功后订阅数据
      *
      * */
-    override fun startAffectiveService(
+    override fun startAffectiveService(authenticationInputStream: InputStream?,
         callback: Callback2<String>,builder: EnterAffectiveConfigProxy
     ) {
         LogUtil.d(TAG,"startAffectiveService")

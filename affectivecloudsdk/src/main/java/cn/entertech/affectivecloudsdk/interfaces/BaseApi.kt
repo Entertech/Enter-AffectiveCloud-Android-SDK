@@ -4,7 +4,7 @@ import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
-import cn.entertech.affective.sdk.bean.Service
+import cn.entertech.affective.sdk.bean.BioOrAffectiveDataCategory
 import cn.entertech.affectivecloudsdk.entity.*
 
 /**
@@ -59,22 +59,22 @@ interface BaseApi {
      * should be init or start (biodata service need init ,and affective service is start)before use.
      * Affective services is base of the biodata services,so this method must be
      * called after a sessino create.
-     * @param serviceList List<String>
+     * @param bioOrAffectiveDataCategoryList List<String>
      * @param callback Callback
      */
     @Deprecated("")
-    fun initBiodataServices(serviceList: List<Service>, callback: Callback)
+    fun initBiodataServices(bioOrAffectiveDataCategoryList: List<BioOrAffectiveDataCategory>, callback: Callback)
 
 
     /**
      * Init biodata services with option params
      *
-     * @param serviceList List<Service>
+     * @param bioOrAffectiveDataCategoryList List<Service>
      * @param callback Callback
      * @param optionParams HashMap<String, Any>
      */
     fun initBiodataServices(
-        serviceList: List<Service>,
+        bioOrAffectiveDataCategoryList: List<BioOrAffectiveDataCategory>,
         callback: Callback,
         optionParams: java.util.HashMap<String, Any?>?
     )
@@ -82,10 +82,10 @@ interface BaseApi {
     /**
      * start affective services before use.
      *
-     * @param services List<String>
+     * @param bioOrAffectiveDataCategories List<String>
      * @param callback Callback
      */
-    fun initAffectiveDataServices(services: List<Service>, callback: Callback)
+    fun initAffectiveDataServices(bioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>, callback: Callback)
 
     /**
      * Send brain data to affective cloud platform.
@@ -158,17 +158,17 @@ interface BaseApi {
 
     /**
      * Report biodata.
-     * @param services List<String>
+     * @param bioOrAffectiveDataCategories List<String>
      * @param callback Callback2<HashMap<Any, Any?>>
      */
-    fun getBiodataReport(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>)
+    fun getBiodataReport(bioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>, callback: Callback2<HashMap<Any, Any?>>)
 
     /**
      * Report affecitve data
-     * @param services List<String>
+     * @param bioOrAffectiveDataCategories List<String>
      * @param callback Callback2<HashMap<Any, Any?>>
      */
-    fun getAffectivedataReport(services: List<Service>, callback: Callback2<HashMap<Any, Any?>>)
+    fun getAffectivedataReport(bioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>, callback: Callback2<HashMap<Any, Any?>>)
 
     /**
      * Unsubscribe biodata.
@@ -190,10 +190,10 @@ interface BaseApi {
 
     /**
      * Warning!:Don't forget to call this method to finish affective services after you have used it.
-     * @param services List<String>
+     * @param bioOrAffectiveDataCategories List<String>
      * @param callback Callback
      */
-    fun finishAffectiveDataServices(services: List<Service>, callback: Callback)
+    fun finishAffectiveDataServices(bioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>, callback: Callback)
 
     /**
      * Finish all affective services started before.

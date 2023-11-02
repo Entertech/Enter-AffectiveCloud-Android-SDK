@@ -15,7 +15,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import cn.entertech.affective.sdk.api.Callback2
-import cn.entertech.affective.sdk.bean.BioOrAffectiveDataCategory
+import cn.entertech.affective.sdk.bean.AffectiveDataCategory
+import cn.entertech.affective.sdk.bean.BioDataCategory
 import cn.entertech.affectivecloudsdk.*
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
@@ -72,18 +73,18 @@ class MainActivity : AppCompatActivity() {
     var realtimeThetaFileHelper = FileHelper()
     var realtimeDeltaFileHelper = FileHelper()
     var reportFileHelper = FileHelper()
-    var availableAffectiveBioOrAffectiveDataCategories =
+    var availableAffectiveDataCategories =
         listOf(
-            BioOrAffectiveDataCategory.ATTENTION,
-            BioOrAffectiveDataCategory.PRESSURE,
-            BioOrAffectiveDataCategory.AROUSAL,
-            BioOrAffectiveDataCategory.RELAXATION,
-            BioOrAffectiveDataCategory.PLEASURE,
-            BioOrAffectiveDataCategory.SLEEP,
-            BioOrAffectiveDataCategory.COHERENCE,
-            BioOrAffectiveDataCategory.FLOW
+            AffectiveDataCategory.ATTENTION,
+            AffectiveDataCategory.PRESSURE,
+            AffectiveDataCategory.AROUSAL,
+            AffectiveDataCategory.RELAXATION,
+            AffectiveDataCategory.PLEASURE,
+            AffectiveDataCategory.SLEEP,
+            AffectiveDataCategory.COHERENCE,
+            AffectiveDataCategory.FLOW
         )
-    var availableBioBioOrAffectiveDataCategories = listOf(BioOrAffectiveDataCategory.EEG, BioOrAffectiveDataCategory.HR)
+    var availableBioDataCategories = listOf(BioDataCategory.EEG, BioDataCategory.HR)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -143,8 +144,8 @@ class MainActivity : AppCompatActivity() {
         var enterAffectiveCloudConfig =
             EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
                 .url(websocketAddress)
-                .availableBiodataServices(availableBioBioOrAffectiveDataCategories)
-                .availableAffectiveServices(availableAffectiveBioOrAffectiveDataCategories)
+                .availableBiodataServices(availableBioDataCategories)
+                .availableAffectiveServices(availableAffectiveDataCategories)
                 .biodataSubscribeParams(biodataSubscribeParams!!)
                 .affectiveSubscribeParams(affectiveSubscribeParams!!)
                 .storageSettings(storageSettings)

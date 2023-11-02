@@ -1,10 +1,13 @@
 package cn.entertech.affectivecloudsdk
 
 import android.util.Log
-import cn.entertech.affective.sdk.bean.Error
-import cn.entertech.affective.sdk.bean.BioOrAffectiveDataCategory
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
+import cn.entertech.affective.sdk.bean.AffectiveDataCategory
+import cn.entertech.affective.sdk.bean.BioDataCategory
+import cn.entertech.affective.sdk.bean.Error
+import cn.entertech.affectivecloudsdk.utils.FileUtil.readFile
+import junit.framework.TestCase.assertEquals
 import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
@@ -12,13 +15,7 @@ import org.powermock.api.mockito.PowerMockito
 import org.powermock.core.classloader.annotations.PowerMockIgnore
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
-
-import java.util.ArrayList
-import java.util.HashMap
 import java.util.concurrent.CountDownLatch
-
-import cn.entertech.affectivecloudsdk.utils.FileUtil.readFile
-import junit.framework.TestCase.assertEquals
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(PowerMockRunner::class)
@@ -197,8 +194,8 @@ class EnterAffectiveCloudManagerTest {
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_hrdata.txt"
         var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 //        var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
-        internal var availableAffectiveBioOrAffectiveDataCategories: MutableList<BioOrAffectiveDataCategory> = ArrayList()
-        internal var availableBioBioOrAffectiveDataCategories: MutableList<BioOrAffectiveDataCategory> = ArrayList()
+        internal var availableAffectiveDataCategories: MutableList<AffectiveDataCategory> = ArrayList()
+        internal var availableBioDataCategories: MutableList<BioDataCategory> = ArrayList()
         private var biodataSubscribeParams: BiodataSubscribeParams? = null
         private var affectiveSubscribeParams: AffectiveSubscribeParams? = null
         private var enterAffectiveCloudConfig: EnterAffectiveCloudConfig? = null
@@ -210,15 +207,15 @@ class EnterAffectiveCloudManagerTest {
         @JvmStatic
         fun init() {
             PowerMockito.mockStatic(Log::class.java)
-            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.ATTENTION)
-            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.PRESSURE)
-            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.AROUSAL)
-            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.RELAXATION)
-            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.PLEASURE)
-            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.SLEEP)
-            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.COHERENCE)
-            availableBioBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.EEG)
-            availableBioBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.HR)
+            availableAffectiveDataCategories.add(AffectiveDataCategory.ATTENTION)
+            availableAffectiveDataCategories.add(AffectiveDataCategory.PRESSURE)
+            availableAffectiveDataCategories.add(AffectiveDataCategory.AROUSAL)
+            availableAffectiveDataCategories.add(AffectiveDataCategory.RELAXATION)
+            availableAffectiveDataCategories.add(AffectiveDataCategory.PLEASURE)
+            availableAffectiveDataCategories.add(AffectiveDataCategory.SLEEP)
+            availableAffectiveDataCategories.add(AffectiveDataCategory.COHERENCE)
+            availableBioDataCategories.add(BioDataCategory.EEG)
+            availableBioDataCategories.add(BioDataCategory.HR)
             biodataSubscribeParams = BiodataSubscribeParams.Builder()
                 .requestEEG()
                 .requestHR()
@@ -246,8 +243,8 @@ class EnterAffectiveCloudManagerTest {
                 .build()
             enterAffectiveCloudConfig = EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
                 .url(websocketAddress)
-                .availableBiodataServices(availableBioBioOrAffectiveDataCategories)
-                .availableAffectiveServices(availableAffectiveBioOrAffectiveDataCategories)
+                .availableBiodataServices(availableBioDataCategories)
+                .availableAffectiveServices(availableAffectiveDataCategories)
                 .biodataSubscribeParams(biodataSubscribeParams!!)
                 .affectiveSubscribeParams(affectiveSubscribeParams!!)
                 .algorithmParams(algorithmParams)

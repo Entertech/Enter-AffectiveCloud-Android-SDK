@@ -5,10 +5,11 @@ import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService.Companion.UPLOAD_BCG_PACKAGE_COUNT
 import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService.Companion.UPLOAD_GYRO_PACKAGE_COUNT
+import cn.entertech.affective.sdk.bean.AffectiveDataCategory
+import cn.entertech.affective.sdk.bean.BioDataCategory
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
-import cn.entertech.affective.sdk.bean.BioOrAffectiveDataCategory
 import cn.entertech.affective.sdk.utils.LogUtil
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
@@ -17,11 +18,7 @@ import cn.entertech.affectivecloudsdk.utils.MD5Encode
 import cn.entertech.affectivecloudsdk.utils.ReportGenerator
 import com.google.gson.Gson
 import org.java_websocket.handshake.ServerHandshake
-import java.lang.Exception
-import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.collections.HashMap
 
 class EnterAffectiveCloudApiImpl internal constructor(
     var websocketAddress: String,
@@ -49,7 +46,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
     private var mCreateSessionCallback: Callback2<String>? = null
     private var mSubscribeAffectiveData: List<Any>? = null
     private var mSubscribeBioData: List<Any>? = null
-    private var mStartedAffectiveBioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>? = null
+    private var mStartedAffectiveDataCategories: List<AffectiveDataCategory>? = null
     private var mSign: String? = null
 
     /*service type：session、biodata、affective*/
@@ -186,7 +183,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
             }
             if (response.isReportBiodata()) {
                 if (response.code == 0) {
-                    var report = mBiodataReprotGenerator?.appendResponse(response)
+                    var report = mBiodataReprotGenerator?.appendBioDataResponse(response)
                     if (report != null) {
                         mBiodataReportCallback?.onSuccess(report)
                     }else{
@@ -199,7 +196,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
 
             if (response.isReportAffective()) {
                 if (response.code == 0) {
-                    var report = mAffectiveReportGenerator?.appendResponse(response)
+                    var report = mAffectiveReportGenerator?.appendAffectiveDataResponse(response)
                     if (report != null) {
                         mAffectiveReportCallback?.onSuccess(report)
                     }else{
@@ -344,18 +341,18 @@ class EnterAffectiveCloudApiImpl internal constructor(
         }
     }
 
-    override fun initBiodataServices(bioOrAffectiveDataCategoryList: List<BioOrAffectiveDataCategory>, callback: Callback) {
-        initBiodataServices(bioOrAffectiveDataCategoryList, callback,null)
+    override fun initBiodataServices(bioDataCategoryList: List<BioDataCategory>, callback: Callback) {
+        initBiodataServices(bioDataCategoryList, callback,null)
     }
 
     override fun initBiodataServices(
-        bioOrAffectiveDataCategoryList: List<BioOrAffectiveDataCategory>,
+        bioDataCategoryList: List<BioDataCategory>,
         callback: Callback,
         optionParams: HashMap<String, Any?>?
     ) {
         this.mBiodataInitCallback = callback
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["bio_data_type"] = bioOrAffectiveDataCategoryList.map { it.value }
+        requestBodyMap["bio_data_type"] = bioDataCategoryList.map { it.value }
         if (optionParams != null) {
             if (optionParams.containsKey("bio_data_tolerance")) {
                 if (optionParams["bio_data_tolerance"] != null) {
@@ -387,9 +384,9 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
 
-    override fun initAffectiveDataServices(bioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>, callback: Callback) {
+    override fun initAffectiveDataServices(bioOrAffectiveDataCategories: List<AffectiveDataCategory>, callback: Callback) {
         this.mAffectiveStartCallback = callback
-        this.mStartedAffectiveBioOrAffectiveDataCategories = bioOrAffectiveDataCategories
+        this.mStartedAffectiveDataCategories = bioOrAffectiveDataCategories
         var requestBodyMap = HashMap<Any, Any>()
         requestBodyMap["cloud_services"] = bioOrAffectiveDataCategories.map { it.value }
         var requestBody =
@@ -566,14 +563,14 @@ class EnterAffectiveCloudApiImpl internal constructor(
 
 
     override fun getBiodataReport(
-        bioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>,
+        bioDataCategories: List<BioDataCategory>,
         callback: Callback2<HashMap<Any, Any?>>
     ) {
         this.mBiodataReportCallback = callback
         mBiodataReprotGenerator = ReportGenerator()
-        mBiodataReprotGenerator!!.init(bioOrAffectiveDataCategories)
+        mBiodataReprotGenerator!!.setBioDataCategories(bioDataCategories)
         var requestBodyMap = java.util.HashMap<Any, Any>()
-        requestBodyMap["bio_data_type"] = bioOrAffectiveDataCategories.map { it.value }
+        requestBodyMap["bio_data_type"] = bioDataCategories.map { it.value }
         var requestBody =
             RequestBody(SERVER_BIO_DATA, "report", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
@@ -581,14 +578,14 @@ class EnterAffectiveCloudApiImpl internal constructor(
     }
 
     override fun getAffectivedataReport(
-        bioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>,
+        affectiveDataCategories: List<AffectiveDataCategory>,
         callback: Callback2<HashMap<Any, Any?>>
     ) {
         this.mAffectiveReportCallback = callback
         this.mAffectiveReportGenerator = ReportGenerator()
-        mAffectiveReportGenerator!!.init(bioOrAffectiveDataCategories)
+        mAffectiveReportGenerator!!.setAffectiveDataCategories(affectiveDataCategories)
         var requestBodyMap = java.util.HashMap<Any, Any>()
-        requestBodyMap["cloud_services"] = bioOrAffectiveDataCategories.map { it.value }
+        requestBodyMap["cloud_services"] = affectiveDataCategories.map { it.value }
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "report", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
@@ -626,22 +623,22 @@ class EnterAffectiveCloudApiImpl internal constructor(
         mWebSocketHelper?.sendMessage(requestJson)
     }
 
-    override fun finishAffectiveDataServices(bioOrAffectiveDataCategories: List<BioOrAffectiveDataCategory>, callback: Callback) {
+    override fun finishAffectiveDataServices(affectiveDataCategories: List<AffectiveDataCategory>, callback: Callback) {
         this.mAffectiveFinishCallback = callback
-        if (mStartedAffectiveBioOrAffectiveDataCategories == null) {
+        if (mStartedAffectiveDataCategories == null) {
             throw IllegalStateException(
                 "there is no affective services started!!"
             )
         }
-        bioOrAffectiveDataCategories.forEach {
-            if (!mStartedAffectiveBioOrAffectiveDataCategories!!.contains(it)) {
+        affectiveDataCategories.forEach {
+            if (!mStartedAffectiveDataCategories!!.contains(it)) {
                 throw IllegalStateException(
                     "service '${it.value}' was not started or not exit"
                 )
             }
         }
         var requestBodyMap = HashMap<Any, Any>()
-        requestBodyMap["cloud_services"] = bioOrAffectiveDataCategories.map { it.value }
+        requestBodyMap["cloud_services"] = affectiveDataCategories.map { it.value }
         var requestBody =
             RequestBody(SERVER_AFFECTIVE, "finish", requestBodyMap)
         var requestJson = Gson().toJson(requestBody)
@@ -650,12 +647,12 @@ class EnterAffectiveCloudApiImpl internal constructor(
 
 
     override fun finishAllAffectiveDataServices(callback: Callback) {
-        if (mStartedAffectiveBioOrAffectiveDataCategories == null) {
+        if (mStartedAffectiveDataCategories == null) {
             throw IllegalStateException(
                 "there is no affective services started!!"
             )
         }
-        finishAffectiveDataServices(mStartedAffectiveBioOrAffectiveDataCategories!!, callback)
+        finishAffectiveDataServices(mStartedAffectiveDataCategories!!, callback)
     }
 
     override fun destroySessionAndCloseWebSocket(callback: Callback) {

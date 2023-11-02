@@ -1,10 +1,13 @@
 package cn.entertech.affectivecloudsdk
 
 import android.util.Log
-import cn.entertech.affective.sdk.bean.Error
-import cn.entertech.affective.sdk.bean.BioOrAffectiveDataCategory
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
+import cn.entertech.affective.sdk.bean.AffectiveDataCategory
+import cn.entertech.affective.sdk.bean.BioDataCategory
+import cn.entertech.affective.sdk.bean.Error
+import cn.entertech.affectivecloudsdk.utils.FileUtil.readFile
+import junit.framework.TestCase.assertEquals
 import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
@@ -12,12 +15,8 @@ import org.powermock.api.mockito.PowerMockito
 import org.powermock.core.classloader.annotations.PowerMockIgnore
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
-
-import java.util.concurrent.CountDownLatch
-
-import cn.entertech.affectivecloudsdk.utils.FileUtil.readFile
-import junit.framework.TestCase.assertEquals
 import java.util.*
+import java.util.concurrent.CountDownLatch
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(PowerMockRunner::class)
@@ -227,8 +226,8 @@ class EnterAffectiveCloudManagerTestMultichannel {
         var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 
         //        var websocketAddress = "wss://server.affectivecloud.com/ws/algorithm/v1/"
-        internal var availableAffectiveBioOrAffectiveDataCategories: MutableList<BioOrAffectiveDataCategory> = ArrayList()
-        internal var availableBioBioOrAffectiveDataCategories: MutableList<BioOrAffectiveDataCategory> = ArrayList()
+        internal var availableAffectiveDataCategories: MutableList<AffectiveDataCategory> = ArrayList()
+        internal var availableBioDataCategories: MutableList<BioDataCategory> = ArrayList()
         private var biodataSubscribeParams: BiodataSubscribeParams? = null
         private var enterAffectiveCloudConfig: EnterAffectiveCloudConfig? = null
         private var enterAffectiveCloudManager: EnterAffectiveCloudManager? = null
@@ -240,10 +239,10 @@ class EnterAffectiveCloudManagerTestMultichannel {
         @JvmStatic
         fun init() {
             PowerMockito.mockStatic(Log::class.java)
-            availableBioBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.PEPR)
+            availableBioDataCategories.add(BioDataCategory.PEPR)
 
-            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.PRESSURE)
-            availableAffectiveBioOrAffectiveDataCategories.add(BioOrAffectiveDataCategory.COHERENCE)
+            availableAffectiveDataCategories.add(AffectiveDataCategory.PRESSURE)
+            availableAffectiveDataCategories.add(AffectiveDataCategory.COHERENCE)
             biodataSubscribeParams = BiodataSubscribeParams.Builder()
                 .requestPEPR()
                 .build()
@@ -260,8 +259,8 @@ class EnterAffectiveCloudManagerTestMultichannel {
             enterAffectiveCloudConfig =
                 EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
                     .url(websocketAddress)
-                    .availableBiodataServices(availableBioBioOrAffectiveDataCategories)
-                    .availableAffectiveServices(availableAffectiveBioOrAffectiveDataCategories)
+                    .availableBiodataServices(availableBioDataCategories)
+                    .availableAffectiveServices(availableAffectiveDataCategories)
                     .affectiveSubscribeParams(affectiveSubscribeParams!!)
                     .biodataSubscribeParams(biodataSubscribeParams!!)
                     .algorithmParams(algorithmParams)

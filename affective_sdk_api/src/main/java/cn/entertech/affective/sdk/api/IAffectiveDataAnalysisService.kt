@@ -1,14 +1,25 @@
 package cn.entertech.affective.sdk.api
 
+import android.content.Context
 import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affective.sdk.bean.UploadReportEntity
-import java.io.File
 import java.io.InputStream
 import java.util.ServiceLoader
 
+
+
+/**
+ * 步骤：
+ * 1.建立情感云连接
+ * 2.启动、初始化生物数据基础分析服务&& 若配置感云计算服务，则启动情感云计算服务
+ * 3.启动服务成功后，各自订阅自己的数据
+ * 4.取消订阅
+ * 5.结束服务
+ * 6.关闭情感云连接
+ * */
 interface IAffectiveDataAnalysisService {
 
     companion object {
@@ -27,26 +38,66 @@ interface IAffectiveDataAnalysisService {
         }
     }
 
+    /**
+     * 连接情感云
+     * */
+    fun connectAffectiveServiceConnection(configProxy: EnterAffectiveConfigProxy)
 
-    fun hasStartBioDataService(): Boolean
+    /**
+     * 断开
+     * */
+    fun closeAffectiveServiceConnection()
 
-    fun checkInitStatue(){
+    fun hasConnectAffectiveService(): Boolean
 
-    }
+    fun addServiceConnectStatueListener(
+        connectionListener: () -> Unit,
+        disconnectListener: (String) -> Unit
+    )
+
+    fun removeServiceConnectStatueListener(
+        connectionListener: () -> Unit,
+        disconnectListener: (String) -> Unit
+    )
+
 
     /**
      * 启动情感服务
      * */
     fun startAffectiveService(
         authenticationInputStream: InputStream?,
-        callback: Callback2<String>,
-        builder: EnterAffectiveConfigProxy
+        context: Context?,
+        callback: Callback2<String>
     )
 
     /**
      * 重启情感服务
      * */
     fun restoreAffectiveService(callback: Callback)
+
+    /**
+     * 结束情感服务
+     * */
+    fun finishAffectiveService(callback: Callback)
+
+    /**
+     * 获取报表
+     * @param needFinishService 是否需要自动结束情感服务 true 自动结束
+     * */
+    fun getReport(callback: Callback2<UploadReportEntity>,needFinishService:Boolean)
+
+    /**
+     * 是否启动了情感云服务
+     * */
+    fun hasStartAffectiveService(): Boolean
+
+    /**
+     * 检查一次初始化状态
+     * @see [hasStartAffectiveService]
+     * */
+    fun checkInitStatue(){
+
+    }
 
     /**
      * 订阅数据
@@ -64,14 +115,10 @@ interface IAffectiveDataAnalysisService {
         listener: ((RealtimeAffectiveData?) -> Unit)? = null
     )
 
-    fun <T> readFileAnalysisData(filePath: String, callback: Callback2<T>,case:(Int)->T?)
-
-    fun <T> readFileAnalysisData(inputStream: InputStream, callback: Callback2<T>,case:(Int)->T?)
-
     /**
      * @param file 待分析的文件
      * */
-    fun <T> readFileAnalysisData(file: File, callback: Callback2<T>,case:(Int)->T?)
+    fun <T> readFileAnalysisData(inputStream: InputStream, callback: Callback2<T>,case:(Int)->T?)
 
     /**
      * 发送数据
@@ -86,6 +133,9 @@ interface IAffectiveDataAnalysisService {
      * */
     fun appendSCEEGData(brainData: ByteArray)
 
+    /**
+     * 添加心率数据
+     * */
     fun appendHeartRateData(heartRateData: Int)
 
     fun appendMCEEGData(mceegData: ByteArray)
@@ -98,27 +148,6 @@ interface IAffectiveDataAnalysisService {
     fun appendBCGData(bcgData: ByteArray, packageCount: Int = UPLOAD_BCG_PACKAGE_COUNT)
 
     fun appendGyroData(gyroData: ByteArray, packageCount: Int = UPLOAD_GYRO_PACKAGE_COUNT)
-
-    /**
-     * 结束情感服务
-     * */
-    fun finishAffectiveService(callback: Callback)
-
-    fun addServiceConnectStatueListener(
-        connectionListener: () -> Unit,
-        disconnectListener: (String) -> Unit
-    )
-
-    fun removeServiceConnectStatueListener(
-        connectionListener: () -> Unit,
-        disconnectListener: (String) -> Unit
-    )
-
-    fun isAffectiveServiceConnect(): Boolean
-
-    fun closeAffectiveServiceConnection()
-
-    fun getReport(callback: Callback2<UploadReportEntity>,needFinishService:Boolean)
 
 
     fun getAffectiveWay(): AffectiveServiceWay

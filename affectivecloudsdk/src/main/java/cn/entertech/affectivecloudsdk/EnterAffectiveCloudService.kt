@@ -1,5 +1,6 @@
 package cn.entertech.affectivecloudsdk
 
+import android.content.Context
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
@@ -12,7 +13,6 @@ import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.UploadReportEntity
 import cn.entertech.affective.sdk.utils.LogUtil
 import com.google.auto.service.AutoService
-import java.io.File
 import java.io.InputStream
 
 @AutoService(IAffectiveDataAnalysisService::class)
@@ -24,6 +24,12 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
 
     private  var mEnterAffectiveCloudManager: EnterAffectiveCloudManager?=null
 
+
+
+    override fun connectAffectiveServiceConnection(configProxy: EnterAffectiveConfigProxy) {
+        mEnterAffectiveCloudManager = EnterAffectiveCloudManager(EnterAffectiveCloudConfig.proxyInstance(configProxy))
+    }
+
     /**
      * 启动webSocket
      * 创建会话
@@ -31,11 +37,11 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
      * 启动AffectiveService ，启动成功后订阅数据
      *
      * */
-    override fun startAffectiveService(authenticationInputStream: InputStream?,
-        callback: Callback2<String>,builder: EnterAffectiveConfigProxy
+    override fun startAffectiveService(
+        authenticationInputStream: InputStream?,
+        context: Context?, callback: Callback2<String>
     ) {
         LogUtil.d(TAG,"startAffectiveService")
-        mEnterAffectiveCloudManager = EnterAffectiveCloudManager(EnterAffectiveCloudConfig.proxyInstance(builder))
         mEnterAffectiveCloudManager?.init(callback)
     }
 
@@ -70,17 +76,11 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         }
     }
 
-    override fun <T> readFileAnalysisData(filePath: String, callback: Callback2<T>,case:(Int)->T?) {
-        callback.onError(Error(-1,"not support this method"))
-    }
 
     override fun <T> readFileAnalysisData(inputStream: InputStream, callback: Callback2<T>,case:(Int)->T?) {
         callback.onError(Error(-1,"not support this method"))
     }
 
-    override fun <T> readFileAnalysisData(file: File, callback: Callback2<T>,case:(Int)->T?) {
-        callback.onError(Error(-1,"not support this method"))
-    }
 
     override fun appendEEGData(brainData: ByteArray) {
         mEnterAffectiveCloudManager?.appendEEGData(brainData)
@@ -135,12 +135,12 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         mEnterAffectiveCloudManager?.removeWebSocketDisconnectListener(disconnectListener)
     }
 
-    override fun hasStartBioDataService(): Boolean {
+    override fun hasStartAffectiveService(): Boolean {
         LogUtil.d(TAG,"hasStartBioDataService")
         return mEnterAffectiveCloudManager?.isInited()?:false
     }
 
-    override fun isAffectiveServiceConnect(): Boolean {
+    override fun hasConnectAffectiveService(): Boolean {
         LogUtil.d(TAG,"isAffectiveServiceConnect $mEnterAffectiveCloudManager")
         return mEnterAffectiveCloudManager?.isWebSocketOpen()?:false
     }

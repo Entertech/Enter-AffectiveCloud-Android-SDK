@@ -1,27 +1,23 @@
 package cn.entertech.affectivecloudsdk
 
-import cn.entertech.affective.sdk.api.Callback
+import cn.entertech.affective.sdk.utils.AffectiveLogHelper
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import org.java_websocket.WebSocket
 import org.java_websocket.enums.ReadyState
 import org.java_websocket.handshake.ServerHandshake
-import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 class EnterWebSocketCallback : WebSocketCallback {
 
-    companion object{
-        private const val TIME=1000
+    companion object {
+        private const val TIME = 1000
+        private const val TAG = "EnterWebSocketCallback"
     }
 
-    private val map by lazy {
-
-    }
 
     var onOpen: (() -> Unit)? = null
     var onClose: (() -> Unit)? = null
     var onError: ((Exception?) -> Unit)? = null
-    var callback: Callback? = null
 
     override fun onOpen(serverHandshake: ServerHandshake?) {
         onOpen?.invoke()
@@ -36,34 +32,34 @@ class EnterWebSocketCallback : WebSocketCallback {
     }
 
     override fun isClosed(isClosed: Boolean): Boolean {
-        if(isClosed) {
-            callback?.log("EnterWebSocketCallback: isClosed $isClosed")
+        if (isClosed) {
+            AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: isClosed $isClosed")
         }
         return super.isClosed(isClosed)
     }
 
     override fun getReadyState(readyState: ReadyState): ReadyState {
-        callback?.log("EnterWebSocketCallback: getReadyState $readyState")
+        AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: getReadyState $readyState")
         return super.getReadyState(readyState)
     }
 
     override fun reconnectBlocking(reconnectBlocking: Boolean): Boolean {
-        callback?.log("EnterWebSocketCallback: reconnectBlocking $reconnectBlocking")
+        AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: reconnectBlocking $reconnectBlocking")
         return super.reconnectBlocking(reconnectBlocking)
     }
 
     override fun reconnect() {
-        callback?.log("EnterWebSocketCallback: reconnect ")
+        AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: reconnect ")
         super.reconnect()
     }
 
     override fun connect() {
-        callback?.log("EnterWebSocketCallback: connect ")
+        AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: connect ")
         super.connect()
     }
 
     override fun connectBlocking(connectBlocking: Boolean): Boolean {
-        callback?.log("EnterWebSocketCallback: connectBlocking $connectBlocking")
+        AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: connectBlocking $connectBlocking")
         return super.connectBlocking(connectBlocking)
     }
 
@@ -72,72 +68,83 @@ class EnterWebSocketCallback : WebSocketCallback {
         timeUnit: TimeUnit?,
         connectBlocking: Boolean
     ): Boolean {
-        callback?.log("EnterWebSocketCallback: connectBlocking timeout $timeout," +
-                " timeUnit, connectBlocking $connectBlocking")
+        AffectiveLogHelper.i(
+            TAG, "EnterWebSocketCallback: connectBlocking timeout $timeout," +
+                    " timeUnit, connectBlocking $connectBlocking"
+        )
         return super.connectBlocking(timeout, timeUnit, connectBlocking)
     }
 
     override fun closeBlocking() {
-        callback?.log("EnterWebSocketCallback: closeBlocking ")
+        AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: closeBlocking ")
         super.closeBlocking()
     }
 
     override fun onCloseInitiated(code: Int, reason: String?) {
-        callback?.log("EnterWebSocketCallback: onCloseInitiated code $code, reason $reason")
+        AffectiveLogHelper.i(
+            TAG,
+            "EnterWebSocketCallback: onCloseInitiated code $code, reason $reason"
+        )
         super.onCloseInitiated(code, reason)
     }
 
     override fun onClosing(code: Int, reason: String?, remote: Boolean) {
-        callback?.log("EnterWebSocketCallback: onClosing ")
+        AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: onClosing ")
         super.onClosing(code, reason, remote)
     }
 
     override fun isClosing(isClosing: Boolean): Boolean {
-        if(isClosing) {
-            callback?.log("EnterWebSocketCallback: isClosing $isClosing ")
+        if (isClosing) {
+            AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: isClosing $isClosing ")
         }
         return super.isClosing(isClosing)
     }
 
     override fun isOpen(isOpen: Boolean): Boolean {
-        if(!isOpen) {
-            callback?.log("EnterWebSocketCallback: isOpen $isOpen ")
+        if (!isOpen) {
+            AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: isOpen $isOpen ")
         }
         return super.isOpen(isOpen)
     }
 
     override fun onWebsocketClosing(conn: WebSocket?, code: Int, reason: String?, remote: Boolean) {
-        callback?.log("EnterWebSocketCallback: onWebsocketClosing code $code reason $reason")
+        AffectiveLogHelper.i(
+            TAG,
+            "EnterWebSocketCallback: onWebsocketClosing code $code reason $reason"
+        )
         super.onWebsocketClosing(conn, code, reason, remote)
     }
 
     override fun close() {
-        callback?.log("EnterWebSocketCallback: close ")
+        AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: close ")
         super.close()
     }
 
     override fun close(code: Int) {
-        callback?.log("EnterWebSocketCallback: close $code ")
+        AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: close $code ")
         super.close(code)
     }
 
     override fun close(code: Int, message: String?) {
-        callback?.log("EnterWebSocketCallback: close code $code message $message")
+        AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: close code $code message $message")
         super.close(code, message)
     }
 
     override fun closeConnection(code: Int, message: String?) {
-        callback?.log("EnterWebSocketCallback: closeConnection code $code message $message")
+        AffectiveLogHelper.i(
+            TAG,
+            "EnterWebSocketCallback: closeConnection code $code message $message"
+        )
         super.closeConnection(code, message)
     }
 
     override fun onWebsocketCloseInitiated(conn: WebSocket?, code: Int, reason: String?) {
-        callback?.log("EnterWebSocketCallback: reconnect ")
+        AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: reconnect ")
         super.onWebsocketCloseInitiated(conn, code, reason)
     }
 
     override fun isFlushAndClose(isFlushAndClose: Boolean): Boolean {
-        callback?.log("EnterWebSocketCallback: isFlushAndClose ")
+        AffectiveLogHelper.i(TAG, "EnterWebSocketCallback: isFlushAndClose ")
         return super.isFlushAndClose(isFlushAndClose)
     }
 }

@@ -10,7 +10,7 @@ import cn.entertech.affective.sdk.bean.BioDataCategory
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
-import cn.entertech.affective.sdk.utils.LogUtil
+import cn.entertech.affective.sdk.utils.AffectiveLogHelper
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import cn.entertech.affectivecloudsdk.utils.ConvertUtil
@@ -254,7 +254,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
 
     override fun isWebSocketOpen(): Boolean {
         if (mWebSocketHelper == null) {
-            LogUtil.e(TAG,"mWebSocketHelper is null")
+            AffectiveLogHelper.e(TAG,"mWebSocketHelper is null")
             return false
         }
         return mWebSocketHelper!!.isOpen()

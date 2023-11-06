@@ -17,12 +17,12 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * 步骤：
- * 1.建立webSocket连接
+ * 1.建立webSocket连接，并创建session会话
  * 2.启动、初始化生物数据基础分析服务&& 若配置感云计算服务，则启动情感云计算服务
  * 3.启动服务成功后，各自订阅自己的数据
  * 4.取消订阅----不必须
- * 5.结束服务
- * 6.关闭webSocket连接
+ * 5.结束服务，释放资源
+ * 6.关闭会话，关闭webSocket连接
  *
  * */
 class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :

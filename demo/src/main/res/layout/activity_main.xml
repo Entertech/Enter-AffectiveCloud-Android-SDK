@@ -1,160 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".activity.MainActivity"
-        android:orientation="vertical"
-        >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.MainActivity">
 
 
     <!--导航条-->
     <cn.entertech.biomoduledemo.utils.PagerSlidingTabStrip
-            android:id="@+id/message_tabs"
-            android:layout_gravity="center"
-            app:pstsIndicatorHeight="2dp"
-            app:pstsUnderlineHeight="0dp"
-            app:pstsTabUnselectedTextColor="#999999"
-            app:pstsTabSelectedTextColor="@color/colorPrimary"
-            app:pstsIndicatorColor="@color/colorPrimary"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            />
+        android:id="@+id/message_tabs"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        app:pstsIndicatorColor="@color/colorPrimary"
+        app:pstsIndicatorHeight="2dp"
+        app:pstsTabSelectedTextColor="@color/colorPrimary"
+        app:pstsTabUnselectedTextColor="#999999"
+        app:pstsUnderlineHeight="0dp" />
 
     <androidx.viewpager.widget.ViewPager
-            android:id="@+id/vp_contain"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+        android:id="@+id/vp_contain"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1">
 
     </androidx.viewpager.widget.ViewPager>
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <Button
-                android:textAllCaps="false"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="@string/main_connect_to_ble"
-                android:onClick="onConnectDevice"
-                />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onConnectDevice"
+            android:text="@string/main_connect_to_ble"
+            android:textAllCaps="false" />
 
         <Button
-                android:textAllCaps="false"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="@string/main_disconnect_ble"
-                android:onClick="onDisconnectDevice"
-                />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onDisconnectDevice"
+            android:text="@string/main_disconnect_ble"
+            android:textAllCaps="false" />
 
 
         <Button
-                android:textAllCaps="false"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="@string/main_clear"
-                android:onClick="onClear"
-                />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onClear"
+            android:text="@string/main_clear"
+            android:textAllCaps="false" />
 
 
         <Button
-                android:textAllCaps="false"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="@string/main_pause"
-                android:onClick="onPause"
-                />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onPause"
+            android:text="@string/main_pause"
+            android:textAllCaps="false" />
 
 
     </LinearLayout>
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <Button
-                android:textAllCaps="false"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="@string/main_init"
-                android:onClick="onInit"
-                />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onInit"
+            android:text="@string/main_init"
+            android:textAllCaps="false" />
 
         <Button
-                android:textAllCaps="false"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="@string/main_upload"
-                android:onClick="onStartUpload"
-                />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onStartUpload"
+            android:text="@string/main_upload"
+            android:textAllCaps="false" />
 
         <Button
-                android:textAllCaps="false"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="@string/upload"
-                android:onClick="onReport"
-                />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onReport"
+            android:text="@string/upload"
+            android:textAllCaps="false" />
 
     </LinearLayout>
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
 
         <Button
-                android:textAllCaps="false"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="@string/main_finish"
-                android:onClick="onFinish"
-                />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onFinish"
+            android:text="@string/main_finish"
+            android:textAllCaps="false" />
 
         <Button
-                android:textAllCaps="false"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="@string/main_submit_comment"
-                android:onClick="onSubmit"
-                />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onSubmit"
+            android:text="@string/main_submit_comment"
+            android:textAllCaps="false" />
+
         <Button
-                android:textAllCaps="false"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="Restore"
-                android:onClick="onRestore"
-                />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onRestore"
+            android:text="Restore"
+            android:textAllCaps="false" />
 
     </LinearLayout>
+
     <Button
-            android:visibility="gone"
-            android:textAllCaps="false"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/main_api_detail"
-            android:onClick="toApiDetail"
-            />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="toApiDetail"
+        android:text="@string/main_api_detail"
+        android:textAllCaps="false"
+        android:visibility="gone" />
 
     <!--<Button android:layout_width="match_parent"-->
     <!--android:layout_height="wrap_content"-->

@@ -47,8 +47,6 @@ import kotlin.collections.HashMap
 class MainActivity : AppCompatActivity() {
     private var appSecret: String? = null
     private var appKey: String? = null
-    private var affectiveSubscribeParams: AffectiveSubscribeParams? = null
-    private var biodataSubscribeParams: BiodataSubscribeParams? = null
     private lateinit var biomoduleBleManager: BiomoduleBleManager
 
     /*userId:your email or phone num;自己的用户ID：邮箱或者手机号码*/
@@ -61,29 +59,9 @@ class MainActivity : AppCompatActivity() {
         IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveCloudService)
     }
 
-    var saveRootPath: String = ""
-    var saveRawDataPath: String = ""
-    var saveRealtimeDataPath: String = ""
-    var saveReportDataPath: String = ""
-    var fileName: String = ""
-
     //    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
     var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 
-    //    var EEG_TEST_FILE_PATH =
-//        "/Users/Enter/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
-    var EEG_TEST_FILE_PATH =
-        Environment.getExternalStorageDirectory().path + File.separator + "flowtime_eegdata.txt"
-    var rawEEGFileHelper = FileHelper()
-    var rawHRFileHelper = FileHelper()
-    var realtimeEEGLeftFileHelper = FileHelper()
-    var realtimeEEGRightFileHelper = FileHelper()
-    var realtimeGammaFileHelper = FileHelper()
-    var realtimeBetaFileHelper = FileHelper()
-    var realtimeAlphaFileHelper = FileHelper()
-    var realtimeThetaFileHelper = FileHelper()
-    var realtimeDeltaFileHelper = FileHelper()
-    var reportFileHelper = FileHelper()
     companion object{
         private const val TAG="MainActivity"
     }
@@ -132,12 +110,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val authenticationInputStream: InputStream? by lazy {
+        null
+    }
+
     private val connectionServiceListener by lazy {
         object : IConnectionServiceListener {
             override fun connectionSuccess(sessionId: String?) {
                 Log.d(TAG, "connectionSuccess: $sessionId")
                 affectiveService?.startAffectiveService(
-                    null,
+                    authenticationInputStream,
                     this@MainActivity, startAffectiveServiceLister
                 )
             }
@@ -324,7 +306,6 @@ class MainActivity : AppCompatActivity() {
             brainDataBuffer.add(brainData)
             writeFileDataBuffer.add((brainData))
             if (writeFileDataBuffer.size >= 20) {
-                rawEEGFileHelper.writeData("${list2String(writeFileDataBuffer)},")
                 writeFileDataBuffer.clear()
             }
         }
@@ -332,7 +313,6 @@ class MainActivity : AppCompatActivity() {
 
     private var heartRateDataBuffer = ArrayList<Int>()
     private var heartRateListener = fun(heartRate: Int) {
-        rawHRFileHelper.writeData("$heartRate,")
         heartRateDataBuffer.add(heartRate)
         affectiveService?.appendHeartRateData(heartRate)
     }

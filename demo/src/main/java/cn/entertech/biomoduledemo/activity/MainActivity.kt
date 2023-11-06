@@ -14,8 +14,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
+import cn.entertech.affective.sdk.api.IFinishAffectiveServiceListener
+import cn.entertech.affective.sdk.api.IStartAffectiveServiceLister
 import cn.entertech.affective.sdk.bean.AffectiveDataCategory
 import cn.entertech.affective.sdk.bean.BioDataCategory
+import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affectivecloudsdk.*
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
@@ -177,7 +180,23 @@ class MainActivity : AppCompatActivity() {
         enterAffectiveCloudManager?.addWebSocketDisconnectListener {
             Log.d("######", "websocket disconnect:$it")
         }
-        enterAffectiveCloudManager?.init()
+        enterAffectiveCloudManager?.init(object :IStartAffectiveServiceLister{
+            override fun startSuccess() {
+                
+            }
+
+            override fun startBioFail(error: Error?) {
+                
+            }
+
+            override fun startAffectionFail(error: Error?) {
+                
+            }
+
+            override fun startFail(error: Error?) {
+                
+            }
+        })
     }
 
 
@@ -377,7 +396,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onFinish(@Suppress("UNUSED_PARAMETER") view: View) {
-        enterAffectiveCloudManager?.release()
+        enterAffectiveCloudManager?.release(object :IFinishAffectiveServiceListener{
+            override fun finishBioFail(error: Error?) {
+                
+            }
+
+            override fun finishAffectiveFail(error: Error?) {
+                
+            }
+
+            override fun finishError(error: Error?) {
+                
+            }
+
+            override fun finishSuccess() {
+                
+            }
+        })
     }
 
     fun onSubmit(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -405,7 +440,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onRestore(@Suppress("UNUSED_PARAMETER") view: View) {
-        enterAffectiveCloudManager?.restore()
+        enterAffectiveCloudManager?.restore(object :IStartAffectiveServiceLister{
+            override fun startSuccess() {
+                
+            }
+
+            override fun startBioFail(error: Error?) {
+                
+            }
+
+            override fun startAffectionFail(error: Error?) {
+                
+            }
+
+            override fun startFail(error: Error?) {
+                
+            }
+        })
     }
 
     fun toApiDetail(@Suppress("UNUSED_PARAMETER") view: View) {

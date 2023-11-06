@@ -3,6 +3,7 @@ package cn.entertech.affectivecloudsdk
 import android.util.Log
 import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.api.IFinishAffectiveServiceListener
+import cn.entertech.affective.sdk.api.IStartAffectiveServiceLister
 import cn.entertech.affective.sdk.bean.AffectiveDataCategory
 import cn.entertech.affective.sdk.bean.BioDataCategory
 import cn.entertech.affective.sdk.bean.Error
@@ -260,8 +261,20 @@ class EnterAffectiveCloudManagerTest {
             enterAffectiveCloudManager!!.addRawJsonRequestListener(rawJsonRequestFunction!!)
             val countDownLatch = CountDownLatch(1)
             val isSuccess = booleanArrayOf(false)
+            enterAffectiveCloudManager!!.init(object :IStartAffectiveServiceLister{
+                override fun startSuccess() {
 
-            enterAffectiveCloudManager!!.init(object :I)
+                }
+
+                override fun startBioFail(error: Error?) {
+                }
+
+                override fun startAffectionFail(error: Error?) {
+                }
+
+                override fun startFail(error: Error?) {
+                }
+            })
             try {
                 countDownLatch.await()
             } catch (e: InterruptedException) {

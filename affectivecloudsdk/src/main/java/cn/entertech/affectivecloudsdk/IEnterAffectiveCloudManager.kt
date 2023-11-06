@@ -4,6 +4,8 @@ import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService.Companion.UPLOAD_BCG_PACKAGE_COUNT
 import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService.Companion.UPLOAD_GYRO_PACKAGE_COUNT
+import cn.entertech.affective.sdk.api.IFinishAffectiveServiceListener
+import cn.entertech.affective.sdk.api.IStartAffectiveServiceLister
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 
@@ -19,7 +21,7 @@ interface IEnterAffectiveCloudManager {
     /**
      * 初始化分析服务
      * */
-    fun init(callback: Callback2<String>)
+    fun init(initListener: IStartAffectiveServiceLister)
 
     /**
      * 是否启动了生物数据基础分析服务
@@ -39,11 +41,13 @@ interface IEnterAffectiveCloudManager {
     /**
      * 恢复
      * */
-    fun restore(callback: Callback)
+    fun restore(listener: IStartAffectiveServiceLister)
 
     fun closeWebSocket()
 
-    fun release(callback: Callback)
+    fun release(listener: IFinishAffectiveServiceListener)
+
+    fun closeSession(callback: Callback)
 
     fun getBiodataReport(callback: Callback2<HashMap<Any, Any?>>)
     fun getAffectiveDataReport(callback: Callback2<HashMap<Any, Any?>>)

@@ -2,6 +2,9 @@ package cn.entertech.affectivecloudsdk
 
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
+import cn.entertech.affective.sdk.api.IConnectionServiceListener
+import cn.entertech.affective.sdk.api.IFinishAffectiveServiceListener
+import cn.entertech.affective.sdk.api.IStartAffectiveServiceLister
 import cn.entertech.affective.sdk.bean.AffectiveDataCategory
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
@@ -10,7 +13,6 @@ import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import java.lang.IllegalStateException
 import java.util.concurrent.CopyOnWriteArrayList
-
 
 
 /**
@@ -22,20 +24,13 @@ import java.util.concurrent.CopyOnWriteArrayList
  * 5.结束服务
  * 6.关闭webSocket连接
  *
- *
- *
- * 对于业务来说 只需要
- * 启动服务
- * 订阅数据
- * 发送数据
- * 取消订阅
- * 关闭服务
  * */
 class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     IEnterAffectiveCloudManager {
-    companion object{
-        private const val TAG="EnterAffectiveCloudManager"
+    companion object {
+        private const val TAG = "EnterAffectiveCloudManager"
     }
+
     private var mApi: BaseApi
     private var mBiodataRealtimeListener =
         CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit>()
@@ -76,10 +71,6 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         if (config.availableBioDataCategories == null) {
             throw IllegalStateException("biodata services must not be null")
         }
-    }
-
-    private fun openWebSocket(webSocketCallback: WebSocketCallback) {
-        mApi.openWebSocket(webSocketCallback)
     }
 
     private fun initBiodata(callback: Callback) {
@@ -129,42 +120,44 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     private fun initAffective(callback: Callback) {
-        mApi.initAffectiveDataServices(config.availableAffectiveDataCategories!!, object : Callback {
-            override fun onSuccess() {
-                if (config.mAffectiveSubscribeParams != null) {
-                    mApi.subscribeAffectiveData(config.mAffectiveSubscribeParams!!,
-                        object : Callback2<RealtimeAffectiveData> {
-                            override fun onSuccess(t: cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) {
-                                mAffectiveRealtimeListener.forEach {
-                                    it.invoke(t)
+        mApi.initAffectiveDataServices(
+            config.availableAffectiveDataCategories!!,
+            object : Callback {
+                override fun onSuccess() {
+                    if (config.mAffectiveSubscribeParams != null) {
+                        mApi.subscribeAffectiveData(config.mAffectiveSubscribeParams!!,
+                            object : Callback2<RealtimeAffectiveData> {
+                                override fun onSuccess(t: cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) {
+                                    mAffectiveRealtimeListener.forEach {
+                                        it.invoke(t)
+                                    }
                                 }
-                            }
 
-                            override fun onError(error: Error?) {
-                                callback.onError(error)
-                            }
-                        },
-                        object : Callback2<SubAffectiveDataFields> {
-                            override fun onSuccess(t: SubAffectiveDataFields?) {
-                                if (t != null) {
-                                    selectAvailableAffectiveServicesInRemote(t)
+                                override fun onError(error: Error?) {
+                                    callback.onError(error)
                                 }
-                                callback.onSuccess()
-                            }
+                            },
+                            object : Callback2<SubAffectiveDataFields> {
+                                override fun onSuccess(t: SubAffectiveDataFields?) {
+                                    if (t != null) {
+                                        selectAvailableAffectiveServicesInRemote(t)
+                                    }
+                                    callback.onSuccess()
+                                }
 
-                            override fun onError(error: Error?) {
-                                callback.onError(error)
-                            }
-                        })
-                } else {
-                    callback.onSuccess()
+                                override fun onError(error: Error?) {
+                                    callback.onError(error)
+                                }
+                            })
+                    } else {
+                        callback.onSuccess()
+                    }
                 }
-            }
 
-            override fun onError(error: Error?) {
-                callback.onError(error)
-            }
-        })
+                override fun onError(error: Error?) {
+                    callback.onError(error)
+                }
+            })
     }
 
     private fun selectAvailableAffectiveServicesInRemote(subData: SubAffectiveDataFields) {
@@ -204,6 +197,31 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         return isInit
     }
 
+    fun openWebSocket(listener: IConnectionServiceListener) {
+        mEnterWebSocketCallback.onOpen = {
+            mApi.createSession(object : Callback2<String> {
+                override fun onSuccess(t: String?) {
+                    listener.connectionSuccess(t)
+                }
+
+                override fun onError(error: Error?) {
+                    listener.connectionError(error)
+                    isInit = false
+                }
+            })
+        }
+        mEnterWebSocketCallback.onError = { e ->
+            isInit = false
+            e?.printStackTrace()
+            listener.connectionError(Error(-1, e.toString()))
+        }
+        mEnterWebSocketCallback.onClose = {
+            isInit = false
+        }
+        mApi.openWebSocket(mEnterWebSocketCallback)
+    }
+
+
     override fun getSessionId(): String? {
         return mApi.getSessionId()
     }
@@ -212,46 +230,53 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         EnterWebSocketCallback()
     }
 
-    override fun init(callback: Callback2<String>) {
-        val cb=object :Callback{
+    override fun init(initListener: IStartAffectiveServiceLister) {
+        initBiodata(object : Callback {
             override fun onSuccess() {
-                callback.onSuccess(mApi.getSessionId())
+                if (config.availableAffectiveDataCategories != null) {
+                    initAffective(object : Callback {
+                        override fun onSuccess() {
+                            initListener.startSuccess()
+                        }
+
+                        override fun onError(error: Error?) {
+                            initListener.startAffectionFail(error)
+                            initListener.startSuccess()
+                        }
+                    })
+                } else {
+                    initListener.startAffectionFail(
+                        Error(
+                            -1,
+                            "availableAffectiveDataCategories is null"
+                        )
+                    )
+                }
             }
 
             override fun onError(error: Error?) {
-                callback.onError(error)
-            }
+                initListener.startBioFail(error)
+                if (config.availableAffectiveDataCategories != null) {
+                    initAffective(object : Callback {
+                        override fun onSuccess() {
+                            initListener.startSuccess()
+                        }
 
-            override fun log(msg: String) {
-                callback.log(msg)
+                        override fun onError(error: Error?) {
+                            initListener.startFail(error)
+                        }
+                    })
+                } else {
+                    initListener.startAffectionFail(
+                        Error(
+                            -1,
+                            "availableAffectiveDataCategories is null"
+                        )
+                    )
+                }
             }
-        }
-        mEnterWebSocketCallback.callback = cb
-        mEnterWebSocketCallback.onOpen = {
-            mApi.createSession(object : Callback2<String> {
-                override fun onSuccess(t: String?) {
-                    callback.onSuccess(t)
-                    initBiodata(cb)
-                    if (config.availableAffectiveDataCategories != null) {
-                        initAffective(cb)
-                    }
-                }
+        })
 
-                override fun onError(error: Error?) {
-                    callback.onError(error)
-                    isInit = false
-                }
-            })
-        }
-        mEnterWebSocketCallback.onError = { e ->
-            isInit = false
-            e?.printStackTrace()
-            callback.onError(Error(-1, e.toString()))
-        }
-        mEnterWebSocketCallback.onClose = {
-            isInit = false
-        }
-        mApi.openWebSocket(mEnterWebSocketCallback)
     }
 
     override fun appendMCEEGData(mceegData: ByteArray) {
@@ -310,35 +335,28 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.getAffectivedataReport(config.availableAffectiveDataCategories!!, callback)
     }
 
-    override fun restore(callback: Callback) {
+    override fun restore(listener: IStartAffectiveServiceLister) {
         if (mApi.isWebSocketOpen()) {
             mApi.restore(object : Callback {
                 override fun onSuccess() {
-                    initBiodata(callback)
-                    if (config.availableAffectiveDataCategories != null) {
-                        initAffective(callback)
-                    }
+                    init(listener)
                 }
 
                 override fun onError(error: Error?) {
-                    callback.onError(error)
+                    listener.startFail(error)
                     isInit = false
                 }
             })
         } else {
-            mEnterWebSocketCallback.callback = callback
             mEnterWebSocketCallback.onOpen = {
                 mApi.restore(object : Callback {
                     override fun onSuccess() {
-                        initBiodata(callback)
-                        if (config.availableAffectiveDataCategories != null) {
-                            initAffective(callback)
-                        }
+                        init(listener)
                     }
 
                     override fun onError(error: Error?) {
                         isInit = false
-                        callback.onError(error)
+                        listener.startFail(error)
                     }
                 })
             }
@@ -348,36 +366,34 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
             mEnterWebSocketCallback.onError = { e ->
                 isInit = false
                 e?.printStackTrace()
-                callback.onError(Error(-1, e.toString()))
+                listener.startFail(Error(-1, e.toString()))
             }
 
             mApi.openWebSocket(mEnterWebSocketCallback)
         }
     }
 
-    override fun release(callback: Callback) {
+    override fun release(listener: IFinishAffectiveServiceListener) {
         if (config.availableAffectiveDataCategories != null) {
             mApi.finishAffectiveDataServices(
-                config.availableAffectiveDataCategories!!,
-                object : Callback {
+                config.availableAffectiveDataCategories!!, object : Callback {
                     override fun onSuccess() {
-                        mApi.destroySessionAndCloseWebSocket(object : Callback {
-                            override fun onSuccess() {
-                                callback.onSuccess()
-                            }
-
-                            override fun onError(error: Error?) {
-                                callback.onError(error)
-                            }
-                        })
+                        listener.finishSuccess()
                     }
 
                     override fun onError(error: Error?) {
-                        callback.onError(error)
+                        listener.finishAffectiveFail(error)
                     }
-
-                })
+                }
+            )
+        } else {
+            listener.finishAffectiveFail(Error(-1, "affective is null"))
+            listener.finishSuccess()
         }
+    }
+
+    override fun closeSession(callback: Callback) {
+        mApi.destroySessionAndCloseWebSocket(callback)
     }
 
 
@@ -425,7 +441,16 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     override fun closeWebSocket() {
-        mApi.closeWebSocket()
+        closeSession(object : Callback {
+            override fun onSuccess() {
+                mApi.closeWebSocket()
+            }
+
+            override fun onError(error: Error?) {
+                mApi.closeWebSocket()
+            }
+        })
+
     }
 
     fun closeConnection(code: Int, message: String) {

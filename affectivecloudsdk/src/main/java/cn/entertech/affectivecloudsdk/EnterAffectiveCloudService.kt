@@ -2,59 +2,67 @@ package cn.entertech.affectivecloudsdk
 
 import android.content.Context
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
-import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService
+import cn.entertech.affective.sdk.api.IConnectionServiceListener
+import cn.entertech.affective.sdk.api.IFinishAffectiveServiceListener
+import cn.entertech.affective.sdk.api.IGetReportListener
+import cn.entertech.affective.sdk.api.IStartAffectiveServiceLister
 import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import java.util.HashMap
 import cn.entertech.affective.sdk.bean.Error
-import cn.entertech.affective.sdk.bean.UploadReportEntity
-import cn.entertech.affective.sdk.utils.LogUtil
+import cn.entertech.affective.sdk.utils.AffectiveLogHelper
 import com.google.auto.service.AutoService
 import java.io.InputStream
 
 @AutoService(IAffectiveDataAnalysisService::class)
 class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
 
-    companion object{
-        private const val TAG="EnterAffectiveCloudService"
+    companion object {
+        private const val TAG = "EnterAffectiveCloudService"
     }
 
-    private  var mEnterAffectiveCloudManager: EnterAffectiveCloudManager?=null
+    private var mEnterAffectiveCloudManager: EnterAffectiveCloudManager? = null
 
 
-
-    override fun connectAffectiveServiceConnection(configProxy: EnterAffectiveConfigProxy) {
-        mEnterAffectiveCloudManager = EnterAffectiveCloudManager(EnterAffectiveCloudConfig.proxyInstance(configProxy))
+    /**
+     * 连接websocket
+     * 创建session
+     * */
+    override fun connectAffectiveServiceConnection(
+        listener: IConnectionServiceListener,
+        configProxy: EnterAffectiveConfigProxy
+    ) {
+        mEnterAffectiveCloudManager =
+            EnterAffectiveCloudManager(EnterAffectiveCloudConfig.proxyInstance(configProxy))
+        mEnterAffectiveCloudManager?.openWebSocket(listener)
     }
 
     /**
-     * 启动webSocket
-     * 创建会话
      * 启动bioDataService，启动成功后订阅数据
      * 启动AffectiveService ，启动成功后订阅数据
      *
      * */
     override fun startAffectiveService(
         authenticationInputStream: InputStream?,
-        context: Context?, callback: Callback2<String>
+        context: Context?, initListener: IStartAffectiveServiceLister
     ) {
-        LogUtil.d(TAG,"startAffectiveService")
-        mEnterAffectiveCloudManager?.init(callback)
+        AffectiveLogHelper.d(TAG, "startAffectiveService")
+        mEnterAffectiveCloudManager?.init(initListener)
     }
 
-    override fun restoreAffectiveService(callback: Callback) {
-        LogUtil.d(TAG,"restoreAffectiveService")
-        mEnterAffectiveCloudManager?.restore(callback)
+    override fun restoreAffectiveService(listener: IStartAffectiveServiceLister) {
+        AffectiveLogHelper.d(TAG, "restoreAffectiveService")
+        mEnterAffectiveCloudManager?.restore(listener)
     }
 
     override fun subscribeData(
         bdListener: ((RealtimeBioData?) -> Unit)?,
         listener: ((RealtimeAffectiveData?) -> Unit)?
     ) {
-        LogUtil.d(TAG,"subscribeData")
+        AffectiveLogHelper.d(TAG, "subscribeData")
         bdListener?.apply {
             mEnterAffectiveCloudManager?.addBiodataRealtimeListener(this)
         }
@@ -67,7 +75,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         bdListener: ((RealtimeBioData?) -> Unit)?,
         listener: ((RealtimeAffectiveData?) -> Unit)?
     ) {
-        LogUtil.d(TAG,"unSubscribeData")
+        AffectiveLogHelper.d(TAG, "unSubscribeData")
         bdListener?.apply {
             mEnterAffectiveCloudManager?.removeBiodataRealtimeListener(this)
         }
@@ -77,8 +85,12 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
     }
 
 
-    override fun <T> readFileAnalysisData(inputStream: InputStream, callback: Callback2<T>,case:(Int)->T?) {
-        callback.onError(Error(-1,"not support this method"))
+    override fun <T> readFileAnalysisData(
+        inputStream: InputStream,
+        callback: Callback2<T>,
+        case: (Int) -> T?
+    ) {
+        callback.onError(Error(-1, "not support this method"))
     }
 
 
@@ -114,9 +126,9 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         mEnterAffectiveCloudManager?.appendGyroData(gyroData, packageCount)
     }
 
-    override fun finishAffectiveService(callback: Callback) {
-        LogUtil.d(TAG,"finishAffectiveService")
-        mEnterAffectiveCloudManager?.release(callback)
+    override fun finishAffectiveService(listener: IFinishAffectiveServiceListener) {
+        AffectiveLogHelper.d(TAG, "finishAffectiveService")
+        mEnterAffectiveCloudManager?.release(listener)
     }
 
     override fun addServiceConnectStatueListener(
@@ -136,13 +148,13 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
     }
 
     override fun hasStartAffectiveService(): Boolean {
-        LogUtil.d(TAG,"hasStartBioDataService")
-        return mEnterAffectiveCloudManager?.isInited()?:false
+        AffectiveLogHelper.d(TAG, "hasStartBioDataService")
+        return mEnterAffectiveCloudManager?.isInited() ?: false
     }
 
     override fun hasConnectAffectiveService(): Boolean {
-        LogUtil.d(TAG,"isAffectiveServiceConnect $mEnterAffectiveCloudManager")
-        return mEnterAffectiveCloudManager?.isWebSocketOpen()?:false
+        AffectiveLogHelper.d(TAG, "isAffectiveServiceConnect $mEnterAffectiveCloudManager")
+        return mEnterAffectiveCloudManager?.isWebSocketOpen() ?: false
     }
 
     override fun closeAffectiveServiceConnection() {
@@ -153,34 +165,39 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
      * 上传report指令，失败不做处理，成功开始释放资源
      * 释放资源之后不管成功还是失败，关闭websocket，然后http请求报表数据
      * */
-    override fun getReport(callback: Callback2<UploadReportEntity>,needFinishService:Boolean) {
+    override fun getReport(listener: IGetReportListener, needFinishService: Boolean) {
         mEnterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onError(error: Error?) {
-                callback.onError(error)
+                listener.getBioReportError(error)
             }
 
             override fun onSuccess(t: HashMap<Any, Any?>?) {
                 mEnterAffectiveCloudManager?.getAffectiveDataReport(object :
                     Callback2<HashMap<Any, Any?>> {
                     override fun onError(error: Error?) {
-                        callback.onError(error)
+                        listener.getAffectiveReportError(error)
+                        listener.onError(error)
                     }
 
                     override fun onSuccess(t: HashMap<Any, Any?>?) {
                         if (!needFinishService) {
-                            callback.onSuccess(null)
+                            listener.onSuccess(null)
                             return
                         }
-                        finishAffectiveService(object :Callback{
-                            override fun onSuccess() {
-                                closeAffectiveServiceConnection()
-                                callback.onSuccess(null)
+                        finishAffectiveService(object : IFinishAffectiveServiceListener {
+                            override fun finishBioFail(error: Error?) {
+
                             }
 
-                            override fun onError(error: Error?) {
-                                closeAffectiveServiceConnection()
-                                //释放失败也是同样操作，所以也是success
-                                callback.onSuccess(null)
+                            override fun finishAffectiveFail(error: Error?) {
+                            }
+
+                            override fun finishError(error: Error?) {
+                                listener.onSuccess(null)
+                            }
+
+                            override fun finishSuccess() {
+                                listener.onSuccess(null)
                             }
                         })
                     }
@@ -191,5 +208,5 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         })
     }
 
-    override fun getAffectiveWay()= AffectiveServiceWay.AffectiveCloudService
+    override fun getAffectiveWay() = AffectiveServiceWay.AffectiveCloudService
 }

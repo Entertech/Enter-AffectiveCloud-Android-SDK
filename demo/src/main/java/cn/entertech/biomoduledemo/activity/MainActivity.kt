@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
-import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.bean.AffectiveDataCategory
 import cn.entertech.affective.sdk.bean.BioDataCategory
 import cn.entertech.affectivecloudsdk.*
@@ -178,37 +177,7 @@ class MainActivity : AppCompatActivity() {
         enterAffectiveCloudManager?.addWebSocketDisconnectListener {
             Log.d("######", "websocket disconnect:$it")
         }
-        enterAffectiveCloudManager?.init(object : Callback2<String> {
-            override fun onError(error: cn.entertech.affective.sdk.bean.Error?) {
-                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_failed) + error.toString())
-                if (error != null && error.code == 1004) {
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@MainActivity,
-                            getText(R.string.auth_page_title),
-                            Toast.LENGTH_LONG
-                        ).show()
-                        finish()
-                    }
-                }
-            }
-
-            override fun onSuccess(t:String?) {
-                fileName = "${getCurrentTime()}"
-                initSaveFiledir()
-                rawEEGFileHelper.setFilePath(saveRawDataPath + "eeg.txt")
-                rawHRFileHelper.setFilePath(saveRawDataPath + "hr.txt")
-                realtimeEEGLeftFileHelper.setFilePath(saveRealtimeDataPath + "brainwave_left.txt")
-                realtimeEEGRightFileHelper.setFilePath(saveRealtimeDataPath + "brainwave_right.txt")
-                realtimeAlphaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_alpha.txt")
-                realtimeBetaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_beta.txt")
-                realtimeGammaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_gamma.txt")
-                realtimeThetaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_theta.txt")
-                realtimeDeltaFileHelper.setFilePath(saveRealtimeDataPath + "rhythms_delta.txt")
-                reportFileHelper.setFilePath(saveReportDataPath+"report.txt")
-                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_sdk_init_success))
-            }
-        })
+        enterAffectiveCloudManager?.init()
     }
 
 
@@ -408,16 +377,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onFinish(@Suppress("UNUSED_PARAMETER") view: View) {
-        enterAffectiveCloudManager?.release(object : cn.entertech.affective.sdk.api.Callback {
-            override fun onSuccess() {
-                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_disconnected_from_cloud))
-            }
-
-            override fun onError(error: cn.entertech.affective.sdk.bean.Error?) {
-                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_disconnected_from_cloud_failed) + error?.msg)
-            }
-
-        })
+        enterAffectiveCloudManager?.release()
     }
 
     fun onSubmit(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -445,16 +405,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onRestore(@Suppress("UNUSED_PARAMETER") view: View) {
-        enterAffectiveCloudManager?.restore(object : cn.entertech.affective.sdk.api.Callback {
-            override fun onSuccess() {
-                messageReceiveFragment.appendMessageToScreen(getString(R.string.mian_cloud_restore_success))
-            }
-
-            override fun onError(error: cn.entertech.affective.sdk.bean.Error?) {
-                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_cloud_restore_failed) + error?.msg)
-            }
-
-        })
+        enterAffectiveCloudManager?.restore()
     }
 
     fun toApiDetail(@Suppress("UNUSED_PARAMETER") view: View) {

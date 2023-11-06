@@ -5,7 +5,6 @@ import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
-import cn.entertech.affective.sdk.bean.UploadReportEntity
 import java.io.InputStream
 import java.util.ServiceLoader
 
@@ -41,7 +40,10 @@ interface IAffectiveDataAnalysisService {
     /**
      * 连接情感云
      * */
-    fun connectAffectiveServiceConnection(configProxy: EnterAffectiveConfigProxy)
+    fun connectAffectiveServiceConnection(
+        listener: IConnectionServiceListener,
+        configProxy: EnterAffectiveConfigProxy
+    )
 
     /**
      * 断开
@@ -67,24 +69,24 @@ interface IAffectiveDataAnalysisService {
     fun startAffectiveService(
         authenticationInputStream: InputStream?,
         context: Context?,
-        callback: Callback2<String>
+        initListener: IStartAffectiveServiceLister
     )
 
     /**
      * 重启情感服务
      * */
-    fun restoreAffectiveService(callback: Callback)
+    fun restoreAffectiveService(listener: IStartAffectiveServiceLister)
 
     /**
      * 结束情感服务
      * */
-    fun finishAffectiveService(callback: Callback)
+    fun finishAffectiveService(listener: IFinishAffectiveServiceListener)
 
     /**
      * 获取报表
      * @param needFinishService 是否需要自动结束情感服务 true 自动结束
      * */
-    fun getReport(callback: Callback2<UploadReportEntity>,needFinishService:Boolean)
+    fun getReport(listener: IGetReportListener, needFinishService: Boolean)
 
     /**
      * 是否启动了情感云服务

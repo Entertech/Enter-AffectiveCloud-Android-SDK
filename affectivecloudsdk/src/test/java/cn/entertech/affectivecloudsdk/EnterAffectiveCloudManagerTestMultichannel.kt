@@ -1,7 +1,6 @@
 package cn.entertech.affectivecloudsdk
 
 import android.util.Log
-import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.bean.AffectiveDataCategory
 import cn.entertech.affective.sdk.bean.BioDataCategory
@@ -277,16 +276,7 @@ class EnterAffectiveCloudManagerTestMultichannel {
             val countDownLatch = CountDownLatch(1)
             val isSuccess = booleanArrayOf(false)
 
-            enterAffectiveCloudManager!!.init(object : Callback2<String> {
-                override fun onSuccess(session:String?) {
-                    isSuccess[0] = true
-                    countDownLatch.countDown()
-                }
-
-                override fun onError(error: Error?) {
-                    isSuccess[0] = false
-                }
-            })
+            enterAffectiveCloudManager!!.init()
             try {
                 countDownLatch.await()
             } catch (e: InterruptedException) {
@@ -302,17 +292,7 @@ class EnterAffectiveCloudManagerTestMultichannel {
             PowerMockito.mockStatic(Log::class.java)
             val results = BooleanArray(1)
             val countDownLatch = CountDownLatch(1)
-            enterAffectiveCloudManager!!.release(object : Callback {
-                override fun onSuccess() {
-                    results[0] = true
-                    countDownLatch.countDown()
-                }
-
-                override fun onError(error: Error?) {
-                    results[0] = false
-                    countDownLatch.countDown()
-                }
-            })
+            enterAffectiveCloudManager!!.release()
             try {
                 countDownLatch.await()
             } catch (e: InterruptedException) {

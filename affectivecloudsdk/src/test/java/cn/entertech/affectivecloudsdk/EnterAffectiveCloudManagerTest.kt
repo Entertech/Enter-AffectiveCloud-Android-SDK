@@ -1,8 +1,8 @@
 package cn.entertech.affectivecloudsdk
 
 import android.util.Log
-import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
+import cn.entertech.affective.sdk.api.IFinishAffectiveServiceListener
 import cn.entertech.affective.sdk.bean.AffectiveDataCategory
 import cn.entertech.affective.sdk.bean.BioDataCategory
 import cn.entertech.affective.sdk.bean.Error
@@ -261,16 +261,7 @@ class EnterAffectiveCloudManagerTest {
             val countDownLatch = CountDownLatch(1)
             val isSuccess = booleanArrayOf(false)
 
-            enterAffectiveCloudManager!!.init(object : Callback2<String> {
-                override fun onSuccess(t:String?) {
-                    isSuccess[0] = true
-                    countDownLatch.countDown()
-                }
-
-                override fun onError(error: Error?) {
-                    isSuccess[0] = false
-                }
-            })
+            enterAffectiveCloudManager!!.init(object :I)
             try {
                 countDownLatch.await()
             } catch (e: InterruptedException) {
@@ -286,15 +277,18 @@ class EnterAffectiveCloudManagerTest {
             PowerMockito.mockStatic(Log::class.java)
             val results = BooleanArray(1)
             val countDownLatch = CountDownLatch(1)
-            enterAffectiveCloudManager!!.release(object : Callback {
-                override fun onSuccess() {
-                    results[0] = true
-                    countDownLatch.countDown()
+            enterAffectiveCloudManager!!.release(object :IFinishAffectiveServiceListener{
+                override fun finishBioFail(error: Error?) {
+
                 }
 
-                override fun onError(error: Error?) {
-                    results[0] = false
-                    countDownLatch.countDown()
+                override fun finishAffectiveFail(error: Error?) {
+                }
+
+                override fun finishError(error: Error?) {
+                }
+
+                override fun finishSuccess() {
                 }
             })
             try {

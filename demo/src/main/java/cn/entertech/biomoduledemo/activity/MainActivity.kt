@@ -14,11 +14,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
+import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService
+import cn.entertech.affective.sdk.api.IConnectionServiceListener
 import cn.entertech.affective.sdk.api.IFinishAffectiveServiceListener
+import cn.entertech.affective.sdk.api.IGetReportListener
 import cn.entertech.affective.sdk.api.IStartAffectiveServiceLister
 import cn.entertech.affective.sdk.bean.AffectiveDataCategory
+import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.BioDataCategory
+import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.Error
+import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
+import cn.entertech.affective.sdk.bean.RealtimeBioData
+import cn.entertech.affective.sdk.bean.UploadReportEntity
 import cn.entertech.affectivecloudsdk.*
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
@@ -39,18 +47,19 @@ import kotlin.collections.HashMap
 class MainActivity : AppCompatActivity() {
     private var appSecret: String? = null
     private var appKey: String? = null
-    private var enterAffectiveCloudManager: EnterAffectiveCloudManager? = null
     private var affectiveSubscribeParams: AffectiveSubscribeParams? = null
     private var biodataSubscribeParams: BiodataSubscribeParams? = null
     private lateinit var biomoduleBleManager: BiomoduleBleManager
 
     /*userId:your email or phone num;自己的用户ID：邮箱或者手机号码*/
-    val USER_ID: String = "1245489@qq.com"
+    private val USER_ID: String = "1245489@qq.com"
     private lateinit var messageReceiveFragment: MessageReceiveFragment
     private lateinit var messageSendFragment: MessageSendFragment
-    lateinit var vpContainer: ViewPager
-    lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
-
+    private lateinit var vpContainer: ViewPager
+    private lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
+    private val affectiveService by lazy {
+        IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveCloudService)
+    }
 
     var saveRootPath: String = ""
     var saveRawDataPath: String = ""
@@ -58,7 +67,7 @@ class MainActivity : AppCompatActivity() {
     var saveReportDataPath: String = ""
     var fileName: String = ""
 
-//    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
+    //    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
     var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
 
     //    var EEG_TEST_FILE_PATH =
@@ -75,7 +84,10 @@ class MainActivity : AppCompatActivity() {
     var realtimeThetaFileHelper = FileHelper()
     var realtimeDeltaFileHelper = FileHelper()
     var reportFileHelper = FileHelper()
-    var availableAffectiveDataCategories =
+    companion object{
+        private const val TAG="MainActivity"
+    }
+    private var availableAffectiveDataCategories =
         listOf(
             AffectiveDataCategory.ATTENTION,
             AffectiveDataCategory.PRESSURE,
@@ -86,7 +98,69 @@ class MainActivity : AppCompatActivity() {
             AffectiveDataCategory.COHERENCE,
             AffectiveDataCategory.FLOW
         )
-    var availableBioDataCategories = listOf(BioDataCategory.EEG, BioDataCategory.HR)
+    private var availableBioDataCategories = listOf(BioDataCategory.EEG, BioDataCategory.HR)
+
+    private val connectionListener by lazy {
+        {
+            val i = Log.d(TAG,"connectionListener")
+        }
+    }
+
+    private val disconnectionListener by lazy {
+        { errorMsg: String ->
+            val i = Log.d(TAG, "disconnect:$errorMsg")
+        }
+    }
+
+    private val startAffectiveServiceLister by lazy {
+        object : IStartAffectiveServiceLister {
+            override fun startSuccess() {
+                Log.d(TAG, "startAffectiveServiceLister:startSuccess")
+            }
+
+            override fun startBioFail(error: Error?) {
+                Log.d(TAG, "startAffectiveServiceLister:startBioFail $error")
+            }
+
+            override fun startAffectionFail(error: Error?) {
+                Log.d(TAG, "startAffectiveServiceLister:startAffectionFail $error")
+            }
+
+            override fun startFail(error: Error?) {
+                Log.d(TAG, "startAffectiveServiceLister:startFail $error")
+            }
+        }
+    }
+
+    private val connectionServiceListener by lazy {
+        object : IConnectionServiceListener {
+            override fun connectionSuccess(sessionId: String?) {
+                Log.d(TAG, "connectionSuccess: $sessionId")
+                affectiveService?.startAffectiveService(
+                    null,
+                    this@MainActivity, startAffectiveServiceLister
+                )
+            }
+
+            override fun connectionError(error: Error?) {
+                Log.d(TAG, "connectionError: $error")
+            }
+        }
+    }
+
+    private val bdListener by lazy {
+        { data: RealtimeBioData? ->
+            Log.d(TAG, "bdListener: $data")
+            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_biodata) + data.toString())
+        }
+    }
+    private val affectiveListener by lazy {
+        { data: RealtimeAffectiveData? ->
+            Log.d(TAG, "affectiveListener: $data")
+            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_affective_data) + data.toString())
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -95,11 +169,10 @@ class MainActivity : AppCompatActivity() {
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
         initView()
-        initEnterAffectiveCloudManager()
         initPermission()
     }
 
-    fun verifyAppKeyAndSecret() {
+    private fun verifyAppKeyAndSecret() {
         appKey = intent.getStringExtra(INTENT_APP_KEY)
         appSecret = intent.getStringExtra(INTENT_APP_SECRET)
         if (appKey == null || appSecret == null) {
@@ -112,118 +185,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun initEnterAffectiveCloudManager() {
-        biodataSubscribeParams = BiodataSubscribeParams.Builder()
-            .requestEEG()
-            .requestHR()
-            .build()
+    private fun initEnterAffectiveCloudManager() {
+        val proxy = EnterAffectiveConfigProxy(
+            availableBioDataCategories,
+            availableAffectiveDataCategories,
+            userId = USER_ID,
+            appSecret = appSecret!!,
+            appKey = appKey!!
+        )
 
-        affectiveSubscribeParams = AffectiveSubscribeParams.Builder()
-            .requestAttention()
-            .requestRelaxation()
-            .requestPressure()
-            .requestPleasure()
-            .requestArousal()
-            .requestCoherence()
-            .requestFlow()
-            .build()
-
-        var storageSettings = StorageSettings.Builder()
-            .allowStoreRawData(true)// Whether to allow the raw data to be saved on the server
-            .build()
-        var algorithmParamsEEG =
-            AlgorithmParamsEEG.Builder()
-                .tolerance(AlgorithmParams.Tolerance.LEVEL_2)
-                .filterMode(AlgorithmParams.FilterMode.SMART)
-                .powerMode(AlgorithmParams.PowerMode.DB)
-                .channelPowerVerbose(false)
-                .build()
-        var algorithmParams = AlgorithmParams.Builder()
-            .eeg(algorithmParamsEEG)
-            .build()
-//        var biodataTolerance = BiodataTolerance.Builder()
-//            .eeg(2).build()
-        var enterAffectiveCloudConfig =
-            EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
-                .url(websocketAddress)
-                .availableBiodataServices(availableBioDataCategories)
-                .availableAffectiveServices(availableAffectiveDataCategories)
-                .biodataSubscribeParams(biodataSubscribeParams!!)
-                .affectiveSubscribeParams(affectiveSubscribeParams!!)
-                .storageSettings(storageSettings)
-                .algorithmParams(algorithmParams)
-                .uploadCycle(3)
-//                .biodataTolerance(biodataTolerance)
-                .build()
-        enterAffectiveCloudManager = EnterAffectiveCloudManager(enterAffectiveCloudConfig)
-        enterAffectiveCloudManager!!.addBiodataRealtimeListener {
-            if (it?.realtimeEEGData != null){
-                realtimeEEGLeftFileHelper.writeData(list2String(it.realtimeEEGData!!.leftwave!!)+",")
-                realtimeEEGRightFileHelper.writeData(list2String(it.realtimeEEGData!!.rightwave!!)+",")
-                realtimeAlphaFileHelper.writeData("${it.realtimeEEGData!!.alphaPower!!},")
-                realtimeBetaFileHelper.writeData("${it.realtimeEEGData!!.betaPower!!},")
-                realtimeGammaFileHelper.writeData("${it.realtimeEEGData!!.gammaPower!!},")
-                realtimeThetaFileHelper.writeData("${it.realtimeEEGData!!.thetaPower!!},")
-                realtimeDeltaFileHelper.writeData("${it.realtimeEEGData!!.deltaPower!!},")
-            }
-            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_biodata) + it.toString())
-        }
-        enterAffectiveCloudManager!!.addAffectiveDataRealtimeListener {
-            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_realtime_affective_data) + it.toString())
-        }
-        enterAffectiveCloudManager!!.addRawJsonRequestListener {
-            messageSendFragment.appendMessageToScreen(it)
-        }
-        enterAffectiveCloudManager!!.addRawJsonResponseListener {
-
-        }
-        enterAffectiveCloudManager?.addWebSocketDisconnectListener {
-            Log.d("######", "websocket disconnect:$it")
-        }
-        enterAffectiveCloudManager?.init(object :IStartAffectiveServiceLister{
-            override fun startSuccess() {
-                
-            }
-
-            override fun startBioFail(error: Error?) {
-                
-            }
-
-            override fun startAffectionFail(error: Error?) {
-                
-            }
-
-            override fun startFail(error: Error?) {
-                
-            }
-        })
+        affectiveService?.addServiceConnectStatueListener(
+            connectionListener,
+            disconnectionListener
+        )
+        affectiveService?.connectAffectiveServiceConnection(
+            configProxy = proxy,
+            listener = connectionServiceListener
+        )
+        affectiveService?.subscribeData(bdListener, affectiveListener)
     }
 
-
-    fun initSaveFiledir() {
-        saveRootPath = getExternalFilesDir(fileName)?.absolutePath?:""
-        saveRealtimeDataPath = saveRootPath + File.separator + "realtime" + File.separator
-        saveReportDataPath = saveRootPath + File.separator + "report" + File.separator
-        saveRawDataPath = saveRootPath + File.separator + "raw" + File.separator
-        var file = File(saveRootPath)
-        var rawDir = File(saveRawDataPath)
-        var realtimeDir = File(saveRealtimeDataPath)
-        var reportDir = File(saveReportDataPath)
-        if (!file.exists()) {
-            file.mkdirs()
-        }
-        if (!rawDir.exists()) {
-            rawDir.mkdirs()
-        }
-        if (!realtimeDir.exists()) {
-            realtimeDir.mkdirs()
-        }
-        if (!reportDir.exists()) {
-            reportDir.mkdirs()
-        }
-    }
-
-    fun initView() {
+    private fun initView() {
         vpContainer = findViewById(R.id.vp_contain)
         pagerSlidingTabStrip = findViewById(R.id.message_tabs)
         val listFragment = mutableListOf<Fragment>()
@@ -232,7 +214,7 @@ class MainActivity : AppCompatActivity() {
         listFragment.add(messageReceiveFragment)
         listFragment.add(messageSendFragment)
         val listTitles = listOf(getString(R.string.main_receive), getString(R.string.main_send))
-        var adapter = MessageAdapter(
+        val adapter = MessageAdapter(
             supportFragmentManager,
             listFragment,
             listTitles
@@ -256,7 +238,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun getItem(position: Int): Fragment {
-            return fragments.get(position)
+            return fragments[position]
         }
 
         override fun getCount(): Int {
@@ -264,7 +246,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun getPageTitle(position: Int): CharSequence {
-            return titles.get(position)
+            return titles[position]
         }
     }
 
@@ -272,7 +254,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Android6.0 auth
      */
-    fun initPermission() {
+    private fun initPermission() {
         val needPermission = arrayOf(
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -333,12 +315,12 @@ class MainActivity : AppCompatActivity() {
         biomoduleBleManager.stopHeartAndBrainCollection()
     }
 
-    var brainDataBuffer = ArrayList<Int>()
-    var writeFileDataBuffer = ArrayList<Int>()
-    var rawListener = fun(bytes: ByteArray) {
-        enterAffectiveCloudManager?.appendEEGData(bytes)
+    private var brainDataBuffer = ArrayList<Int>()
+    private var writeFileDataBuffer = ArrayList<Int>()
+    private var rawListener = fun(bytes: ByteArray) {
+        affectiveService?.appendEEGData(bytes)
         for (byte in bytes) {
-            var brainData = ConvertUtil.converUnchart(byte)
+            val brainData = ConvertUtil.converUnchart(byte)
             brainDataBuffer.add(brainData)
             writeFileDataBuffer.add((brainData))
             if (writeFileDataBuffer.size >= 20) {
@@ -348,14 +330,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    var heartRateDataBuffer = ArrayList<Int>()
-    var heartRateListener = fun(heartRate: Int) {
+    private var heartRateDataBuffer = ArrayList<Int>()
+    private var heartRateListener = fun(heartRate: Int) {
         rawHRFileHelper.writeData("$heartRate,")
         heartRateDataBuffer.add(heartRate)
-        enterAffectiveCloudManager?.appendHeartRateData(heartRate)
+        affectiveService?.appendHeartRateData(heartRate)
     }
 
-    fun list2String(data:ArrayList<out Number>):String{
+    private fun list2String(data: ArrayList<out Number>): String {
         return "${Arrays.toString(data.toArray())}".replace("[", "").replace("]", "")
     }
 
@@ -369,94 +351,58 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onReport(@Suppress("UNUSED_PARAMETER") view: View) {
-        enterAffectiveCloudManager?.getBiodataReport(object :
-            cn.entertech.affective.sdk.api.Callback2<HashMap<Any, Any?>> {
-            override fun onSuccess(t: HashMap<Any, Any?>?) {
-                reportFileHelper.writeData(getCurrentTime() + "<--" + t.toString() + "\n")
-                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_bio_report) + t.toString())
+        affectiveService?.getReport(object : IGetReportListener {
+            override fun onError(error: Error?) {
+                Log.d(TAG, "getReport: onError $error")
+                messageReceiveFragment.appendMessageToScreen("getReport onError" + error.toString())
             }
 
-            override fun onError(error: cn.entertech.affective.sdk.bean.Error?) {
-                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_get_bio_report_failed) + error.toString())
+            override fun onSuccess(entity: UploadReportEntity?) {
+                Log.d(TAG, "getReport: onSuccess $entity")
+                messageReceiveFragment.appendMessageToScreen("getReport onSuccess" + entity.toString())
             }
 
-        })
-        enterAffectiveCloudManager?.getAffectiveDataReport(object :
-            cn.entertech.affective.sdk.api.Callback2<HashMap<Any, Any?>> {
-            override fun onSuccess(t: HashMap<Any, Any?>?) {
-                reportFileHelper.writeData(getCurrentTime() + "<--" + t.toString() + "\n")
-                messageReceiveFragment.appendMessageToScreen(getString(R.string.main_get_affective_report) + t.toString())
+            override fun getBioReportError(error: Error?) {
+                Log.d(TAG, "getReport: getBioReportError $error")
+                messageReceiveFragment.appendMessageToScreen("getReport getBioReportError" + error.toString())
             }
 
-            override fun onError(error: cn.entertech.affective.sdk.bean.Error?) {
-                messageReceiveFragment.appendMessageToScreen(getString(R.string.mian_get_affective_report_failed) + error?.msg)
+            override fun getAffectiveReportError(error: Error?) {
+                Log.d(TAG, "getReport: getAffectiveReportError $error")
+                messageReceiveFragment.appendMessageToScreen("getReport getAffectiveReportError" + error.toString())
             }
+        }, false)
 
-        })
     }
 
     fun onFinish(@Suppress("UNUSED_PARAMETER") view: View) {
-        enterAffectiveCloudManager?.release(object :IFinishAffectiveServiceListener{
+        affectiveService?.finishAffectiveService(object : IFinishAffectiveServiceListener {
             override fun finishBioFail(error: Error?) {
-                
+                Log.d(TAG, "onFinish: finishBioFail $error")
             }
 
             override fun finishAffectiveFail(error: Error?) {
-                
+                Log.d(TAG, "onFinish: finishAffectiveFail $error")
             }
 
             override fun finishError(error: Error?) {
-                
+                Log.d(TAG, "onFinish: finishError $error")
+                affectiveService?.closeAffectiveServiceConnection()
             }
 
             override fun finishSuccess() {
-                
+                Log.d(TAG, "onFinish: finishSuccess ")
+                affectiveService?.closeAffectiveServiceConnection()
             }
         })
     }
 
     fun onSubmit(@Suppress("UNUSED_PARAMETER") view: View) {
-        var datas = ArrayList<RecData>()
-        var tagMap = HashMap<String, Float>()
-        tagMap["pleasure"] = 0.75f
-        var recData = RecData()
-        recData.st = 0.1f
-        recData.et = 180f
-        recData.tag = tagMap
-        recData.note = listOf("asdf", "sfdfsf")
-        datas.add(recData)
-        enterAffectiveCloudManager?.submit(
-            datas,
-            object : cn.entertech.affective.sdk.api.Callback {
-                override fun onSuccess() {
-                    messageReceiveFragment.appendMessageToScreen(getString(R.string.main_submit_comment_success))
-                }
-
-                override fun onError(error: cn.entertech.affective.sdk.bean.Error?) {
-                    messageReceiveFragment.appendMessageToScreen(getString(R.string.main_submit_comment_failed) + error?.msg)
-                }
-
-            })
+       
     }
 
     fun onRestore(@Suppress("UNUSED_PARAMETER") view: View) {
-        enterAffectiveCloudManager?.restore(object :IStartAffectiveServiceLister{
-            override fun startSuccess() {
-                
-            }
-
-            override fun startBioFail(error: Error?) {
-                
-            }
-
-            override fun startAffectionFail(error: Error?) {
-                
-            }
-
-            override fun startFail(error: Error?) {
-                
-            }
-        })
+        affectiveService?.restoreAffectiveService(startAffectiveServiceLister)
     }
 
     fun toApiDetail(@Suppress("UNUSED_PARAMETER") view: View) {

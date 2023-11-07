@@ -3,12 +3,14 @@ package cn.entertech.biomoduledemo.activity
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import androidx.core.app.ActivityCompat
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -56,6 +58,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var vpContainer: ViewPager
     private lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
     private val affectiveService by lazy {
+//        IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveLocalService)
         IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveCloudService)
     }
 
@@ -147,7 +150,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         verifyAppKeyAndSecret()
-        biomoduleBleManager = BiomoduleBleManager.getInstance(this)
+        biomoduleBleManager = BiomoduleBleManager.getInstance(applicationContext)
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
         initView()
@@ -232,6 +235,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun initPermissionS() {
+        val needPermission = arrayOf(
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_ADVERTISE,
+        )
+        val needRequestPermissions = ArrayList<String>()
+        for (i in needPermission.indices) {
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    needPermission[i]
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                needRequestPermissions.add(needPermission[i])
+            }
+        }
+        if (needRequestPermissions.size != 0) {
+            val permissions = arrayOfNulls<String>(needRequestPermissions.size)
+            for (i in needRequestPermissions.indices) {
+                permissions[i] = needRequestPermissions[i]
+            }
+            ActivityCompat.requestPermissions(this@MainActivity, permissions, 1)
+        }
+    }
+
 
     /**
      * Android6.0 auth
@@ -257,6 +286,9 @@ class MainActivity : AppCompatActivity() {
                 permissions[i] = needRequestPermissions[i]
             }
             ActivityCompat.requestPermissions(this@MainActivity, permissions, 1)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            initPermissionS()
         }
     }
 

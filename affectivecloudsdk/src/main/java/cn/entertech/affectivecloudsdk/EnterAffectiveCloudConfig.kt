@@ -9,7 +9,7 @@ import java.lang.IllegalStateException
 class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
     var appKey: String? = null
     var appSecret: String? = null
-    var userId: String? = null
+    var userId: Int = -1
     var mAffectiveSubscribeParams: AffectiveSubscribeParams? = null
     var mBiodataSubscribeParams: BiodataSubscribeParams? = null
     var uri: String? = null
@@ -137,7 +137,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
         this.uploadCycle = builder.uploadCycle
     }
 
-    class Builder(var appKey: String, var appSecret: String, var userId: String) {
+    class Builder(var appKey: String, var appSecret: String, var userId: Int) {
         var algorithmParams: AlgorithmParams? = null
         var storageSettings: StorageSettings? = null
         var mAffectiveSubscribeParams: AffectiveSubscribeParams? = null

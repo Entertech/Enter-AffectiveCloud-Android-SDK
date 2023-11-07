@@ -9,6 +9,7 @@ import cn.entertech.affective.sdk.bean.AffectiveDataCategory
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
+import cn.entertech.affective.sdk.utils.AffectiveLogHelper
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import java.lang.IllegalStateException
@@ -33,9 +34,9 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
 
     private var mApi: BaseApi
     private var mBiodataRealtimeListener =
-        CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit>()
+        CopyOnWriteArrayList<(RealtimeBioData?) -> Unit>()
     private var mAffectiveRealtimeListener =
-        CopyOnWriteArrayList<(cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit>()
+        CopyOnWriteArrayList<(RealtimeAffectiveData?) -> Unit>()
     private var disconnectListeners = CopyOnWriteArrayList<(String) -> Unit>()
     private var isInit = false
 
@@ -74,6 +75,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     private fun initBiodata(callback: Callback) {
+        AffectiveLogHelper.i(TAG,"initBiodata")
         var optionsMap = java.util.HashMap<String, Any?>()
         optionsMap["storage_settings"] = config.storageSettings?.body()
         optionsMap["bio_data_tolerance"] = config.biodataTolerance?.body()
@@ -84,7 +86,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 if (config.mBiodataSubscribeParams != null) {
                     mApi.subscribeBioData(config.mBiodataSubscribeParams!!,
                         object : Callback2<RealtimeBioData> {
-                            override fun onSuccess(t: cn.entertech.affective.sdk.bean.RealtimeBioData?) {
+                            override fun onSuccess(t: RealtimeBioData?) {
                                 mBiodataRealtimeListener.forEach {
                                     it.invoke(t)
                                 }
@@ -120,6 +122,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     private fun initAffective(callback: Callback) {
+        AffectiveLogHelper.d(TAG,"initBiodata")
         mApi.initAffectiveDataServices(
             config.availableAffectiveDataCategories!!,
             object : Callback {
@@ -127,7 +130,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                     if (config.mAffectiveSubscribeParams != null) {
                         mApi.subscribeAffectiveData(config.mAffectiveSubscribeParams!!,
                             object : Callback2<RealtimeAffectiveData> {
-                                override fun onSuccess(t: cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) {
+                                override fun onSuccess(t: RealtimeAffectiveData?) {
                                     mAffectiveRealtimeListener.forEach {
                                         it.invoke(t)
                                     }
@@ -233,6 +236,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     override fun init(initListener: IStartAffectiveServiceLister) {
         initBiodata(object : Callback {
             override fun onSuccess() {
+                AffectiveLogHelper.d(TAG,"initBiodata onSuccess")
                 if (config.availableAffectiveDataCategories != null) {
                     initAffective(object : Callback {
                         override fun onSuccess() {
@@ -311,19 +315,19 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
         mApi.appendHeartData(heartRateData)
     }
 
-    override fun addBiodataRealtimeListener(listener: (cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit) {
+    override fun addBiodataRealtimeListener(listener: (RealtimeBioData?) -> Unit) {
         mBiodataRealtimeListener.add(listener)
     }
 
-    override fun addAffectiveDataRealtimeListener(listener: (cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit) {
+    override fun addAffectiveDataRealtimeListener(listener: (RealtimeAffectiveData?) -> Unit) {
         mAffectiveRealtimeListener.add(listener)
     }
 
-    override fun removeBiodataRealtimeListener(listener: (cn.entertech.affective.sdk.bean.RealtimeBioData?) -> Unit) {
+    override fun removeBiodataRealtimeListener(listener: (RealtimeBioData?) -> Unit) {
         mBiodataRealtimeListener.remove(listener)
     }
 
-    override fun removeAffectiveRealtimeListener(listener: (cn.entertech.affective.sdk.bean.RealtimeAffectiveData?) -> Unit) {
+    override fun removeAffectiveRealtimeListener(listener: (RealtimeAffectiveData?) -> Unit) {
         mAffectiveRealtimeListener.remove(listener)
     }
 

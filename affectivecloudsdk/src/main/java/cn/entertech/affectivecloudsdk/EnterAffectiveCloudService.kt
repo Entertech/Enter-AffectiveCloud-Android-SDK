@@ -50,12 +50,16 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         context: Context?, initListener: IStartAffectiveServiceLister
     ) {
         AffectiveLogHelper.d(TAG, "startAffectiveService")
-        mEnterAffectiveCloudManager?.init(initListener)
+        mEnterAffectiveCloudManager?.init(initListener)?: run {
+            AffectiveLogHelper.e(TAG, "startAffectiveService mEnterAffectiveCloudManager is null")
+        }
     }
 
     override fun restoreAffectiveService(listener: IStartAffectiveServiceLister) {
         AffectiveLogHelper.d(TAG, "restoreAffectiveService")
-        mEnterAffectiveCloudManager?.restore(listener)
+        mEnterAffectiveCloudManager?.restore(listener)?: run {
+            AffectiveLogHelper.e(TAG, "restoreAffectiveService mEnterAffectiveCloudManager is null")
+        }
     }
 
     override fun subscribeData(
@@ -64,7 +68,9 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
     ) {
         AffectiveLogHelper.d(TAG, "subscribeData")
         bdListener?.apply {
-            mEnterAffectiveCloudManager?.addBiodataRealtimeListener(this)
+            mEnterAffectiveCloudManager?.addBiodataRealtimeListener(this)?: run {
+                AffectiveLogHelper.e(TAG, "mEnterAffectiveCloudManager is null")
+            }
         }
         listener?.apply {
             mEnterAffectiveCloudManager?.addAffectiveDataRealtimeListener(this)

@@ -1,6 +1,6 @@
 package cn.entertech.affectivecloudsdk.sourcedataapi
 
-import android.util.Log
+import cn.entertech.affective.sdk.utils.AffectiveLogHelper
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
 
@@ -11,7 +11,7 @@ open class ResponseHandler {
         }
 
         fun <T : Any> handleException(e: Exception): Resource<T> {
-            Log.d("########","handle exception e is ${e.printStackTrace()}")
+            AffectiveLogHelper.d("########","handle exception e is ${e.printStackTrace()}")
             return when (e) {
                 is HttpException -> Resource.error(getErrorMessage(e.code()), null)
                 is SocketTimeoutException -> Resource.error(getErrorMessage(-1), null)

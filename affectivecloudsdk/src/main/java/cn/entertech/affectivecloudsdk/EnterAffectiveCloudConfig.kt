@@ -30,7 +30,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
             val biodataSubscribeParamsBuilder = BiodataSubscribeParams.Builder()
             val affectiveSubscribeParamsBuilder = AffectiveSubscribeParams.Builder()
             val storageSettingsBuild = StorageSettings.Builder()
-            availableAffectiveServices?.forEach {
+            availableAffectiveServices.forEach {
                 when (it) {
                     AffectiveDataCategory.ATTENTION -> {
                         affectiveSubscribeParamsBuilder.requestAttention()
@@ -61,7 +61,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
                     }
                 }
             }
-            availableBiodataServices?.forEach {
+            availableBiodataServices.forEach {
                 when (it) {
                     BioDataCategory.EEG -> {
                         biodataSubscribeParamsBuilder.requestEEG()
@@ -79,7 +79,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
                     }
                 }
             }
-            var sexType = when (proxy.sex) {
+            val sexType = when (proxy.sex) {
                 "m" -> {
                     StorageSettings.Sex.MALE
                 }

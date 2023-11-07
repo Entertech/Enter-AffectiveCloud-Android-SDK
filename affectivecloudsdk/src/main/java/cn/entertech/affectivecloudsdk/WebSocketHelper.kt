@@ -1,6 +1,6 @@
 package cn.entertech.affectivecloudsdk
 
-import android.util.Log
+import cn.entertech.affective.sdk.utils.AffectiveLogHelper
 import cn.entertech.affectivecloudsdk.interfaces.IWebSocketHelper
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import cn.entertech.affectivecloudsdk.utils.ConvertUtil
@@ -23,19 +23,23 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
     private var mBrainDataWebSocket: WebSocketClient? = null
 
     var mOpenCallback: WebSocketCallback? = null
-    var messageResponseListeners = CopyOnWriteArrayList<(String) -> Unit>()
-    var rawJsonRequestListeners = CopyOnWriteArrayList<(String) -> Unit>()
+    private var messageResponseListeners = CopyOnWriteArrayList<(String) -> Unit>()
+    private var rawJsonRequestListeners = CopyOnWriteArrayList<(String) -> Unit>()
     var rawJsonResponseListeners = CopyOnWriteArrayList<(String) -> Unit>()
     var connectListeners = CopyOnWriteArrayList<() -> Unit>()
     var disconnectListeners = CopyOnWriteArrayList<(String) -> Unit>()
 
+
+    companion object{
+        private const val TAG="WebSocketHelper"
+    }
     override fun open(webSocketCallback: WebSocketCallback) {
         try {
             this.mOpenCallback = webSocketCallback
             mBrainDataWebSocket =
                 object : WebSocketClient(URI(address), Draft_6455(), null, timeout) {
                     override fun onOpen(handshakedata: ServerHandshake?) {
-                        Log.d("WebSocketHelper", "onConnected " + handshakedata.toString())
+                        AffectiveLogHelper.d(TAG, "onConnected " + handshakedata.toString())
                         mOpenCallback?.onOpen(handshakedata)
                         connectListeners.forEach {
                             it.invoke()
@@ -47,7 +51,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
                         disconnectListeners.forEach {
                             it.invoke("$code:$reason")
                         }
-                        Log.d("WebSocketHelper", "onClose :$code::reason is $reason")
+                        AffectiveLogHelper.i(TAG, "onClose :$code::reason is $reason")
                     }
 
                     override fun isClosed(): Boolean {
@@ -79,7 +83,6 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
                     }
 
                     override fun connectBlocking(): Boolean {
-
                         val connectBlocking = super.connectBlocking()
                         mOpenCallback?.connectBlocking(connectBlocking)
                         return connectBlocking
@@ -169,7 +172,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
                     override fun onMessage(message: ByteBuffer) {
                         val arr = ByteArray(message.remaining())
                         message.get(arr)
-                        Log.d("WebSocketHelper", "receive msg is " + ConvertUtil.uncompress(arr))
+                        AffectiveLogHelper.d(TAG, "receive msg is " + ConvertUtil.uncompress(arr))
                         var msg = ConvertUtil.uncompress(arr)
                         rawJsonResponseListeners.forEach {
                             it.invoke(msg)
@@ -178,7 +181,7 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
 
                     override fun onError(ex: java.lang.Exception?) {
                         mOpenCallback?.onError(ex)
-                        Log.d("WebSocketHelper", "onError " + ex.toString())
+                        AffectiveLogHelper.d("WebSocketHelper", "onError " + ex.toString())
                     }
                 }
             var sslSocketFactory = getSSLSocketFactory()
@@ -197,18 +200,18 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
                     chain: Array<out java.security.cert.X509Certificate>?,
                     authType: String?
                 ) {
-//                        Log.d("getSSLSocketFactory","checkClientTrusted")
+//                        AffectiveLogHelper.d("getSSLSocketFactory","checkClientTrusted")
                 }
 
                 override fun checkServerTrusted(
                     chain: Array<out java.security.cert.X509Certificate>?,
                     authType: String?
                 ) {
-//                        Log.d("getSSLSocketFactory","checkServerTrusted")
+//                        AffectiveLogHelper.d("getSSLSocketFactory","checkServerTrusted")
                 }
 
                 override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate>? {
-//                        Log.d("getSSLSocketFactory","getAcceptedIssuers")
+//                        AffectiveLogHelper.d("getSSLSocketFactory","getAcceptedIssuers")
                     return null
                 }
             }
@@ -246,6 +249,8 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
     override fun sendMessage(data: ByteArray) {
         if (isOpen()) {
             mBrainDataWebSocket?.send(data)
+        }else{
+            AffectiveLogHelper.e(TAG,"sendMessage is not open")
         }
     }
 

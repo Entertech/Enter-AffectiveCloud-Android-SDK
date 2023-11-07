@@ -1,6 +1,5 @@
 package cn.entertech.affectivecloudsdk
 
-import android.util.Log
 import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService.Companion.UPLOAD_BCG_PACKAGE_COUNT
@@ -97,7 +96,6 @@ class EnterAffectiveCloudApiImpl internal constructor(
         initUploadTrigger()
         mWebSocketHelper = WebSocketHelper(websocketAddress, timeout)
         mWebSocketHelper?.addRawJsonResponseListener {
-            Log.d(TAG, "receive msg from web socket:$it")
             var response = Gson().fromJson(it, ResponseBody::class.java)
             if (response.isCreateOp()) {
                 if (response.code == 0) {

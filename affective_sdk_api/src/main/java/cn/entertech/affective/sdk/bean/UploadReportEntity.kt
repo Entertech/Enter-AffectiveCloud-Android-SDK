@@ -8,21 +8,22 @@ data class UploadReportEntity(
     val `data`: Data? = null,
     val msg: String,
 
-    //写死
     @SerializedName("report_version")
-    val reportVersion: String="3",
+    val reportVersion: String = "3",
     @SerializedName("session_id")
     var sessionId: String,
     var start: String,
     @SerializedName("time_points")
-    var timePoints: TimePoints?=null,
+    var timePoints: TimePoints? = null,
     val user_id: Int,
     /**
      * 算法版本
      * */
     val version: Version,
-
     var deviceString: String? = null,
+    /**
+     * 设备的mac地址
+     * */
     var MAC: String? = null
 )
 
@@ -48,7 +49,7 @@ data class Affective(
     val pleasure: Pleasure,
     val pressure: Pressure,
     val relaxation: Relaxation,
-    val meditation:Meditation
+    val meditation: Meditation
 )
 
 data class Biodata(
@@ -79,31 +80,55 @@ data class PEPR(
 
 
 data class Arousal(
+    /**
+     * 全程激活度有效值（除去无效值0）的均值
+     * */
     val arousal_avg: Int,
+    /**
+     * 全程激活度记录
+     * */
     val arousal_rec: Any
 )
 
 data class Attention(
+    /**
+     * 全程注意力有效值（除去无效值0）的均值
+     * */
     @SerializedName("attention_avg")
     val attentionAvg: Double,
+    /**
+     * 全程注意力记录
+     * */
     @SerializedName("attention_rec")
     val attentionRec: List<Double>
 )
 
 data class Coherence(
+    /**
+     * 全程和谐度有效值（除去无效值0）的均值
+     * */
     @SerializedName("coherence_avg")
     val coherenceAvg: Double,
     @SerializedName("coherence_duration")
     val coherenceDuration: Int?,
     @SerializedName("coherence_flag")
     val coherenceFlag: List<Int>?,
+    /**
+     * 全程和谐度记录
+     * */
     @SerializedName("coherence_rec")
     val coherenceRec: List<Double>
 )
 
 data class Pleasure(
+    /**
+     * 全程愉悦度有效值（除去无效值0）的均值
+     * */
     @SerializedName("pleasure_avg")
     val pleasureAvg: Double,
+    /**
+     * 全程压力水平记录
+     * */
     @SerializedName("pleasure_rec")
     val pleasureRec: List<Double>
 )
@@ -116,11 +141,18 @@ data class Pressure(
 )
 
 data class Relaxation(
+    /**
+     * 全程放松度有效值（除去无效值0）的均值
+     * */
     @SerializedName("relaxation_avg")
     val relaxationAvg: Double,
+    /**
+     * 全程放松度记录
+     * */
     @SerializedName("relaxation_rec")
     val relaxationRec: List<Double>
 )
+
 data class Meditation(
     @SerializedName("meditation_avg")
     val meditationAvg: Double,

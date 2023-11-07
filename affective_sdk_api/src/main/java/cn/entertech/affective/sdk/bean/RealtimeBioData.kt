@@ -3,6 +3,9 @@ package cn.entertech.affective.sdk.bean
 import com.google.gson.annotations.SerializedName
 
 data class RealtimeBioData(
+    /**
+     * eeg数据
+     * */
     @SerializedName("realtimeEEGData") var realtimeEEGData: RealtimeEEGData? = null,
     var realtimeHrData: RealtimeHrData? = null,
     var realtimeMCEEGData: RealtimeMCEEGData? = null,

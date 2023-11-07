@@ -118,7 +118,8 @@ interface IAffectiveDataAnalysisService {
     )
 
     /**
-     * @param file 待分析的文件
+     * @param inputStream 待分析的文件流
+     * @param case 把int转成T的方法
      * */
     fun <T> readFileAnalysisData(inputStream: InputStream, callback: Callback2<T>,case:(Int)->T?)
 

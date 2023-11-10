@@ -50,16 +50,13 @@ class MainActivity : AppCompatActivity() {
     private var appSecret: String? = null
     private var appKey: String? = null
     private lateinit var biomoduleBleManager: BiomoduleBleManager
-
-    /*userId:your email or phone num;自己的用户ID：邮箱或者手机号码*/
-    private val USER_ID: String = "1245489@qq.com"
     private lateinit var messageReceiveFragment: MessageReceiveFragment
     private lateinit var messageSendFragment: MessageSendFragment
     private lateinit var vpContainer: ViewPager
     private lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
     private val affectiveService by lazy {
-//        IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveLocalService)
-        IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveCloudService)
+        IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveLocalService)
+//        IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveCloudService)
     }
 
     //    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
@@ -174,7 +171,7 @@ class MainActivity : AppCompatActivity() {
         val proxy = EnterAffectiveConfigProxy(
             availableBioDataCategories,
             availableAffectiveDataCategories,
-            userId = USER_ID,
+            userId = -1,
             appSecret = appSecret!!,
             appKey = appKey!!
         )
@@ -182,7 +179,9 @@ class MainActivity : AppCompatActivity() {
         affectiveService?.addServiceConnectStatueListener(
             connectionListener,
             disconnectionListener
-        )
+        )?: kotlin.run {
+            Log.d(TAG,"affectiveService is null")
+        }
         affectiveService?.connectAffectiveServiceConnection(
             configProxy = proxy,
             listener = connectionServiceListener
@@ -306,13 +305,13 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 Toast.makeText(this@MainActivity, "设备连接成功", Toast.LENGTH_SHORT).show()
             }
-        }) { msg ->
+        },{msg->
             Logger.d("连接失败")
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_connect_failed) + msg)
             runOnUiThread {
                 Toast.makeText(this@MainActivity, "设备连接失败：$msg", Toast.LENGTH_SHORT).show()
             }
-        }
+        },0,)
     }
 
     fun onDisconnectDevice(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -343,15 +342,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var heartRateDataBuffer = ArrayList<Int>()
     private var heartRateListener = fun(heartRate: Int) {
-        heartRateDataBuffer.add(heartRate)
         affectiveService?.appendHeartRateData(heartRate)
     }
 
-    private fun list2String(data: ArrayList<out Number>): String {
-        return "${Arrays.toString(data.toArray())}".replace("[", "").replace("]", "")
-    }
 
     fun onInit(@Suppress("UNUSED_PARAMETER") view: View) {
         initEnterAffectiveCloudManager()

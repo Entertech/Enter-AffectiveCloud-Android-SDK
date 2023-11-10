@@ -1,6 +1,7 @@
 package cn.entertech.affectivecloudsdk
 
 import android.content.Context
+import cn.entertech.affective.sdk.api.Callback
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.api.Callback2
 import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService
@@ -50,14 +51,14 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         context: Context?, initListener: IStartAffectiveServiceLister
     ) {
         AffectiveLogHelper.d(TAG, "startAffectiveService")
-        mEnterAffectiveCloudManager?.init(initListener)?: run {
+        mEnterAffectiveCloudManager?.init(initListener) ?: run {
             AffectiveLogHelper.e(TAG, "startAffectiveService mEnterAffectiveCloudManager is null")
         }
     }
 
     override fun restoreAffectiveService(listener: IStartAffectiveServiceLister) {
         AffectiveLogHelper.d(TAG, "restoreAffectiveService")
-        mEnterAffectiveCloudManager?.restore(listener)?: run {
+        mEnterAffectiveCloudManager?.restore(listener) ?: run {
             AffectiveLogHelper.e(TAG, "restoreAffectiveService mEnterAffectiveCloudManager is null")
         }
     }
@@ -68,7 +69,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
     ) {
         AffectiveLogHelper.d(TAG, "subscribeData")
         bdListener?.apply {
-            mEnterAffectiveCloudManager?.addBiodataRealtimeListener(this)?: run {
+            mEnterAffectiveCloudManager?.addBiodataRealtimeListener(this) ?: run {
                 AffectiveLogHelper.e(TAG, "mEnterAffectiveCloudManager is null")
             }
         }
@@ -91,14 +92,32 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
     }
 
 
-    override fun <T> readFileAnalysisData(
+    override fun <R> readFileAnalysisData(
         inputStream: InputStream,
-        callback: Callback2<T>,
-        case: (Int) -> T?
+        appSingleData: ((R) -> Boolean)?,
+        appendAllData: (List<R>) -> Unit,
+        case: (String) -> R,
+        callback: Callback
     ) {
         callback.onError(Error(-1, "not support this method"))
+        throw IllegalAccessError("not support this method")
     }
 
+    override fun appendEEGData(brainData: Int) {
+        throw IllegalAccessError("not support this method")
+    }
+
+    override fun appendEEGData(brainData: List<Int>) {
+        throw IllegalAccessError("not support this method")
+    }
+
+    override fun appendSCEEGData(brainData: Int) {
+        throw IllegalAccessError("not support this method")
+    }
+
+    override fun appendSCEEGData(brainData: List<Int>) {
+        throw IllegalAccessError("not support this method")
+    }
 
     override fun appendEEGData(brainData: ByteArray) {
         mEnterAffectiveCloudManager?.appendEEGData(brainData)

@@ -118,16 +118,26 @@ interface IAffectiveDataAnalysisService {
     )
 
     /**
-     * @param inputStream 待分析的文件流
-     * @param case 把int转成T的方法
+     * @param inputStream 待分析的数据流
+     * @param callback 结果回调
+     * @param appSingleData 处理单个数据，若返回true，则表示消耗该数据，不添加到all数据里面
+     * @param case 数据流读取出来的字符串转成需要的类型R
+     * @param appendAllData 发送数据逻辑：eeg，sceeg，hr，pepr数据
      * */
-    fun <T> readFileAnalysisData(inputStream: InputStream, callback: Callback2<T>,case:(Int)->T?)
+    fun <R> readFileAnalysisData(inputStream: InputStream,
+                                 appSingleData: ((R) -> Boolean)? = null,
+                                 appendAllData: (List<R>) -> Unit,
+                                 case: (String) -> R,
+                                 callback: Callback,
+    )
 
     /**
      * 发送数据
      * */
 
     fun appendEEGData(brainData: ByteArray)
+    fun appendEEGData(brainData: Int)
+    fun appendEEGData(brainData: List<Int>)
 
     fun appendDCEEGData(brainData: ByteArray)
 
@@ -135,6 +145,8 @@ interface IAffectiveDataAnalysisService {
      * 单通道数据
      * */
     fun appendSCEEGData(brainData: ByteArray)
+    fun appendSCEEGData(brainData: Int)
+    fun appendSCEEGData(brainData: List<Int>)
 
     /**
      * 添加心率数据

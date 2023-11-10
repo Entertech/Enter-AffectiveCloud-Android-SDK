@@ -53,6 +53,7 @@ data class Affective(
 )
 
 data class Biodata(
+    val sceegData:Sceeg,
     val eeg: Eeg,
     @SerializedName("hr-v2")
     val hr: HrV2,
@@ -175,6 +176,16 @@ data class Meditation(
     @SerializedName("flow_loss_num")
     val flowLossNum: Int,
 )
+
+data class Sceeg(
+    val sceegAlphaCurve: List<Double>,
+    val scegBetaCurve: List<Double>,
+    val sceegDeltaCurve: List<Double>,
+    val sceegGammaCurve: List<Double>,
+    val sceegThetaCurve: List<Double>,
+    val sceegQualityRec: List<Int>
+)
+
 
 data class Eeg(
     @SerializedName("eeg_alpha_curve")

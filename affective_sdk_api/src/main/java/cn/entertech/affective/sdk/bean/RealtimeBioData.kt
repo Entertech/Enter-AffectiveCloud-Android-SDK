@@ -9,6 +9,7 @@ data class RealtimeBioData(
     @SerializedName("realtimeEEGData") var realtimeEEGData: RealtimeEEGData? = null,
     var realtimeHrData: RealtimeHrData? = null,
     var realtimeMCEEGData: RealtimeMCEEGData? = null,
+    var realtimeSCEEGData: RealtimeSCEEGData?=null,
     var realtimeBCGData: RealtimeBCGData? = null,
     var realtimePEPRData: RealtimePEPRData? = null,
     var realtimeDceegSsvepData: RealtimeDceegSsvepData? = null

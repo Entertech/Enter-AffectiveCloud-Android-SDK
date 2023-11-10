@@ -56,7 +56,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 config.uri!!,
                 config.appKey!!,
                 config.appSecret!!,
-                config.userId!!,
+                config.userId.toString(),
                 config.uploadCycle
             )
         } else {
@@ -65,7 +65,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
                 config.websocketTimeout!!,
                 config.appKey!!,
                 config.appSecret!!,
-                config.userId!!,
+                config.userId.toString(),
                 config.uploadCycle
             )
         }

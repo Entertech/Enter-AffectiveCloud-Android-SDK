@@ -41,6 +41,13 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         mEnterAffectiveCloudManager?.openWebSocket(listener)
     }
 
+    override fun startAffectiveService(initListener: IStartAffectiveServiceLister) {
+        AffectiveLogHelper.d(TAG, "startAffectiveService")
+        mEnterAffectiveCloudManager?.init(initListener) ?: run {
+            AffectiveLogHelper.e(TAG, "startAffectiveService mEnterAffectiveCloudManager is null")
+        }
+    }
+
     /**
      * 启动bioDataService，启动成功后订阅数据
      * 启动AffectiveService ，启动成功后订阅数据
@@ -50,10 +57,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         authenticationInputStream: InputStream?,
         context: Context?, initListener: IStartAffectiveServiceLister
     ) {
-        AffectiveLogHelper.d(TAG, "startAffectiveService")
-        mEnterAffectiveCloudManager?.init(initListener) ?: run {
-            AffectiveLogHelper.e(TAG, "startAffectiveService mEnterAffectiveCloudManager is null")
-        }
+        startAffectiveService(initListener)
     }
 
     override fun restoreAffectiveService(listener: IStartAffectiveServiceLister) {

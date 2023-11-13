@@ -62,6 +62,13 @@ interface IAffectiveDataAnalysisService {
         disconnectListener: (String) -> Unit
     )
 
+    /**
+     * 启动情感服务
+     * */
+    fun startAffectiveService(
+        initListener: IStartAffectiveServiceLister
+    )
+
 
     /**
      * 启动情感服务

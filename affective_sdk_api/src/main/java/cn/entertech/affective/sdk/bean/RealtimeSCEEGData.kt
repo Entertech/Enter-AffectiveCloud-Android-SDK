@@ -15,7 +15,7 @@ data class RealtimeSCEEGData(
     val sceegGammaPower: Double = 0.0,
     /**
      * 脑电信号质量等级
-     * 大于1表示脑电信号质量良好
+     * 大于等于1表示脑电信号质量良好
      * */
     val sceegQuality: Double = 0.0,
 )

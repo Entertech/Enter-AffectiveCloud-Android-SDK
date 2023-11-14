@@ -129,7 +129,7 @@ interface IAffectiveDataAnalysisService {
      * @param callback 结果回调
      * @param appSingleData 处理单个数据，若返回true，则表示消耗该数据，不添加到all数据里面
      * @param case 数据流读取出来的字符串转成需要的类型R
-     * @param appendAllData 发送数据逻辑：eeg，sceeg，hr，pepr数据
+     * @param appendAllData 处理所有未被消耗的数据
      * */
     fun <R> readFileAnalysisData(inputStream: InputStream,
                                  appSingleData: ((R) -> Boolean)? = null,

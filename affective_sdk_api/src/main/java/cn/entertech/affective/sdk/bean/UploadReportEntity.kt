@@ -84,27 +84,27 @@ data class Sleep(
     /**
      * 睡眠曲线，反映整个体验过程的睡眠情况。睡眠曲线的值越高表明越接近清醒，曲线值越低表明越接近深睡。
      * */
-    val sleepCurve: ArrayList<Double>,
+    val sleepCurve: ArrayList<Double> = ArrayList(),
     /**
      * 入睡点时间索引,即入睡时刻在睡眠曲线上的时间轴坐标。数值范围[0, +∞),0表示无效值
      * */
-    val sleepPoint: Int,
+    val sleepPoint: Int = 0,
     /**
      * 入睡用时，单位：秒
      * */
-    val sleepLatency: Int,
+    val sleepLatency: Int = 0,
     /**
      * 清醒时长，单位：秒
      * */
-    val awakeDuration: Int,
+    val awakeDuration: Int = 0,
     /**
      * 浅睡时长，单位：秒
      * */
-    val lightDuration: Int,
+    val lightDuration: Int = 0,
     /**
      * 深睡时长，单位：秒
      * */
-    val deepDuration: Int,
+    val deepDuration: Int = 0,
     /**
      * 快速眼动时长
      */

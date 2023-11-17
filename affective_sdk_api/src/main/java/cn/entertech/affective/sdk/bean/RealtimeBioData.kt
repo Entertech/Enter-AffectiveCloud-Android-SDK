@@ -15,6 +15,6 @@ data class RealtimeBioData(
     var realtimeDceegSsvepData: RealtimeDceegSsvepData? = null
 ) {
     override fun toString(): String {
-        return "RealtimeBioData(realtimeEEGData=$realtimeEEGData, realtimeHrData=$realtimeHrData, realtimeMCEEGData=$realtimeMCEEGData, realtimeBCGData=$realtimeBCGData, realtimePEPRData=$realtimePEPRData, realtimeDceegSsvepData=$realtimeDceegSsvepData)"
+        return "RealtimeBioData(realtimeEEGData=$realtimeEEGData, realtimeHrData=$realtimeHrData, realtimeMCEEGData=$realtimeMCEEGData, realtimeSCEEGData=$realtimeSCEEGData, realtimeBCGData=$realtimeBCGData, realtimePEPRData=$realtimePEPRData, realtimeDceegSsvepData=$realtimeDceegSsvepData)"
     }
 }

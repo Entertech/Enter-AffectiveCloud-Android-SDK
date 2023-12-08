@@ -8,51 +8,26 @@ import java.lang.IllegalStateException
 class ReportGenerator {
     private var reportBioDataCategoryList: List<BioDataCategory>? = null
     private var reportAffectiveDataCategoryList: List<AffectiveDataCategory>? = null
+    private val affectiveItem = HashMap<Any, Any?>()
+    private val item = HashMap<Any, Any?>()
+    private val affectiveItemSet = HashSet<String>()
 
-    fun setBioDataCategories(bioDataCategories:List<BioDataCategory>){
-        this.reportBioDataCategoryList=bioDataCategories
+    fun setBioDataCategories(bioDataCategories: List<BioDataCategory>) {
+        this.reportBioDataCategoryList = bioDataCategories
     }
-    fun setAffectiveDataCategories(affectiveDataCategories:List<AffectiveDataCategory>){
-        this.reportAffectiveDataCategoryList=affectiveDataCategories
-    }
 
-
-    fun appendResponse(responseBody: ResponseBody): HashMap<Any, Any?>? {
-        if (reportBioDataCategoryList?.isEmpty()!=false || reportAffectiveDataCategoryList?.isEmpty()!=false) {
-            throw IllegalStateException("please init ReportGenerator first")
+    fun setAffectiveDataCategories(affectiveDataCategories: List<AffectiveDataCategory>) {
+        this.reportAffectiveDataCategoryList = affectiveDataCategories
+        affectiveDataCategories.forEach {
+            affectiveItemSet.add(it.value)
         }
-        val item=HashMap<Any,Any?>()
-        var data = responseBody.data
-        var keys = responseBody.data.keys
-        keys.forEach {
-            for (service in reportBioDataCategoryList!!) {
-                if (it == service.value)
-                    item[it] = data[it]
-            }
-            for (service in reportAffectiveDataCategoryList!!) {
-                if (it == service.value)
-                    item[it] = data[it]
-            }
-        }
-        for (service in reportBioDataCategoryList!!) {
-            if (!item.containsKey(service.value)) {
-                return null
-            }
-        }
-        for (service in reportAffectiveDataCategoryList!!) {
-            if (!item.containsKey(service.value)) {
-                return null
-            }
-        }
-        return item
     }
 
 
-    fun appendBioDataResponse(responseBody: ResponseBody): HashMap<Any, Any?>?{
-        if (reportBioDataCategoryList?.isEmpty()!=false) {
+    fun appendBioDataResponse(responseBody: ResponseBody): HashMap<Any, Any?>? {
+        if (reportBioDataCategoryList?.isEmpty() != false) {
             throw IllegalStateException("please set breportBioDataCategoryList first")
         }
-        val item=HashMap<Any,Any?>()
         var data = responseBody.data
         var keys = responseBody.data.keys
 
@@ -70,26 +45,23 @@ class ReportGenerator {
         return item
     }
 
-    fun appendAffectiveDataResponse(responseBody: ResponseBody): HashMap<Any, Any?>?{
-        if (reportAffectiveDataCategoryList?.isEmpty()!=false) {
+    fun appendAffectiveDataResponse(responseBody: ResponseBody): HashMap<Any, Any?>? {
+        if (affectiveItemSet.isEmpty()) {
             throw IllegalStateException("please set AffectiveDataResponse first")
         }
-        val item=HashMap<Any,Any?>()
-        var data = responseBody.data
-        var keys = responseBody.data.keys
+        val data = responseBody.data
+        val keys = responseBody.data.keys
 
         keys.forEach {
-            for (service in reportAffectiveDataCategoryList!!) {
-                if (it == service.value)
-                    item[it] = data[it]
+            if (affectiveItemSet.remove(it)) {
+                affectiveItem[it] = data[it]
             }
         }
-        for (service in reportAffectiveDataCategoryList!!) {
-            if (!item.containsKey(service.value)) {
-                return null
-            }
+        return if (affectiveItemSet.isEmpty()) {
+            affectiveItem
+        } else {
+            null
         }
-        return item
     }
 
 }

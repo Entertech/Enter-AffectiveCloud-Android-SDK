@@ -96,6 +96,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         initUploadTrigger()
         mWebSocketHelper = WebSocketHelper(websocketAddress, timeout)
         mWebSocketHelper?.addRawJsonResponseListener {
+            AffectiveLogHelper.d(TAG,"RawJsonResponse : $it")
             var response = Gson().fromJson(it, ResponseBody::class.java)
             if (response.isCreateOp()) {
                 if (response.code == 0) {
@@ -181,11 +182,9 @@ class EnterAffectiveCloudApiImpl internal constructor(
             }
             if (response.isReportBiodata()) {
                 if (response.code == 0) {
-                    var report = mBiodataReprotGenerator?.appendBioDataResponse(response)
+                    val report = mBiodataReprotGenerator?.appendBioDataResponse(response)
                     if (report != null) {
                         mBiodataReportCallback?.onSuccess(report)
-                    }else{
-                        mBiodataReportCallback?.onError(Error(response.code, "report is null"))
                     }
                 } else {
                     mBiodataReportCallback?.onError(Error(response.code, response.msg))
@@ -194,11 +193,9 @@ class EnterAffectiveCloudApiImpl internal constructor(
 
             if (response.isReportAffective()) {
                 if (response.code == 0) {
-                    var report = mAffectiveReportGenerator?.appendAffectiveDataResponse(response)
+                    val report = mAffectiveReportGenerator?.appendAffectiveDataResponse(response)
                     if (report != null) {
                         mAffectiveReportCallback?.onSuccess(report)
-                    }else{
-                        mAffectiveReportCallback?.onError(Error(response.code, "report is null"))
                     }
                 } else {
                     mAffectiveReportCallback?.onError(Error(response.code, response.msg))
@@ -579,6 +576,7 @@ class EnterAffectiveCloudApiImpl internal constructor(
         affectiveDataCategories: List<AffectiveDataCategory>,
         callback: Callback2<HashMap<Any, Any?>>
     ) {
+
         this.mAffectiveReportCallback = callback
         this.mAffectiveReportGenerator = ReportGenerator()
         mAffectiveReportGenerator!!.setAffectiveDataCategories(affectiveDataCategories)

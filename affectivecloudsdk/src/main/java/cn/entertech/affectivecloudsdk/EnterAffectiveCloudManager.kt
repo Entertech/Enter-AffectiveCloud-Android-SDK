@@ -75,42 +75,44 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     private fun initBiodata(callback: Callback) {
-        AffectiveLogHelper.i(TAG,"initBiodata")
+        AffectiveLogHelper.i(TAG, "initBiodata")
         var optionsMap = java.util.HashMap<String, Any?>()
         optionsMap["storage_settings"] = config.storageSettings?.body()
         optionsMap["bio_data_tolerance"] = config.biodataTolerance?.body()
         optionsMap["algorithm_params"] = config.algorithmParams?.body()
         mApi.initBiodataServices(config.availableBioDataCategories!!, object : Callback {
             override fun onSuccess() {
+                AffectiveLogHelper.i(TAG, "initBiodataServices onSuccess")
                 isInit = true
+                callback.onSuccess()
                 if (config.mBiodataSubscribeParams != null) {
                     mApi.subscribeBioData(config.mBiodataSubscribeParams!!,
                         object : Callback2<RealtimeBioData> {
                             override fun onSuccess(t: RealtimeBioData?) {
+                                AffectiveLogHelper.i(TAG, "subscribeBioData response onSuccess")
                                 mBiodataRealtimeListener.forEach {
                                     it.invoke(t)
                                 }
                             }
 
                             override fun onError(error: Error?) {
-                                callback.onError(error)
+                                AffectiveLogHelper.e(TAG, "subscribeBioData  response onError $error")
                             }
 
                         },
                         object : Callback2<SubBiodataFields> {
                             override fun onSuccess(t: SubBiodataFields?) {
-                                if (config.availableAffectiveDataCategories == null) {
-                                    callback.onSuccess()
-                                }
+                                AffectiveLogHelper.i(TAG, "subscribeBioData  callback onSuccess ")
+
                             }
 
                             override fun onError(error: Error?) {
-                                callback.onError(error)
+                                AffectiveLogHelper.e(TAG, "subscribeBioData  callback onError $error")
                             }
 
                         })
-                } else if (config.availableAffectiveDataCategories == null) {
-                    callback.onSuccess()
+                } else {
+                    AffectiveLogHelper.i(TAG, "initBiodata config.mBiodataSubscribeParams == null")
                 }
             }
 
@@ -122,42 +124,47 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     }
 
     private fun initAffective(callback: Callback) {
-        AffectiveLogHelper.d(TAG,"initBiodata")
+        AffectiveLogHelper.i(TAG, "initAffective")
         mApi.initAffectiveDataServices(
             config.availableAffectiveDataCategories!!,
             object : Callback {
                 override fun onSuccess() {
+                    AffectiveLogHelper.i(TAG, "initAffective onSuccess ")
+                    callback.onSuccess()
                     if (config.mAffectiveSubscribeParams != null) {
                         mApi.subscribeAffectiveData(config.mAffectiveSubscribeParams!!,
                             object : Callback2<RealtimeAffectiveData> {
                                 override fun onSuccess(t: RealtimeAffectiveData?) {
+                                    AffectiveLogHelper.i(TAG, "subscribeAffectiveData onSuccess ")
                                     mAffectiveRealtimeListener.forEach {
                                         it.invoke(t)
                                     }
+
                                 }
 
                                 override fun onError(error: Error?) {
-                                    callback.onError(error)
+                                    AffectiveLogHelper.e(TAG, "subscribeAffectiveData onError $error ")
                                 }
                             },
                             object : Callback2<SubAffectiveDataFields> {
                                 override fun onSuccess(t: SubAffectiveDataFields?) {
+                                    AffectiveLogHelper.e(TAG, "subscribeAffectiveData callback onSuccess ")
                                     if (t != null) {
                                         selectAvailableAffectiveServicesInRemote(t)
                                     }
-                                    callback.onSuccess()
                                 }
 
                                 override fun onError(error: Error?) {
-                                    callback.onError(error)
+                                    AffectiveLogHelper.e(TAG, "subscribeAffectiveData callback onError $error ")
                                 }
                             })
                     } else {
-                        callback.onSuccess()
+                        AffectiveLogHelper.e(TAG, "initAffective config.mAffectiveSubscribeParams == null ")
                     }
                 }
 
                 override fun onError(error: Error?) {
+                    AffectiveLogHelper.e(TAG, "initAffective onError $error")
                     callback.onError(error)
                 }
             })
@@ -236,7 +243,7 @@ class EnterAffectiveCloudManager(var config: EnterAffectiveCloudConfig) :
     override fun init(initListener: IStartAffectiveServiceLister) {
         initBiodata(object : Callback {
             override fun onSuccess() {
-                AffectiveLogHelper.d(TAG,"initBiodata onSuccess")
+                AffectiveLogHelper.d(TAG, "initBiodata onSuccess")
                 if (config.availableAffectiveDataCategories != null) {
                     initAffective(object : Callback {
                         override fun onSuccess() {

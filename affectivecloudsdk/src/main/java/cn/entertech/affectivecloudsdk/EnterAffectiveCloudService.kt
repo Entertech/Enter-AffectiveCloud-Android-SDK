@@ -177,7 +177,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
     }
 
     override fun hasStartAffectiveService(): Boolean {
-        AffectiveLogHelper.d(TAG, "hasStartBioDataService")
+//        AffectiveLogHelper.d(TAG, "hasStartBioDataService")
         return mEnterAffectiveCloudManager?.isInited() ?: false
     }
 
@@ -197,40 +197,43 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
     override fun getReport(listener: IGetReportListener, needFinishService: Boolean) {
         mEnterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onError(error: Error?) {
+                AffectiveLogHelper.e(TAG, "getBiodataReport error $error")
                 listener.getBioReportError(error)
-            }
-
-            override fun onSuccess(t: HashMap<Any, Any?>?) {
                 mEnterAffectiveCloudManager?.getAffectiveDataReport(object :
                     Callback2<HashMap<Any, Any?>> {
                     override fun onError(error: Error?) {
+                        AffectiveLogHelper.e(TAG, "getAffectiveDataReport error $error")
                         listener.getAffectiveReportError(error)
                         listener.onError(error)
                     }
 
                     override fun onSuccess(t: HashMap<Any, Any?>?) {
+                        AffectiveLogHelper.e(TAG, "getAffectiveDataReport onSuccess ")
                         if (!needFinishService) {
                             listener.onSuccess(null)
                             return
                         }
-                        finishAffectiveService(object : IFinishAffectiveServiceListener {
-                            override fun finishBioFail(error: Error?) {
+                    }
+                })
+            }
 
-                            }
-
-                            override fun finishAffectiveFail(error: Error?) {
-                            }
-
-                            override fun finishError(error: Error?) {
-                                listener.onSuccess(null)
-                            }
-
-                            override fun finishSuccess() {
-                                listener.onSuccess(null)
-                            }
-                        })
+            override fun onSuccess(t: HashMap<Any, Any?>?) {
+                AffectiveLogHelper.e(TAG, "getBiodataReport onSuccess ")
+                mEnterAffectiveCloudManager?.getAffectiveDataReport(object :
+                    Callback2<HashMap<Any, Any?>> {
+                    override fun onError(error: Error?) {
+                        AffectiveLogHelper.e(TAG, "getAffectiveDataReport error $error")
+                        listener.getAffectiveReportError(error)
+                        listener.onError(error)
                     }
 
+                    override fun onSuccess(t: HashMap<Any, Any?>?) {
+                        AffectiveLogHelper.e(TAG, "getAffectiveDataReport onSuccess ")
+                        if (!needFinishService) {
+                            listener.onSuccess(null)
+                            return
+                        }
+                    }
                 })
             }
 

@@ -23,6 +23,7 @@ class EnterAffectiveCloudConfig internal constructor(builder: Builder) {
 
     companion object {
         private const val AFFECTIVE_CLOUD_ADDRESS = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
+        private const val TRANSFER_ADDRESS = "wss://%s/ws?session_id=%s&verify=%s&role=%s"
 
         fun proxyInstance(proxy: EnterAffectiveConfigProxy): EnterAffectiveCloudConfig {
             val availableAffectiveServices = proxy.availableAffectiveCategories

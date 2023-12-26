@@ -2,7 +2,6 @@ package cn.entertech.affectivecloudsdk.interfaces
 
 interface IWebSocketHelper {
     fun open(webSocketCallback: WebSocketCallback)
-    fun addMessageResponseListener(listener: ((String) -> Unit))
     fun addConnectListener(listener: (() -> Unit))
     fun addDisconnectListener(listener: ((String) -> Unit))
     fun removeConnectListener(listener: (() -> Unit))

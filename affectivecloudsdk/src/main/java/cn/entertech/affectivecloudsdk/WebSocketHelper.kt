@@ -23,7 +23,6 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
     private var mBrainDataWebSocket: WebSocketClient? = null
 
     var mOpenCallback: WebSocketCallback? = null
-    private var messageResponseListeners = CopyOnWriteArrayList<(String) -> Unit>()
     private var rawJsonRequestListeners = CopyOnWriteArrayList<(String) -> Unit>()
     var rawJsonResponseListeners = CopyOnWriteArrayList<(String) -> Unit>()
     var connectListeners = CopyOnWriteArrayList<() -> Unit>()
@@ -219,9 +218,6 @@ class WebSocketHelper(var address: String, var timeout: Int = 10000) : IWebSocke
         return sslContext?.socketFactory
     }
 
-    override fun addMessageResponseListener(listener: (String) -> Unit) {
-        messageResponseListeners.add(listener)
-    }
 
     override fun addConnectListener(listener: () -> Unit) {
         connectListeners.add(listener)

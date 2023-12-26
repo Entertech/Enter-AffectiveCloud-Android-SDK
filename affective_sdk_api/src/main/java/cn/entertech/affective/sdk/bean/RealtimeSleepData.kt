@@ -1,6 +1,7 @@
 package cn.entertech.affective.sdk.bean
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class RealtimeSleepData(
     /**
@@ -14,7 +15,7 @@ data class RealtimeSleepData(
      * 数值范围{0, 1}；未睡着之前为0，入睡后保持为1；数组中数值范围[-500, 500]，信号质量不佳时全为0
      * */
     @SerializedName("sleepState") var sleepState: Double? = null
-) {
+) : Serializable {
 
     override fun toString(): String {
         return "RealtimeSleepData(sleepDegree=$sleepDegree, sleepState=$sleepState)"

@@ -1,5 +1,7 @@
 package cn.entertech.affective.sdk.bean
 
+import java.io.Serializable
+
 data class RealtimeSCEEGData(
     /**
      * 经过滤波后的通道实时脑电波，一个数组，长度为150，对应0.6秒内的脑电波形；
@@ -18,4 +20,4 @@ data class RealtimeSCEEGData(
      * 大于等于1表示脑电信号质量良好
      * */
     val sceegQuality: Double = 0.0,
-)
+): Serializable

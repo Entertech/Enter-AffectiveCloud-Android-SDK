@@ -1,9 +1,10 @@
 package cn.entertech.affective.sdk.bean
 
 import cn.entertech.affective.sdk.utils.map
+import java.io.Serializable
 
 
-class MCEEGWaveData(mapData: Map<Any, Any>) {
+class MCEEGWaveData(mapData: Map<Any, Any>): Serializable {
     private val _fp1_fpz: Any by map(mapData, "Fp1-Fpz")
     private val _fp2_fpz: Any by map(mapData, "Fp2-Fpz")
     private val _O1_fpz: Any by map(mapData, "O1-Fpz")

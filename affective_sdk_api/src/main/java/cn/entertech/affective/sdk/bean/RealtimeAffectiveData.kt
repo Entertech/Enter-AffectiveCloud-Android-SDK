@@ -1,5 +1,7 @@
 package cn.entertech.affective.sdk.bean
 
+import java.io.Serializable
+
 class RealtimeAffectiveData(
     /**
      * 实时注意力数据
@@ -34,7 +36,7 @@ class RealtimeAffectiveData(
      * 实时智慧数据
      * */
     var realtimeFlowData: RealtimeFlowData? = null
-) {
+) : Serializable {
 
     override fun toString(): String {
         return "RealtimeAffectiveData(realtimeAttentionData=$realtimeAttentionData, realtimeRelaxationData=$realtimeRelaxationData, realtimePressureData=$realtimePressureData, realtimePleasureData=$realtimePleasureData, realtimeArousalData=$realtimeArousalData, realtimeSleepData=$realtimeSleepData, realtimeCoherenceData=$realtimeCoherenceData, realtimeSsvepMultiClassifyData=$realtimeSsvepMultiClassifyData, realtimeFlowData=$realtimeFlowData)"

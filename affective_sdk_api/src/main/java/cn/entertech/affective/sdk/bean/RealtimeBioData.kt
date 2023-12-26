@@ -1,6 +1,7 @@
 package cn.entertech.affective.sdk.bean
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class RealtimeBioData(
     /**
@@ -13,7 +14,7 @@ data class RealtimeBioData(
     var realtimeBCGData: RealtimeBCGData? = null,
     var realtimePEPRData: RealtimePEPRData? = null,
     var realtimeDceegSsvepData: RealtimeDceegSsvepData? = null
-) {
+):Serializable {
     override fun toString(): String {
         return "RealtimeBioData(realtimeEEGData=$realtimeEEGData, realtimeHrData=$realtimeHrData, realtimeMCEEGData=$realtimeMCEEGData, realtimeSCEEGData=$realtimeSCEEGData, realtimeBCGData=$realtimeBCGData, realtimePEPRData=$realtimePEPRData, realtimeDceegSsvepData=$realtimeDceegSsvepData)"
     }

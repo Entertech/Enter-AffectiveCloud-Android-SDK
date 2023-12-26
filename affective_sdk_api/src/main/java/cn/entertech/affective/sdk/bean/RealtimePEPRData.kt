@@ -1,6 +1,8 @@
 package cn.entertech.affective.sdk.bean
 
-class RealtimePEPRData {
+import java.io.Serializable
+
+class RealtimePEPRData : Serializable {
     //脉搏波
     var bcgWave: ArrayList<Double>? = null
     //呼吸波

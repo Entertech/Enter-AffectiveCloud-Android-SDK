@@ -1,6 +1,8 @@
 package cn.entertech.affective.sdk.bean
 
- class RealtimeDceegSsvepData {
+import java.io.Serializable
+
+class RealtimeDceegSsvepData: Serializable {
      var eegAlphaPower: Double? = null
      var eegBetaPower: Double? = null
      var eegDeltaPower: Double? = null

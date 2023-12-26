@@ -1,6 +1,8 @@
 package cn.entertech.affective.sdk.bean
 
-class RealtimeSsvepMultiClassifyData {
+import java.io.Serializable
+
+class RealtimeSsvepMultiClassifyData : Serializable {
     var ssvepClass: Int? = null
     var ssvepProb: Map<String, Double>? = null
     override fun toString(): String {

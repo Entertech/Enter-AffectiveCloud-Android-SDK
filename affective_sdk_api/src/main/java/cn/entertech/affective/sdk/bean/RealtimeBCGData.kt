@@ -1,6 +1,8 @@
 package cn.entertech.affective.sdk.bean
 
-class RealtimeBCGData {
+import java.io.Serializable
+
+class RealtimeBCGData: Serializable {
     var bcgWave: ArrayList<Double>? = null
     var bcgQuality: Double? = null
     var hr: Double? = null

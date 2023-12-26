@@ -1,6 +1,8 @@
 package cn.entertech.affective.sdk.bean
 
-class RealtimeMCEEGData {
+import java.io.Serializable
+
+class RealtimeMCEEGData : Serializable {
     var mceegWave: MCEEGWaveData? = null
     var mceogWave: MCEOGWaveData? = null
     var eegAlphaPower: Double? = null

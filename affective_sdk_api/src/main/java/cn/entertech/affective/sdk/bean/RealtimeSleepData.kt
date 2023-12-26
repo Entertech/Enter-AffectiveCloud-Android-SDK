@@ -38,6 +38,6 @@ data class RealtimeSleepData(
     ) : Serializable {
 
     override fun toString(): String {
-        return "RealtimeSleepData(sleepDegree=$sleepDegree, sleepState=$sleepState)"
+        return "RealtimeSleepData(sleepDegree=$sleepDegree, sleepState=$sleepState, sleepSpindle=$sleepSpindle, updateFlag=$updateFlag, sleepStage=$sleepStage)"
     }
 }

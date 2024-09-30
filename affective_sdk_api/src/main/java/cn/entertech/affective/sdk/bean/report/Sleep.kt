@@ -9,27 +9,27 @@ class Sleep() : Serializable {
         /**
          * 清醒
          * */
-        private const val SLEEP_STAGE_AWAKE = 0
+        const val SLEEP_STAGE_AWAKE = 0
 
         /**
          * 非快速眼动期1（思睡期）
          * */
-        private const val SLEEP_STAGE_NREM1 = 1
+        const val SLEEP_STAGE_NREM1 = 1
 
         /**
          * NREM2 = 2  # 非快速眼动期2（浅睡期）
          * */
-        private const val SLEEP_STAGE_NREM2 = 2
+        const val SLEEP_STAGE_NREM2 = 2
 
         /**
          * NREM3 = 3  # 非快速眼动期3（深睡期）
          * */
-        private const val SLEEP_STAGE_NREM3 = 3
+        const val SLEEP_STAGE_NREM3 = 3
 
         /**
          * REM = 4  # 快速眼动期
          * */
-        private const val SLEEP_STAGE_REM = 4
+        const val SLEEP_STAGE_REM = 4
     }
 
     /**

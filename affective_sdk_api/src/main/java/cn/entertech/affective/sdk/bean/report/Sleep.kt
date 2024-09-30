@@ -4,6 +4,34 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 class Sleep() : Serializable {
+
+    companion object {
+        /**
+         * 清醒
+         * */
+        private const val SLEEP_STAGE_AWAKE = 0
+
+        /**
+         * 非快速眼动期1（思睡期）
+         * */
+        private const val SLEEP_STAGE_NREM1 = 1
+
+        /**
+         * NREM2 = 2  # 非快速眼动期2（浅睡期）
+         * */
+        private const val SLEEP_STAGE_NREM2 = 2
+
+        /**
+         * NREM3 = 3  # 非快速眼动期3（深睡期）
+         * */
+        private const val SLEEP_STAGE_NREM3 = 3
+
+        /**
+         * REM = 4  # 快速眼动期
+         * */
+        private const val SLEEP_STAGE_REM = 4
+    }
+
     /**
      * 清醒时长，单位：秒
      * */
@@ -74,11 +102,11 @@ class Sleep() : Serializable {
     var sleepSpindleRec: List<Double> = ArrayList()
 
     /**
-     * WAKE = 0  # 清醒
-     * NREM1 = 1  # 非快速眼动期1（思睡期）
-     * NREM2 = 2  # 非快速眼动期2（浅睡期）
-     * NREM3 = 3  # 非快速眼动期3（深睡期）
-     * REM = 4  # 快速眼动期
+     * WAKE = [SLEEP_STAGE_AWAKE]  # 清醒
+     * NREM1 = [SLEEP_STAGE_NREM1]  # 非快速眼动期1（思睡期）
+     * NREM2 = [SLEEP_STAGE_NREM2]  # 非快速眼动期2（浅睡期）
+     * NREM3 = [SLEEP_STAGE_NREM3]  # 非快速眼动期3（深睡期）
+     * REM = [SLEEP_STAGE_REM]  # 快速眼动期
      */
     @SerializedName("sleep_stage")
     var sleepStage: List<Int> = emptyList()
@@ -106,20 +134,15 @@ class Sleep() : Serializable {
 
     var sleepEegAlphaCurve: List<Double> = ArrayList()
 
-    var sleepEegBetaCurve: List<Double> =
-        ArrayList()
+    var sleepEegBetaCurve: List<Double> = ArrayList()
 
-    var sleepEegThetaCurve: List<Double> =
-        ArrayList()
+    var sleepEegThetaCurve: List<Double> = ArrayList()
 
-    var sleepEegDeltaCurve: List<Double> =
-        ArrayList()
+    var sleepEegDeltaCurve: List<Double> = ArrayList()
 
-    var sleepEegGammaCurve: List<Double> =
-        ArrayList()
+    var sleepEegGammaCurve: List<Double> = ArrayList()
 
-    var sleepEegQualityRec: List<Int> =
-        ArrayList()
+    var sleepEegQualityRec: List<Int> = ArrayList()
 
     var sleepArousalRec: List<Int> = ArrayList()
 

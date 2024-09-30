@@ -8,7 +8,7 @@ plugins {
 PublishInfo {
     groupId = "cn.entertech.android" // 库的组织，使用域名表示
     artifactId = "affective-offline-sdk-flowtime" // 库名称
-    version = "1.2.3" // 库版本
+    version = "1.2.4" // 库版本
 }
 
 android {

@@ -1,14 +1,14 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-//    id("custom.android.plugin")
+    id("custom.android.plugin")
 }
-
-/*PublishInfo {
+val libraryVersion = (rootProject.ext.get("libraryVersion") as? String) ?: "1.0.0"
+PublishInfo {
     groupId = "cn.entertech.android" // 库的组织，使用域名表示
     artifactId = "affective_sdk_api" // 库名称
-    version = "1.2.3" // 库版本
-}*/
+    version = libraryVersion // 库版本
+}
 
 
 android {

@@ -41,7 +41,7 @@ android {
 }
 
 dependencies {
-    api ("com.entertech.android:biomoduleble-api:0.0.3")
+    api ("com.entertech.android:biomoduleble-api:latest.release")
     implementation("androidx.core:core-ktx:1.6.0")
     testImplementation("junit:junit:4.13.2")
     implementation("com.google.code.gson:gson:2.8.5")

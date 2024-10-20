@@ -4,11 +4,11 @@ apply plugin:'custom.android.plugin'
 apply plugin: 'kotlin-kapt'
 
 def libraryVersion = (rootProject.ext.get("libraryVersion")) ?: "1.0.0"
-println(libraryVersion)
+
 PublishInfo {
     groupId = 'cn.entertech.android' // 库的组织，使用域名表示
     artifactId = 'affective_cloud_sdk' // 库名称
-    version = '3.3.7' // 库版本
+    version = libraryVersion // 库版本
 }
 android {
     compileSdkVersion 32

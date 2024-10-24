@@ -7,7 +7,7 @@ plugins {
 PublishInfo {
     groupId = "cn.entertech.android" // 库的组织，使用域名表示
     artifactId = "affective_sdk_api" // 库名称
-    version = "1.2.4" // 库版本
+    version = "1.2.5" // 库版本
 }
 
 
@@ -41,11 +41,11 @@ android {
 }
 
 dependencies {
-    api ("com.entertech.android:biomoduleble-api:0.0.3")
+    implementation ("com.entertech.android:biomoduleble_base_api:0.0.4")
     implementation("androidx.core:core-ktx:1.6.0")
     testImplementation("junit:junit:4.13.2")
     implementation("com.google.code.gson:gson:2.8.5")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    api ("cn.entertech.android:device:0.0.1")
+    implementation ("cn.entertech.android:device:0.0.1")
 }

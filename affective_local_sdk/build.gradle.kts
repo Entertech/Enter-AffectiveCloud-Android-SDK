@@ -5,9 +5,10 @@ plugins {
     id("kotlin-kapt")
 }
 val libraryVersion = (rootProject.ext.get("libraryVersion") as? String) ?: "1.0.0"
+val groupIdString = (rootProject.ext.get("groupId") as? String) ?: "1.0.0"
 
 PublishInfo {
-    groupId = "cn.entertech.android" // 库的组织，使用域名表示
+    groupId = groupIdString // 库的组织，使用域名表示
     artifactId = "affective-offline-sdk-flowtime" // 库名称
     version = libraryVersion  // 库版本
 }

@@ -1,12 +1,13 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin:'custom.android.plugin'
+apply plugin: 'custom.android.plugin'
 apply plugin: 'kotlin-kapt'
 
 def libraryVersion = (rootProject.ext.get("libraryVersion")) ?: "1.0.0"
+def groupIdString = (rootProject.ext.get("groupId")) ?: ""
 
 PublishInfo {
-    groupId = 'cn.entertech.android' // 库的组织，使用域名表示
+    groupId = groupIdString // 库的组织，使用域名表示
     artifactId = 'affective_cloud_sdk' // 库名称
     version = libraryVersion // 库版本
 }
@@ -59,5 +60,5 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
     kapt 'com.google.auto.service:auto-service:1.0-rc6'
     implementation 'com.google.auto.service:auto-service:1.0-rc6'
-    implementation ("cn.entertech.android:base:0.0.5")
+    implementation("cn.entertech.android:base:0.0.5")
 }

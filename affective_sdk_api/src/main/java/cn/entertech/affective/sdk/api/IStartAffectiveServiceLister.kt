@@ -6,20 +6,28 @@ interface IStartAffectiveServiceLister {
     /**
      * 启动成功
      * */
-    fun startSuccess()
+    fun startSuccess(){
+
+    }
 
     /**
      * 启动生物基础服务失败
      * */
-    fun startBioFail(error: Error?)
+    fun startBioFail(error: Error?){
+
+    }
 
     /**
      * 启动生理基础服务失败
      * */
-    fun startAffectionFail(error: Error?)
+    fun startAffectionFail(error: Error?){
+
+    }
 
     /**
      * 启动失败
      * */
-    fun startFail(error: Error?)
+    fun startFail(error: Error?){
+
+    }
 }

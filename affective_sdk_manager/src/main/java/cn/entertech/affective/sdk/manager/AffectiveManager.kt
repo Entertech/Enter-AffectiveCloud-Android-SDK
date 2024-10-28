@@ -138,11 +138,16 @@ class AffectiveManager<Key> {
      * 一键订阅数据
      * */
     fun oneClickSubscribeData(
-        key: Key, listener: IConnectionServiceListener, configProxy: EnterAffectiveConfigProxy
+        key: Key,
+        listener: IConnectionServiceListener,
+        startListener: IStartAffectiveServiceLister,
+        bdListener: ((Key, RealtimeBioData?) -> Unit),
+        adListener: ((Key, RealtimeAffectiveData?) -> Unit),
+        configProxy: EnterAffectiveConfigProxy
     ) {
         getAffectiveService(key)?.apply {
             if (hasConnectAffectiveService()) {
-
+                startAffectiveService(key, this, startListener, bdListener, adListener)
             } else {
                 connectAffectiveServiceConnection(object : IConnectionServiceListener {
                     override fun connectionSuccess(sessionId: String?) {
@@ -159,17 +164,19 @@ class AffectiveManager<Key> {
     }
 
     private fun startAffectiveService(
-        affective: IAffectiveDataAnalysisService, listener: IStartAffectiveServiceLister
+        key: Key,
+        affective: IAffectiveDataAnalysisService,
+        listener: IStartAffectiveServiceLister,
+        bdListener: ((Key, RealtimeBioData?) -> Unit),
+        adListener: ((Key, RealtimeAffectiveData?) -> Unit)
     ) {
         if (affective.hasStartAffectiveService()) {
-            affective.subscribeData()
+            subscribeData(key, bdListener, adListener)
         } else {
             affective.startAffectiveService(object : IStartAffectiveServiceLister {
                 override fun startSuccess() {
                     listener.startSuccess()
-                    affective.subscribeData({},{
-
-                    })
+                    subscribeData(key, bdListener, adListener)
                 }
 
                 override fun startBioFail(error: Error?) {
@@ -186,4 +193,5 @@ class AffectiveManager<Key> {
             })
         }
     }
+
 }

@@ -42,7 +42,7 @@ android {
 }
 
 dependencies {
-    api ("com.entertech.android:biomoduleble-api:latest.release")
+    api ("cn.entertech.android:biomoduleble_base_api:2.3.0")
     implementation("androidx.core:core-ktx:1.6.0")
     testImplementation("junit:junit:4.13.2")
     implementation("com.google.code.gson:gson:2.8.5")

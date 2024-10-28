@@ -169,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         val proxy = EnterAffectiveConfigProxy(
             availableBioDataCategories,
             availableAffectiveDataCategories,
-            userId = -1,
+            userId = "-1",
             appSecret = appSecret!!,
             appKey = appKey!!
         )

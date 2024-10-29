@@ -117,8 +117,12 @@ class AffectiveManager<Key> {
                 }
             })
         }
-        bdListeners.add(bdListener)
-        adListeners.add(listener)
+        if (!bdListeners.contains(bdListener)) {
+            bdListeners.add(bdListener)
+        }
+        if (!adListeners.contains(listener)) {
+            adListeners.add(listener)
+        }
     }
 
     /**

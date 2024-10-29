@@ -5,6 +5,7 @@ import cn.entertech.affective.sdk.api.IConnectionServiceListener
 import cn.entertech.affective.sdk.api.IFinishAffectiveServiceListener
 import cn.entertech.affective.sdk.api.IGetReportListener
 import cn.entertech.affective.sdk.api.IStartAffectiveServiceLister
+import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
@@ -17,7 +18,9 @@ class AffectiveManager<Key> {
     /**
      * 实例化回调
      * */
-    var mInstanceListener: ((Key) -> IAffectiveDataAnalysisService?)? = null
+    var mInstanceListener: ((Key) -> IAffectiveDataAnalysisService?) = {
+        IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveLocalService)
+    }
 
     private val managerMap: MutableMap<Key, IAffectiveDataAnalysisService?> by lazy {
         ConcurrentHashMap<Key, IAffectiveDataAnalysisService?>()
@@ -43,7 +46,7 @@ class AffectiveManager<Key> {
     private val adListener: ((RealtimeAffectiveData?) -> Unit)? = null
 
     fun getAffectiveService(key: Key): IAffectiveDataAnalysisService? {
-        return mInstanceListener?.let {
+        return mInstanceListener.let {
             var service = managerMap[key]
             if (service == null) {
                 service = it.invoke(key)
@@ -139,11 +142,11 @@ class AffectiveManager<Key> {
      * */
     fun oneClickSubscribeData(
         key: Key,
-        listener: IConnectionServiceListener,
+        listener: IConnectionServiceListener? = null,
         startListener: IStartAffectiveServiceLister,
         bdListener: ((Key, RealtimeBioData?) -> Unit),
         adListener: ((Key, RealtimeAffectiveData?) -> Unit),
-        configProxy: EnterAffectiveConfigProxy
+        configProxy: EnterAffectiveConfigProxy = EnterAffectiveConfigProxy()
     ) {
         getAffectiveService(key)?.apply {
             if (hasConnectAffectiveService()) {
@@ -151,15 +154,24 @@ class AffectiveManager<Key> {
             } else {
                 connectAffectiveServiceConnection(object : IConnectionServiceListener {
                     override fun connectionSuccess(sessionId: String?) {
-                        listener.connectionSuccess(sessionId)
+                        listener?.connectionSuccess(sessionId)
+                        startAffectiveService(
+                            key, this@apply, startListener, bdListener, adListener
+                        )
                     }
 
                     override fun connectionError(error: Error?) {
-                        listener.connectionError(error)
+                        listener?.connectionError(error)
                     }
 
                 }, configProxy)
             }
+        } ?: kotlin.run {
+            listener?.connectionError(
+                Error(
+                    -1, "affectiveService is null"
+                )
+            )
         }
     }
 

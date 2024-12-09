@@ -12,6 +12,7 @@ PublishInfo {
     version = libraryVersion // 库版本
 }
 android {
+    namespace 'cn.entertech.android.affective_cloud_sdk'
     compileSdkVersion 32
 
     defaultConfig {

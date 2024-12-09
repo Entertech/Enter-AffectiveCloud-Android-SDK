@@ -11,6 +11,7 @@ android {
             storePassword '123456'
         }
     }
+    namespace 'cn.entertech.android.affective.demo'
     compileSdkVersion 32
     defaultConfig {
         applicationId "cn.entertech.biomoduledemo"

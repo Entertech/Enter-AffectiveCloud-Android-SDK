@@ -5,12 +5,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -20,29 +20,24 @@ import cn.entertech.affective.sdk.api.IConnectionServiceListener
 import cn.entertech.affective.sdk.api.IFinishAffectiveServiceListener
 import cn.entertech.affective.sdk.api.IGetReportListener
 import cn.entertech.affective.sdk.api.IStartAffectiveServiceLister
-import cn.entertech.affective.sdk.bean.type.PhysiologyDataCategory
 import cn.entertech.affective.sdk.bean.AffectiveServiceWay
-import cn.entertech.affective.sdk.bean.type.BioDataCategory
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affective.sdk.bean.UploadReportEntity
-import cn.entertech.affectivecloudsdk.*
-import cn.entertech.affectivecloudsdk.entity.*
-import cn.entertech.affectivecloudsdk.interfaces.*
-import cn.entertech.biomoduledemo.R
+import cn.entertech.affective.sdk.bean.type.BioDataCategory
+import cn.entertech.affective.sdk.bean.type.PhysiologyDataCategory
+import cn.entertech.android.affective.demo.R
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_KEY
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
-import cn.entertech.biomoduledemo.utils.*
+import cn.entertech.biomoduledemo.utils.ConvertUtil
+import cn.entertech.biomoduledemo.utils.PagerSlidingTabStrip
 import cn.entertech.ble.single.BiomoduleBleManager
 import com.orhanobut.logger.Logger
-import java.io.*
-import java.lang.Exception
-import java.util.*
-import kotlin.collections.ArrayList
+import java.io.InputStream
 
 class MainActivity : AppCompatActivity() {
     private var appSecret: String? = null
@@ -329,7 +324,7 @@ class MainActivity : AppCompatActivity() {
     private var brainDataBuffer = ArrayList<Int>()
     private var writeFileDataBuffer = ArrayList<Int>()
     private var rawListener = fun(bytes: ByteArray) {
-        affectiveService?.appendEEGData(bytes)
+        affectiveService?.appendEEGData(bytes, false)
         for (byte in bytes) {
             val brainData = ConvertUtil.converUnchart(byte)
             brainDataBuffer.add(brainData)

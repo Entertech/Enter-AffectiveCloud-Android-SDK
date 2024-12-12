@@ -16,7 +16,6 @@ import java.util.HashMap
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.utils.AffectiveLogHelper
 import cn.entertech.base.net.NetworkUtils
-import cn.entertech.ble.api.bean.MeditateDataType
 import com.google.auto.service.AutoService
 import java.io.InputStream
 
@@ -116,11 +115,11 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         throw IllegalAccessError("not support this method")
     }
 
-    override fun appendEEGData(brainData: Int) {
+    override fun appendEEGData(brainData: Int, isEar: Boolean) {
         throw IllegalAccessError("not support this method")
     }
 
-    override fun appendEEGData(brainData: List<Int>) {
+    override fun appendEEGData(brainData: List<Int>, isEar: Boolean) {
         throw IllegalAccessError("not support this method")
     }
 
@@ -132,7 +131,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         throw IllegalAccessError("not support this method")
     }
 
-    override fun appendEEGData(brainData: ByteArray) {
+    override fun appendEEGData(brainData: ByteArray, isEar: Boolean) {
         mEnterAffectiveCloudManager?.appendEEGData(brainData)
     }
 

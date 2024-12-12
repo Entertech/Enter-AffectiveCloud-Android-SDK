@@ -163,7 +163,7 @@ interface IAffectiveDataAnalysisService {
     fun appendByteArrayData(dataType: MeditateDataType, data: ByteArray): Boolean {
         return when (dataType) {
             MeditateDataType.EEG -> {
-                appendEEGData(data)
+                appendEEGData(data, false)
                 true
             }
 
@@ -194,7 +194,7 @@ interface IAffectiveDataAnalysisService {
         }
         when (dataType) {
             MeditateDataType.EEG -> {
-                appendEEGData(data)
+                appendEEGData(data,)
             }
 
             MeditateDataType.SCEEG -> {
@@ -215,7 +215,7 @@ interface IAffectiveDataAnalysisService {
     fun appendIntListData(dataType: MeditateDataType, data: List<Int>): Boolean {
         when (dataType) {
             MeditateDataType.EEG -> {
-                appendEEGData(data)
+                appendEEGData(data,)
             }
 
             MeditateDataType.SCEEG -> {
@@ -233,9 +233,9 @@ interface IAffectiveDataAnalysisService {
         return false
     }
 
-    fun appendEEGData(brainData: ByteArray)
-    fun appendEEGData(brainData: Int)
-    fun appendEEGData(brainData: List<Int>)
+    fun appendEEGData(brainData: ByteArray, isEar: Boolean = false)
+    fun appendEEGData(brainData: Int, isEar: Boolean = false)
+    fun appendEEGData(brainData: List<Int>, isEar: Boolean = false)
 
     fun appendDCEEGData(brainData: ByteArray)
 

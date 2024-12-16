@@ -38,11 +38,6 @@ android {
 //    }
 
 }
-PublishInfo {
-    groupId = 'cn.entertech.android' // 库的组织，使用域名表示
-    artifactId = 'affective_sdk_cloud' // 库名称
-    version = '1.2.5' // 库版本
-}
 
 
 dependencies {

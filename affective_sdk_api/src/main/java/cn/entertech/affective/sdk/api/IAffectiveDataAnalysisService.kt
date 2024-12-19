@@ -5,6 +5,7 @@ import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
+import cn.entertech.affective.sdk.bean.UploadReportEntity
 import cn.entertech.ble.api.bean.MeditateDataType
 import cn.entertech.device.DeviceType
 import java.io.InputStream
@@ -90,11 +91,14 @@ interface IAffectiveDataAnalysisService {
      * */
     fun finishAffectiveService(listener: IFinishAffectiveServiceListener)
 
+    suspend fun suspendFinishAffectiveService()
     /**
      * 获取报表
      * @param needFinishService 是否需要自动结束情感服务 true 自动结束
      * */
     fun getReport(listener: IGetReportListener, needFinishService: Boolean)
+
+    suspend fun suspendGetReport(needFinishService: Boolean):UploadReportEntity?
 
     /**
      * 是否启动了情感云服务

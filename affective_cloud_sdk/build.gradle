@@ -9,7 +9,7 @@ def groupIdString = (rootProject.ext.get("groupId")) ?: ""
 PublishInfo {
     groupId = groupIdString // 库的组织，使用域名表示
     artifactId = 'affective_cloud_sdk' // 库名称
-    version = libraryVersion // 库版本
+    version = "1.2.5" // 库版本
 }
 android {
     namespace 'cn.entertech.android.affective_cloud_sdk'
@@ -44,7 +44,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation 'androidx.appcompat:appcompat:1.0.0'
-    api project(path: ':affective_sdk_api')
+    implementation("cn.entertech.android:affective_sdk_api:1.2.5")
 //    api 'cn.entertech.android:affective_sdk_api:1.1.6'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

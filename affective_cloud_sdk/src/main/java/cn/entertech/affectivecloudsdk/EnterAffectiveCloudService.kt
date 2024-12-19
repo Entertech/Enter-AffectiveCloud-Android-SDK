@@ -115,11 +115,11 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         throw IllegalAccessError("not support this method")
     }
 
-    override fun appendEEGData(brainData: Int, isEar: Boolean) {
+    override fun appendEEGData(brainData: Int) {
         throw IllegalAccessError("not support this method")
     }
 
-    override fun appendEEGData(brainData: List<Int>, isEar: Boolean) {
+    override fun appendEEGData(brainData: List<Int>) {
         throw IllegalAccessError("not support this method")
     }
 
@@ -131,7 +131,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         throw IllegalAccessError("not support this method")
     }
 
-    override fun appendEEGData(brainData: ByteArray, isEar: Boolean) {
+    override fun appendEEGData(brainData: ByteArray) {
         mEnterAffectiveCloudManager?.appendEEGData(brainData)
     }
 

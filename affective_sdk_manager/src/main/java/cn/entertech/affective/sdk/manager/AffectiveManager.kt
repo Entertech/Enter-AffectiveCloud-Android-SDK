@@ -10,204 +10,392 @@ import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
+import cn.entertech.affective.sdk.bean.UploadReportEntity
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
-class AffectiveManager<Key> {
+open class AffectiveManager<Key> {
 
-    /**
-     * 实例化回调
-     * */
-    var mInstanceListener: ((Key) -> IAffectiveDataAnalysisService?) = {
-        IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveLocalService)
+    private val affectiveServiceMap: MutableMap<Key, IAffectiveDataAnalysisService?> by lazy {
+        ConcurrentHashMap()
     }
 
-    private val managerMap: MutableMap<Key, IAffectiveDataAnalysisService?> by lazy {
-        ConcurrentHashMap<Key, IAffectiveDataAnalysisService?>()
+    private val connectionServiceListenerMap: MutableMap<Key, IConnectionServiceListener?> by lazy {
+        ConcurrentHashMap()
     }
 
-    private val connectionListeners by lazy {
-        CopyOnWriteArrayList<(Key) -> Unit>()
+    private val startAffectiveServiceListerMap: MutableMap<Key, IStartAffectiveServiceLister?> by lazy {
+        ConcurrentHashMap()
+    }
+    private val finishAffectiveServiceListenerMap: MutableMap<Key, IFinishAffectiveServiceListener?> by lazy {
+        ConcurrentHashMap()
     }
 
-    private val disconnectListeners by lazy {
-        CopyOnWriteArrayList<(Key, String) -> Unit>()
+    private val bioDataListenerMap: MutableMap<Key, ((RealtimeBioData?) -> Unit)?> by lazy {
+        ConcurrentHashMap()
     }
 
-    private val bdListeners by lazy {
-        CopyOnWriteArrayList<(Key, RealtimeBioData?) -> Unit>()
+    private val affectiveDataListenerMap: MutableMap<Key, ((RealtimeAffectiveData?) -> Unit)?> by lazy {
+        ConcurrentHashMap()
+    }
+    private val getReportListenerMap: MutableMap<Key, IGetReportListener?> by lazy {
+        ConcurrentHashMap()
     }
 
-    private val adListeners by lazy {
-        CopyOnWriteArrayList<(Key, RealtimeAffectiveData?) -> Unit>()
+    private val affectionConnectionServiceListeners by lazy {
+        CopyOnWriteArrayList<IAffectionConnectionServiceListener<Key>>()
     }
-    private var bdListener: ((RealtimeBioData?) -> Unit)? = null
-
-    private val adListener: ((RealtimeAffectiveData?) -> Unit)? = null
-
-    fun getAffectiveService(key: Key): IAffectiveDataAnalysisService? {
-        return mInstanceListener.let {
-            var service = managerMap[key]
-            if (service == null) {
-                service = it.invoke(key)
-                service?.addServiceConnectStatueListener(connectionListener = {
-                    connectionListeners.forEach { listener ->
-                        listener(key)
-                    }
-                }, disconnectListener = {
-                    disconnectListeners.forEach { listener ->
-                        listener(key, it)
-                    }
-                })
-                managerMap[key] = service
-            }
-            service
-        }
+    private val affectiveStartServiceLister by lazy {
+        CopyOnWriteArrayList<IAffectiveStartServiceLister<Key>>()
+    }
+    private val bioDataListeners: MutableList<(Key, RealtimeBioData?) -> Unit> by lazy {
+        CopyOnWriteArrayList()
     }
 
-    fun addServiceConnectStatueListener(
-        connectionListener: ((Key) -> Unit), disconnectListener: ((Key, String) -> Unit)
-    ) {
-        connectionListeners.add(connectionListener)
-        disconnectListeners.add(disconnectListener)
+    private val affectiveDataListeners: MutableList<(Key, RealtimeAffectiveData?) -> Unit> by lazy {
+        CopyOnWriteArrayList()
     }
-
-    fun removeServiceConnectStatueListener(
-        connectionListener: ((Key) -> Unit), disconnectListener: ((Key, String) -> Unit)?
-    ) {
-        connectionListeners.remove(connectionListener)
-        disconnectListeners.remove(disconnectListener)
+    private val affectiveIGetReportListener: MutableList<IAffectiveIGetReportListener<Key>> by lazy {
+        CopyOnWriteArrayList()
+    }
+    private val affectiveFinishServiceListener: MutableList<IAffectiveFinishServiceListener<Key>> by lazy {
+        CopyOnWriteArrayList()
     }
 
     fun connectAffectiveServiceConnection(
-        key: Key, listener: IConnectionServiceListener, configProxy: EnterAffectiveConfigProxy
+        key: Key,
+        connectionServiceListener: IConnectionServiceListener,
+        configProxy: EnterAffectiveConfigProxy
     ) {
-        getAffectiveService(key)?.connectAffectiveServiceConnection(listener, configProxy)
+        getAffectiveService(key)?.apply {
+            connectAffectiveServiceConnection(connectionServiceListener, configProxy)
+        } ?: kotlin.run {
+            connectionServiceListener.connectionError(Error(-1, "key service is null"))
+        }
     }
 
-    fun closeAffectiveServiceConnection(key: Key) {
-        getAffectiveService(key)?.closeAffectiveServiceConnection()
+    fun startAffectiveService(
+        key: Key, initListener: IStartAffectiveServiceLister
+    ) {
+        getAffectiveService(key)?.apply {
+            startAffectiveService(initListener)
+        } ?: kotlin.run {
+            initListener.startFail(Error(-1, "key service is null"))
+        }
     }
 
-    fun startAffectiveService(key: Key, listener: IStartAffectiveServiceLister) {
-        getAffectiveService(key)?.startAffectiveService(listener)
+
+    fun connectAndStartAffectiveService(key: Key, failure: (String) -> Unit = {}) {
+        getAffectiveService(key)?.apply {
+            if (hasConnectAffectiveService()) {
+                if (hasStartAffectiveService()) {
+                    affectiveStartServiceLister.forEach {
+                        it.hasStarted(key)
+                    }
+                } else {
+                    startAffectiveService(key, this)
+                }
+            } else {
+                getConnectionServiceListener(key, this)?.apply {
+                    connectAffectiveServiceConnection(this, EnterAffectiveConfigProxy())
+                }
+            }
+        } ?: kotlin.run {
+            failure("  $key affective Service is null")
+        }
     }
 
-    fun finishAffectiveService(key: Key, listener: IFinishAffectiveServiceListener) {
-        getAffectiveService(key)?.finishAffectiveService(listener)
+
+    private fun getAffectiveService(
+        key: Key, serviceType: AffectiveServiceWay = AffectiveServiceWay.AffectiveLocalService
+    ): IAffectiveDataAnalysisService? {
+        return affectiveServiceMap.getValueWithInit(key, initValue = {
+            IAffectiveDataAnalysisService.getService(serviceType)
+        })
     }
 
-    fun getReport(key: Key, listener: IGetReportListener, needFinishService: Boolean) {
-        getAffectiveService(key)?.getReport(listener, needFinishService)
+    private fun startAffectiveService(key: Key, service: IAffectiveDataAnalysisService) {
+        getStartAffectiveServiceLister(key, service)?.apply {
+            service.startAffectiveService(this)
+        }
+    }
+
+    private fun getConnectionServiceListener(
+        key: Key, service: IAffectiveDataAnalysisService
+    ): IConnectionServiceListener? {
+        return connectionServiceListenerMap.getValueWithInit(key, initValue = {
+            object : IConnectionServiceListener {
+                override fun connectionError(error: Error?) {
+                    affectionConnectionServiceListeners.forEach {
+                        it.connectionError(key, error)
+                    }
+                }
+
+                override fun connectionSuccess(sessionId: String?) {
+                    affectionConnectionServiceListeners.forEach {
+                        it.connectionSuccess(key, sessionId)
+                    }
+                    startAffectiveService(key, service)
+                }
+
+                override fun hasConnected() {
+                    super.hasConnected()
+                    affectionConnectionServiceListeners.forEach {
+                        it.hasConnected(key)
+                    }
+                }
+            }
+        })
+    }
+
+    fun appendHeartRateData(
+        key: Key, hrData: List<Int>, success: () -> Unit = {}, failure: (String) -> Unit = {}
+    ) {
+        getAffectiveService(key)?.apply {
+            hrData.forEach {
+                appendHeartRateData(it)
+            }
+            success()
+        } ?: run {
+            failure("key $key service is null")
+        }
+    }
+
+    fun appendEEGData(
+        key: Key, eegData: List<Int>, success: () -> Unit = {}, failure: (String) -> Unit = {}
+    ) {
+        getAffectiveService(key)?.apply {
+            this.appendEEGData(eegData)
+            success()
+        } ?: kotlin.run {
+            failure("key $key service is null")
+        }
     }
 
     fun subscribeData(
         key: Key,
-        bdListener: ((Key, RealtimeBioData?) -> Unit),
-        listener: ((Key, RealtimeAffectiveData?) -> Unit)
+        service: IAffectiveDataAnalysisService? = getAffectiveService(key),
     ) {
-        if (bdListeners.isEmpty() && adListeners.isEmpty()) {
-            getAffectiveService(key)?.subscribeData({
-                bdListeners.forEach { listener ->
-                    listener(key, it)
+        val bioDataListener = bioDataListenerMap.getValueWithInit(key, initValue = {
+            { bioData ->
+                bioDataListeners.forEach {
+                    it(key, bioData)
                 }
-            }, {
-                adListeners.forEach { listener ->
-                    listener(key, it)
+            }
+        })
+
+        val affectiveDataListener = affectiveDataListenerMap.getValueWithInit(key, initValue = {
+            { affectiveData ->
+                affectiveDataListeners.forEach {
+                    it(key, affectiveData)
                 }
-            })
-        }
-        if (!bdListeners.contains(bdListener)) {
-            bdListeners.add(bdListener)
-        }
-        if (!adListeners.contains(listener)) {
-            adListeners.add(listener)
-        }
+            }
+        })
+        service?.subscribeData(bioDataListener, affectiveDataListener)
     }
 
-    /**
-     * 取消订阅
-     * */
     fun unSubscribeData(
         key: Key,
-        bdListener: ((Key, RealtimeBioData?) -> Unit),
-        listener: ((Key, RealtimeAffectiveData?) -> Unit)
+        service: IAffectiveDataAnalysisService? = getAffectiveService(key),
     ) {
-        bdListeners.remove(bdListener)
-        adListeners.remove(listener)
-        if (bdListeners.isEmpty() && adListeners.isEmpty()) {
-            getAffectiveService(key)?.unSubscribeData(this.bdListener, this.adListener)
-        }
+        service?.unSubscribeData(bioDataListenerMap[key], affectiveDataListenerMap[key])
     }
 
 
-    /**
-     * 一键订阅数据
-     * */
-    fun oneClickSubscribeData(
-        key: Key,
-        listener: IConnectionServiceListener? = null,
-        startListener: IStartAffectiveServiceLister,
-        bdListener: ((Key, RealtimeBioData?) -> Unit),
-        adListener: ((Key, RealtimeAffectiveData?) -> Unit),
-        configProxy: EnterAffectiveConfigProxy = EnterAffectiveConfigProxy()
-    ) {
-        getAffectiveService(key)?.apply {
-            if (hasConnectAffectiveService()) {
-                startAffectiveService(key, this, startListener, bdListener, adListener)
-            } else {
-                connectAffectiveServiceConnection(object : IConnectionServiceListener {
-                    override fun connectionSuccess(sessionId: String?) {
-                        listener?.connectionSuccess(sessionId)
-                        startAffectiveService(
-                            key, this@apply, startListener, bdListener, adListener
-                        )
+    private fun getStartAffectiveServiceLister(
+        key: Key, service: IAffectiveDataAnalysisService
+    ): IStartAffectiveServiceLister? {
+        return startAffectiveServiceListerMap.getValueWithInit(key, initValue = {
+            object : IStartAffectiveServiceLister {
+                override fun startAffectionFail(error: Error?) {
+                    super.startAffectionFail(error)
+                    affectiveStartServiceLister.forEach {
+                        it.startAffectionFail(key, error)
                     }
-
-                    override fun connectionError(error: Error?) {
-                        listener?.connectionError(error)
-                    }
-
-                }, configProxy)
-            }
-        } ?: kotlin.run {
-            listener?.connectionError(
-                Error(
-                    -1, "affectiveService is null"
-                )
-            )
-        }
-    }
-
-    private fun startAffectiveService(
-        key: Key,
-        affective: IAffectiveDataAnalysisService,
-        listener: IStartAffectiveServiceLister,
-        bdListener: ((Key, RealtimeBioData?) -> Unit),
-        adListener: ((Key, RealtimeAffectiveData?) -> Unit)
-    ) {
-        if (affective.hasStartAffectiveService()) {
-            subscribeData(key, bdListener, adListener)
-        } else {
-            affective.startAffectiveService(object : IStartAffectiveServiceLister {
-                override fun startSuccess() {
-                    listener.startSuccess()
-                    subscribeData(key, bdListener, adListener)
                 }
 
                 override fun startBioFail(error: Error?) {
-                    listener.startBioFail(error)
-                }
-
-                override fun startAffectionFail(error: Error?) {
-                    listener.startAffectionFail(error)
+                    super.startBioFail(error)
+                    affectiveStartServiceLister.forEach {
+                        it.startBioFail(key, error)
+                    }
                 }
 
                 override fun startFail(error: Error?) {
-                    listener.startFail(error)
+                    super.startFail(error)
+                    affectiveStartServiceLister.forEach {
+                        it.startFail(key, error)
+                    }
                 }
-            })
+
+                override fun startSuccess() {
+                    super.startSuccess()
+                    affectiveStartServiceLister.forEach {
+                        it.startSuccess(key)
+                    }
+//                    subscribeData(key, service)
+                }
+
+                override fun hasStarted() {
+                    super.hasStarted()
+                    affectiveStartServiceLister.forEach {
+                        it.hasStarted(key)
+                    }
+                }
+            }
+        })
+    }
+
+    suspend fun suspendGetAffectiveReport(key: Key): UploadReportEntity? {
+        return getAffectiveService(key)?.suspendGetReport(false)
+    }
+
+    fun getAffectiveReport(key: Key, needFinishService: Boolean = false) {
+        getAffectiveService(key)?.apply {
+            getReportListenerMap.getValueWithInit(key, initValue = {
+                object : IGetReportListener {
+                    override fun getAffectiveReportError(error: Error?) {
+                        affectiveIGetReportListener.forEach {
+                            it.getAffectiveReportError(key, error)
+                        }
+                    }
+
+                    override fun getBioReportError(error: Error?) {
+                        affectiveIGetReportListener.forEach {
+                            it.getBioReportError(key, error)
+                        }
+                    }
+
+                    override fun onError(error: Error?) {
+                        affectiveIGetReportListener.forEach {
+                            it.onError(key, error)
+                        }
+                    }
+
+                    override fun onSuccess(entity: UploadReportEntity?) {
+                        affectiveIGetReportListener.forEach {
+                            it.onSuccess(key, entity)
+                        }
+                    }
+                }
+            })?.apply {
+                getReport(this, needFinishService)
+            }
+
+        } ?: run {
+            affectiveIGetReportListener.forEach {
+                it.onError(key, Error(-1, "key service is null"))
+            }
         }
     }
 
+    suspend fun suspendFinishService(key: Key) {
+        getAffectiveService(key)?.apply {
+            suspendFinishAffectiveService()
+        }
+    }
+
+    fun finishService(key: Key) {
+        getAffectiveService(key)?.apply {
+            finishAffectiveServiceListenerMap.getValueWithInit(key, initValue = {
+                object : IFinishAffectiveServiceListener {
+                    override fun finishError(error: Error?) {
+                        affectiveFinishServiceListener.forEach {
+                            it.finishError(key, error)
+                        }
+                    }
+
+                    override fun finishSuccess() {
+                        affectiveFinishServiceListener.forEach {
+                            it.finishSuccess(key)
+                        }
+                    }
+                }
+            })?.apply {
+                finishAffectiveService(this)
+            }
+
+        } ?: kotlin.run {
+            affectiveFinishServiceListener.forEach {
+                it.finishError(key, Error(-1, "key service is null"))
+            }
+        }
+    }
+
+    fun addAffectionConnectionServiceListener(listener: IAffectionConnectionServiceListener<Key>) {
+        affectionConnectionServiceListeners.addWithoutRepeat(listener)
+    }
+
+    fun removeAffectionConnectionServiceListener(listener: IAffectionConnectionServiceListener<Key>) {
+        affectionConnectionServiceListeners.remove(listener)
+    }
+
+    fun addAffectiveStartServiceLister(listener: IAffectiveStartServiceLister<Key>) {
+        affectiveStartServiceLister.addWithoutRepeat(listener)
+    }
+
+    fun removeAffectiveStartServiceLister(listener: IAffectiveStartServiceLister<Key>) {
+        affectiveStartServiceLister.remove(listener)
+    }
+
+    fun addAffectiveIGetReportListener(listener: IAffectiveIGetReportListener<Key>) {
+        affectiveIGetReportListener.addWithoutRepeat(listener)
+    }
+
+    fun removeAffectiveIGetReportListener(listener: IAffectiveIGetReportListener<Key>) {
+        affectiveIGetReportListener.remove(listener)
+    }
+
+    fun addAffectiveFinishServiceListener(listener: IAffectiveFinishServiceListener<Key>) {
+        affectiveFinishServiceListener.addWithoutRepeat(listener)
+    }
+
+    fun removeAffectiveFinishServiceListener(listener: IAffectiveFinishServiceListener<Key>) {
+        affectiveFinishServiceListener.remove(listener)
+    }
+
+    fun subscribeData(
+        bioDataListener: ((Key, RealtimeBioData?) -> Unit)? = null,
+        affectiveDataListener: ((Key, RealtimeAffectiveData?) -> Unit)? = null
+    ) {
+        bioDataListener?.apply {
+            bioDataListeners.addWithoutRepeat(this)
+        }
+        affectiveDataListener?.apply {
+            affectiveDataListeners.addWithoutRepeat(this)
+        }
+    }
+
+    fun unSubscribeData(
+        bioDataListener: ((Key, RealtimeBioData?) -> Unit)? = null,
+        affectiveDataListener: ((Key, RealtimeAffectiveData?) -> Unit)? = null,
+    ) {
+        bioDataListener?.apply {
+            bioDataListeners.remove(this)
+        }
+        affectiveDataListener?.apply {
+            affectiveDataListeners.remove(this)
+        }
+    }
+
+    private inline fun <reified T> MutableList<T>.addWithoutRepeat(t: T) {
+        if (!contains(t)) {
+            add(t)
+        }
+    }
+
+    private inline fun <reified K> MutableMap<Key, K?>.getValueWithInit(
+        key: Key,
+        initValue: () -> K?,
+        checkValidValue: (K?) -> Boolean = {
+            it != null
+        },
+    ): K? {
+        var value = get(key)
+        if (!checkValidValue(value)) {
+            value = initValue()
+            this[key] = value
+        }
+        return value
+    }
 }

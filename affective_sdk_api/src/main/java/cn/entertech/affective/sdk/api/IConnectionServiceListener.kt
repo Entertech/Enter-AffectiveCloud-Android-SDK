@@ -13,4 +13,8 @@ interface IConnectionServiceListener {
      * 连接失败
      * */
     fun connectionError(error: Error?)
+
+    fun hasConnected(){
+
+    }
 }

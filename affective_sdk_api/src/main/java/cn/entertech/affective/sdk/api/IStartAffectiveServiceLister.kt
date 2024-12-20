@@ -30,4 +30,8 @@ interface IStartAffectiveServiceLister {
     fun startFail(error: Error?){
 
     }
+
+    fun hasStarted(){
+
+    }
 }

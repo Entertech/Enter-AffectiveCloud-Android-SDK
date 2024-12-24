@@ -161,7 +161,7 @@ open class AffectiveManager<Key> {
     }
 
 
-    private fun getAffectiveService(
+    fun getAffectiveService(
         key: Key, serviceType: AffectiveServiceWay = AffectiveServiceWay.AffectiveLocalService
     ): IAffectiveDataAnalysisService? {
         return affectiveServiceMap.getValueWithInit(key, initValue = {
@@ -342,6 +342,7 @@ open class AffectiveManager<Key> {
         getAffectiveService(key)?.apply {
             suspendFinishAffectiveService()
         }
+        affectiveServiceMap.remove(key)
     }
 
     fun finishService(key: Key) {
@@ -369,6 +370,7 @@ open class AffectiveManager<Key> {
                 it.finishError(key, Error(-1, "key service is null"))
             }
         }
+        affectiveServiceMap.remove(key)
     }
 
     fun addAffectionConnectionServiceListener(listener: IAffectionConnectionServiceListener<Key>) {

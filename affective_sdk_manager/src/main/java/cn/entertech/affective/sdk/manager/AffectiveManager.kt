@@ -13,6 +13,9 @@ import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affective.sdk.bean.UploadReportEntity
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 open class AffectiveManager<Key> {
 
@@ -85,7 +88,11 @@ open class AffectiveManager<Key> {
     }
 
 
-    fun connectAndStartAffectiveService(key: Key, failure: (String) -> Unit = {}) {
+    fun connectAndStartAffectiveService(
+        key: Key,
+        configProxy: EnterAffectiveConfigProxy = EnterAffectiveConfigProxy(),
+        failure: (String) -> Unit = {}
+    ) {
         getAffectiveService(key)?.apply {
             if (hasConnectAffectiveService()) {
                 if (hasStartAffectiveService()) {
@@ -93,15 +100,63 @@ open class AffectiveManager<Key> {
                         it.hasStarted(key)
                     }
                 } else {
-                    startAffectiveService(key, this)
+                    startAffectiveService(key)
                 }
             } else {
-                getConnectionServiceListener(key, this)?.apply {
-                    connectAffectiveServiceConnection(this, EnterAffectiveConfigProxy())
+                getConnectionServiceListener(key)?.apply {
+                    connectAffectiveServiceConnection(this, configProxy)
                 }
             }
         } ?: kotlin.run {
             failure("  $key affective Service is null")
+        }
+    }
+
+    suspend fun suspendConnectAndStartAffectiveService(key: Key) {
+        suspendCoroutine { continuation ->
+            getAffectiveService(key)?.apply {
+                if (hasStartAffectiveService()) {
+                    continuation.resume(Unit)
+                } else {
+                    val startAffectiveServiceLister = object : IStartAffectiveServiceLister {
+                        override fun startSuccess() {
+                            super.startSuccess()
+                            continuation.resume(Unit)
+                        }
+
+                        override fun hasStarted() {
+                            super.hasStarted()
+                            continuation.resume(Unit)
+                        }
+
+                        override fun startFail(error: Error?) {
+                            super.startFail(error)
+                            continuation.resumeWithException(RuntimeException("key $key service start error"))
+                        }
+                    }
+                    if (hasConnectAffectiveService()) {
+                        startAffectiveService(key, startAffectiveServiceLister)
+                    } else {
+                        val connectionListener = object : IConnectionServiceListener {
+                            override fun connectionSuccess(sessionId: String?) {
+                                startAffectiveService(key, startAffectiveServiceLister)
+                            }
+
+                            override fun connectionError(error: Error?) {
+                                continuation.resumeWithException(RuntimeException("key $key service connect error"))
+                            }
+
+                            override fun hasConnected() {
+                                super.hasConnected()
+                                startAffectiveService(key, startAffectiveServiceLister)
+                            }
+                        }
+                        connectAffectiveServiceConnection(
+                            connectionListener, EnterAffectiveConfigProxy()
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -114,15 +169,13 @@ open class AffectiveManager<Key> {
         })
     }
 
-    private fun startAffectiveService(key: Key, service: IAffectiveDataAnalysisService) {
-        getStartAffectiveServiceLister(key, service)?.apply {
-            service.startAffectiveService(this)
+    private fun startAffectiveService(key: Key) {
+        getStartAffectiveServiceLister(key)?.apply {
+            getAffectiveService(key)?.startAffectiveService(this)
         }
     }
 
-    private fun getConnectionServiceListener(
-        key: Key, service: IAffectiveDataAnalysisService
-    ): IConnectionServiceListener? {
+    private fun getConnectionServiceListener(key: Key): IConnectionServiceListener? {
         return connectionServiceListenerMap.getValueWithInit(key, initValue = {
             object : IConnectionServiceListener {
                 override fun connectionError(error: Error?) {
@@ -135,7 +188,7 @@ open class AffectiveManager<Key> {
                     affectionConnectionServiceListeners.forEach {
                         it.connectionSuccess(key, sessionId)
                     }
-                    startAffectiveService(key, service)
+                    startAffectiveService(key)
                 }
 
                 override fun hasConnected() {
@@ -172,10 +225,7 @@ open class AffectiveManager<Key> {
         }
     }
 
-    fun subscribeData(
-        key: Key,
-        service: IAffectiveDataAnalysisService? = getAffectiveService(key),
-    ) {
+    fun subscribeData(key: Key) {
         val bioDataListener = bioDataListenerMap.getValueWithInit(key, initValue = {
             { bioData ->
                 bioDataListeners.forEach {
@@ -191,19 +241,18 @@ open class AffectiveManager<Key> {
                 }
             }
         })
-        service?.subscribeData(bioDataListener, affectiveDataListener)
+        getAffectiveService(key)?.subscribeData(bioDataListener, affectiveDataListener)
     }
 
-    fun unSubscribeData(
-        key: Key,
-        service: IAffectiveDataAnalysisService? = getAffectiveService(key),
-    ) {
-        service?.unSubscribeData(bioDataListenerMap[key], affectiveDataListenerMap[key])
+    fun unSubscribeData(key: Key) {
+        getAffectiveService(key)?.unSubscribeData(
+            bioDataListenerMap[key], affectiveDataListenerMap[key]
+        )
     }
 
 
     private fun getStartAffectiveServiceLister(
-        key: Key, service: IAffectiveDataAnalysisService
+        key: Key
     ): IStartAffectiveServiceLister? {
         return startAffectiveServiceListerMap.getValueWithInit(key, initValue = {
             object : IStartAffectiveServiceLister {

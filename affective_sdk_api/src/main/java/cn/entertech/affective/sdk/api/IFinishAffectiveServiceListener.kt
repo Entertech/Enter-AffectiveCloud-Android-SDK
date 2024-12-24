@@ -13,4 +13,8 @@ interface IFinishAffectiveServiceListener {
 
     fun finishError(error: Error?)
     fun finishSuccess()
+
+    fun hasFinished(){
+
+    }
 }

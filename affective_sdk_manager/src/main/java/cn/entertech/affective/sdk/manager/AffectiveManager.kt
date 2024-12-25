@@ -64,6 +64,12 @@ open class AffectiveManager<Key> {
     private val affectiveFinishServiceListener: MutableList<IAffectiveFinishServiceListener<Key>> by lazy {
         CopyOnWriteArrayList()
     }
+    private val affectiveStartTimeMap: MutableMap<Key, Long?> by lazy {
+        ConcurrentHashMap()
+    }
+    private val affectiveEndTimeMap: MutableMap<Key, Long?> by lazy {
+        ConcurrentHashMap()
+    }
 
     fun connectAffectiveServiceConnection(
         key: Key,
@@ -228,6 +234,11 @@ open class AffectiveManager<Key> {
     fun subscribeData(key: Key) {
         val bioDataListener = bioDataListenerMap.getValueWithInit(key, initValue = {
             { bioData ->
+           /*     var startTime= affectiveStartTimeMap[key]
+                if (startTime == null) {
+                    startTime = System.currentTimeMillis()
+                    affectiveStartTimeMap[key] = startTime
+                }*/
                 bioDataListeners.forEach {
                     it(key, bioData)
                 }
@@ -245,6 +256,11 @@ open class AffectiveManager<Key> {
     }
 
     fun unSubscribeData(key: Key) {
+        /*var endTime = affectiveEndTimeMap[key]
+        if (endTime == null) {
+            endTime = System.currentTimeMillis()
+            affectiveStartTimeMap[key] = endTime
+        }*/
         getAffectiveService(key)?.unSubscribeData(
             bioDataListenerMap[key], affectiveDataListenerMap[key]
         )
@@ -322,6 +338,9 @@ open class AffectiveManager<Key> {
                     }
 
                     override fun onSuccess(entity: UploadReportEntity?) {
+                      /*  entity?.start =
+                            DateUtils.convertLocalTime2UTC(affectiveStartTimeMap[key] ?: 0)
+                        */
                         affectiveIGetReportListener.forEach {
                             it.onSuccess(key, entity)
                         }

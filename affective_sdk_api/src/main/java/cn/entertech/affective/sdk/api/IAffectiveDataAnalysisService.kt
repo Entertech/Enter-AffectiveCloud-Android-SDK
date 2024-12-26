@@ -64,6 +64,7 @@ interface IAffectiveDataAnalysisService {
         disconnectListener: ((String) -> Unit)? = null
     )
 
+    fun getSessionId(): String
     /**
      * 启动情感服务
      * */

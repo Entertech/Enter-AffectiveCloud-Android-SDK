@@ -1,4 +1,4 @@
 rootProject.ext {
    groupId = "cn.entertech.android"
-   libraryVersion="1.2.5"
+   libraryVersion="1.2.7-debug"
 }

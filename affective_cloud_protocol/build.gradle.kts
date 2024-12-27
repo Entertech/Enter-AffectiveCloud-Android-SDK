@@ -8,7 +8,7 @@ val groupIdString = (rootProject.ext.get("groupId") as? String) ?: "1.0.0"
 PublishInfo {
     groupId = groupIdString // 库的组织，使用域名表示
     artifactId = "affective-cloud-protocol" // 库名称
-    version = "0.0.1-debug" // 库版本
+    version = "0.0.1-vr-control" // 库版本
 }
 
 android {

@@ -29,12 +29,11 @@ interface IAffectiveDataAnalysisService {
 
 
         fun getService(way: AffectiveServiceWay): IAffectiveDataAnalysisService? {
-            ServiceLoader.load(IAffectiveDataAnalysisService::class.java)
-                .forEach {
-                    if (it.getAffectiveWay() == way) {
-                        return it
-                    }
+            ServiceLoader.load(IAffectiveDataAnalysisService::class.java).forEach {
+                if (it.getAffectiveWay() == way) {
+                    return it
                 }
+            }
             return null
         }
     }
@@ -43,8 +42,7 @@ interface IAffectiveDataAnalysisService {
      * 连接情感云
      * */
     fun connectAffectiveServiceConnection(
-        listener: IConnectionServiceListener,
-        configProxy: EnterAffectiveConfigProxy
+        listener: IConnectionServiceListener, configProxy: EnterAffectiveConfigProxy
     )
 
     /**
@@ -55,16 +53,15 @@ interface IAffectiveDataAnalysisService {
     fun hasConnectAffectiveService(): Boolean
 
     fun addServiceConnectStatueListener(
-        connectionListener: (() -> Unit)? = null,
-        disconnectListener: ((String) -> Unit)? = null
+        connectionListener: (() -> Unit)? = null, disconnectListener: ((String) -> Unit)? = null
     )
 
     fun removeServiceConnectStatueListener(
-        connectionListener: (() -> Unit)? = null,
-        disconnectListener: ((String) -> Unit)? = null
+        connectionListener: (() -> Unit)? = null, disconnectListener: ((String) -> Unit)? = null
     )
 
     fun getSessionId(): String
+
     /**
      * 启动情感服务
      * */
@@ -93,13 +90,15 @@ interface IAffectiveDataAnalysisService {
     fun finishAffectiveService(listener: IFinishAffectiveServiceListener)
 
     suspend fun suspendFinishAffectiveService()
+
     /**
      * 获取报表
      * @param needFinishService 是否需要自动结束情感服务 true 自动结束
+     * @param isEar 是否为耳道脑电报表
      * */
-    fun getReport(listener: IGetReportListener, needFinishService: Boolean)
+    fun getReport(listener: IGetReportListener, isEar: Boolean, needFinishService: Boolean = false)
 
-    suspend fun suspendGetReport(needFinishService: Boolean):UploadReportEntity?
+    suspend fun suspendGetReport(needFinishService: Boolean): UploadReportEntity?
 
     /**
      * 是否启动了情感云服务
@@ -153,7 +152,7 @@ interface IAffectiveDataAnalysisService {
 
     fun isGoodQuality(quality: Double): Boolean
 
-    fun appendDevicePosition(device:DeviceType,position:String){
+    fun appendDevicePosition(device: DeviceType, position: String) {
 
     }
 
@@ -199,7 +198,7 @@ interface IAffectiveDataAnalysisService {
         }
         when (dataType) {
             MeditateDataType.EEG -> {
-                appendEEGData(data,)
+                appendEEGData(data)
             }
 
             MeditateDataType.SCEEG -> {
@@ -220,7 +219,7 @@ interface IAffectiveDataAnalysisService {
     fun appendIntListData(dataType: MeditateDataType, data: List<Int>): Boolean {
         when (dataType) {
             MeditateDataType.EEG -> {
-                appendEEGData(data,)
+                appendEEGData(data)
             }
 
             MeditateDataType.SCEEG -> {
@@ -247,9 +246,9 @@ interface IAffectiveDataAnalysisService {
     /**
      * 单通道数据
      * */
-    fun appendSCEEGData(brainData: ByteArray)
-    fun appendSCEEGData(brainData: Int)
-    fun appendSCEEGData(brainData: List<Int>)
+    fun appendSCEEGData(brainData: ByteArray, isEar: Boolean = false)
+    fun appendSCEEGData(brainData: Int, isEar: Boolean = false)
+    fun appendSCEEGData(brainData: List<Int>, isEar: Boolean = false)
 
     /**
      * 添加心率数据

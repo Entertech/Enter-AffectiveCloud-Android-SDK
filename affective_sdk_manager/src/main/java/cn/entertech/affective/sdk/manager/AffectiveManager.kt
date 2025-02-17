@@ -17,6 +17,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+@Suppress("unused")
 open class AffectiveManager<Key> {
 
     private val affectiveServiceMap: MutableMap<Key, IAffectiveDataAnalysisService?> by lazy {
@@ -234,11 +235,11 @@ open class AffectiveManager<Key> {
     fun subscribeData(key: Key) {
         val bioDataListener = bioDataListenerMap.getValueWithInit(key, initValue = {
             { bioData ->
-           /*     var startTime= affectiveStartTimeMap[key]
-                if (startTime == null) {
-                    startTime = System.currentTimeMillis()
-                    affectiveStartTimeMap[key] = startTime
-                }*/
+                /*     var startTime= affectiveStartTimeMap[key]
+                     if (startTime == null) {
+                         startTime = System.currentTimeMillis()
+                         affectiveStartTimeMap[key] = startTime
+                     }*/
                 bioDataListeners.forEach {
                     it(key, bioData)
                 }
@@ -255,8 +256,7 @@ open class AffectiveManager<Key> {
         getAffectiveService(key)?.subscribeData(bioDataListener, affectiveDataListener)
     }
 
-    fun unSubscribeData(key: Key) {
-        /*var endTime = affectiveEndTimeMap[key]
+    fun unSubscribeData(key: Key) {/*var endTime = affectiveEndTimeMap[key]
         if (endTime == null) {
             endTime = System.currentTimeMillis()
             affectiveStartTimeMap[key] = endTime
@@ -315,7 +315,7 @@ open class AffectiveManager<Key> {
         return getAffectiveService(key)?.suspendGetReport(false)
     }
 
-    fun getAffectiveReport(key: Key, needFinishService: Boolean = false) {
+    fun getAffectiveReport(key: Key, isEar: Boolean = false, needFinishService: Boolean = false) {
         getAffectiveService(key)?.apply {
             getReportListenerMap.getValueWithInit(key, initValue = {
                 object : IGetReportListener {
@@ -338,16 +338,13 @@ open class AffectiveManager<Key> {
                     }
 
                     override fun onSuccess(entity: UploadReportEntity?) {
-                      /*  entity?.start =
-                            DateUtils.convertLocalTime2UTC(affectiveStartTimeMap[key] ?: 0)
-                        */
                         affectiveIGetReportListener.forEach {
                             it.onSuccess(key, entity)
                         }
                     }
                 }
             })?.apply {
-                getReport(this, needFinishService)
+                getReport(this, isEar, needFinishService)
             }
 
         } ?: run {

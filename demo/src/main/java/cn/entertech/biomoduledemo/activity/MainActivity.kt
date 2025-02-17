@@ -370,7 +370,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "getReport: getAffectiveReportError $error")
                 messageReceiveFragment.appendMessageToScreen("getReport getAffectiveReportError" + error.toString())
             }
-        }, false)
+        }, false, false)
 
     }
 

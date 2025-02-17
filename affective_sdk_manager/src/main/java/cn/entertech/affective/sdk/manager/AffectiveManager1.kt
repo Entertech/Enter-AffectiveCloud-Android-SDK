@@ -98,7 +98,7 @@ class AffectiveManager1<Key> {
     }
 
     fun getReport(key: Key, listener: IGetReportListener, needFinishService: Boolean) {
-        getAffectiveService(key)?.getReport(listener, needFinishService)
+        getAffectiveService(key)?.getReport(listener, false, needFinishService)
     }
 
     fun subscribeData(

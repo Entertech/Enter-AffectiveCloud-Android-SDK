@@ -17,14 +17,17 @@ include_directories(src/main/cpp/package/libs/NumCpp)
 include_directories(src/main/cpp/package/libs/Eigen)
 include_directories(src/main/cpp/package/source)
 
+# 选项：不使用 Boost
 option(NUMCPP_NO_USE_BOOST "Set to switch not use boost" ON)
 add_definitions(-DNUMCPP_NO_USER_BOOST)
-CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
-if (COMPILER_SUPPORTS_CXX14)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-else ()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support. Please use a different C++ compiler.")
-endif ()
+
+# 设置 C++17 标准
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# 输出 C++ 标准版本（可选，方便调试）
+message(STATUS "Using C++ standard: ${CMAKE_CXX_STANDARD}")
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")

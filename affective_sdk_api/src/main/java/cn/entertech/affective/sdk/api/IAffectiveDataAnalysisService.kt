@@ -42,7 +42,7 @@ interface IAffectiveDataAnalysisService {
      * 连接情感云
      * */
     fun connectAffectiveServiceConnection(
-        listener: IConnectionServiceListener, configProxy: EnterAffectiveConfigProxy
+        listener: IConnectionServiceListener?, configProxy: EnterAffectiveConfigProxy
     )
 
     /**
@@ -96,7 +96,9 @@ interface IAffectiveDataAnalysisService {
      * @param needFinishService 是否需要自动结束情感服务 true 自动结束
      * @param isEar 是否为耳道脑电报表
      * */
-    fun getReport(listener: IGetReportListener, isEar: Boolean, needFinishService: Boolean = false)
+    fun getReport(
+        listener: IGetReportListener, isEar: Boolean = false, needFinishService: Boolean = false
+    )
 
     suspend fun suspendGetReport(needFinishService: Boolean): UploadReportEntity?
 

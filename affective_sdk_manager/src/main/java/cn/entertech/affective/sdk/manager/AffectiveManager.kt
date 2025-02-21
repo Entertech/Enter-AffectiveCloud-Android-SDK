@@ -17,6 +17,11 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * 情感云服务管理类（泛型类）
+ *
+ * @param Key 设备/服务标识类型，用于区分不同设备/服务的实例
+ */
 @Suppress("unused")
 open class AffectiveManager<Key> {
 
@@ -96,9 +101,7 @@ open class AffectiveManager<Key> {
 
 
     fun connectAndStartAffectiveService(
-        key: Key,
-        configProxy: EnterAffectiveConfigProxy = EnterAffectiveConfigProxy(),
-        failure: (String) -> Unit = {}
+        key: Key, configProxy: EnterAffectiveConfigProxy = EnterAffectiveConfigProxy()
     ) {
         getAffectiveService(key)?.apply {
             if (hasConnectAffectiveService()) {
@@ -110,12 +113,12 @@ open class AffectiveManager<Key> {
                     startAffectiveService(key)
                 }
             } else {
-                getConnectionServiceListener(key)?.apply {
-                    connectAffectiveServiceConnection(this, configProxy)
-                }
+                connectAffectiveServiceConnection(getConnectionServiceListener(key), configProxy)
             }
         } ?: kotlin.run {
-            failure("  $key affective Service is null")
+            affectionConnectionServiceListeners.forEach {
+                it.connectionError(key, Error(-1, "key $key affective service is null"))
+            }
         }
     }
 
@@ -222,10 +225,14 @@ open class AffectiveManager<Key> {
     }
 
     fun appendEEGData(
-        key: Key, eegData: List<Int>, success: () -> Unit = {}, failure: (String) -> Unit = {}
+        key: Key,
+        eegData: List<Int>,
+        isEar: Boolean = false,
+        success: () -> Unit = {},
+        failure: (String) -> Unit = {}
     ) {
         getAffectiveService(key)?.apply {
-            this.appendEEGData(eegData)
+            this.appendEEGData(eegData, isEar)
             success()
         } ?: kotlin.run {
             failure("key $key service is null")

@@ -1,13 +1,13 @@
 package cn.entertech.affective.sdk.manager
 
-import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import cn.entertech.base.BaseService
 import cn.entertech.base.notification.NotificationUtils
 
-class AffectiveService : Service() {
+open class AffectiveService : BaseService() {
 
     companion object {
         private const val TAG = "AffectiveService"
@@ -16,14 +16,14 @@ class AffectiveService : Service() {
         private const val SERVICE_NOTIFICATION_ICON = "icon"
     }
 
-    class AffectiveBinder(private val service: AffectiveService) : Binder() {
+    inner class AffectiveBinder : Binder() {
         fun getAffectiveService(): AffectiveService {
-            return service
+            return this@AffectiveService
         }
     }
 
-    override fun onBind(intent: Intent): IBinder? {
-        return AffectiveBinder(this)
+    override fun onBind(intent: Intent?): IBinder {
+        return AffectiveBinder()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-    implementation ("cn.entertech.android:base:0.0.7")
+    implementation ("cn.entertech.android:base:1.0.0-flowtime-local")
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")

@@ -8,7 +8,7 @@ val groupIdString = (rootProject.ext.get("groupId") as? String) ?: "1.0.0"
 PublishInfo {
     groupId = groupIdString // 库的组织，使用域名表示
     artifactId = "affective-cloud-protocol" // 库名称
-    version = "0.0.1-vr-control" // 库版本
+    version = libraryVersion // 库版本
 }
 
 android {
@@ -41,10 +41,10 @@ android {
 }
 
 dependencies {
-    implementation ("com.google.code.gson:gson:2.8.5")
-    implementation("androidx.appcompat:appcompat:1.0.0")
+    implementation (libs.gson.v285)
+    implementation(libs.androidx.appcompat)
     implementation(project(":affective_sdk_api"))
-    testImplementation("junit:junit:4.12")
-    androidTestImplementation("androidx.test.ext:junit:1.1.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.1.0")
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }

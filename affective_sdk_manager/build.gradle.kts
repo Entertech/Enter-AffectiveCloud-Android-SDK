@@ -40,12 +40,12 @@ android {
 }
 
 dependencies {
-    implementation ("cn.entertech.android:base:1.0.0-flowtime-local")
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation (libs.base)
+    implementation(libs.androidx.core.ktx.v1131)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
     implementation(project(":affective_sdk_api"))
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }

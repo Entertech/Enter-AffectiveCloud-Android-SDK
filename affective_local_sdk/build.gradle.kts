@@ -15,7 +15,7 @@ PublishInfo {
 
 android {
     namespace = "cn.entertech.affectivesdk"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 23
@@ -55,20 +55,21 @@ android {
 }
 
 dependencies {
-
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation (libs.biomoduleble.base.api)
+    implementation(libs.androidx.core.ktx.v190)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
     implementation(project(mapOf("path" to ":affective_sdk_api")))
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    kapt("com.google.auto.service:auto-service:1.0-rc6")
-    implementation("com.google.auto.service:auto-service:1.0-rc6")
-    testImplementation("org.powermock:powermock-api-mockito:1.6.5")
-    testImplementation("org.powermock:powermock-module-junit4:1.6.5")
-    implementation("com.google.code.gson:gson:2.8.9")
-    implementation("org.conscrypt:conscrypt-android:2.4.0")
-    implementation("org.bouncycastle:bcprov-jdk18on:1.76")
-    implementation("org.bouncycastle:bcpkix-jdk18on:1.76")
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    kapt(libs.auto.service)
+    implementation(libs.auto.service)
+    testImplementation(libs.powermock.api.mockito)
+    testImplementation(libs.powermock.module.junit4)
+    implementation(libs.gson.v289)
+    implementation(libs.conscrypt.android)
+    implementation(libs.bcprov.jdk18on)
+    implementation(libs.bcpkix.jdk18on)
+    implementation(libs.device)
 }

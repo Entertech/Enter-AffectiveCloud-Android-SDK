@@ -37,16 +37,16 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
     }
 }
 
 dependencies {
-    api ("cn.entertech.android:biomoduleble_base_api:2.4.0-flowtime")
-    implementation("androidx.core:core-ktx:1.6.0")
-    testImplementation("junit:junit:4.13.2")
-    implementation("com.google.code.gson:gson:2.8.5")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    api ("cn.entertech.android:device:0.0.1")
+    implementation (libs.biomoduleble.base.api)
+    implementation(libs.androidx.core.ktx.v160)
+    testImplementation(libs.junit)
+    implementation(libs.gson.v2101)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    implementation (libs.device)
 }

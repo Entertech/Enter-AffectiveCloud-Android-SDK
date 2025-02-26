@@ -1,4 +1,4 @@
 rootProject.ext {
    groupId = "cn.entertech.android"
-   libraryVersion="1.2.8-flowtime-svm-local"
+   libraryVersion="flowtime-svm-5.0.9.0-local"
 }

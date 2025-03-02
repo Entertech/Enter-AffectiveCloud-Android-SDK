@@ -28,7 +28,7 @@ constraintlayoutVersion = "2.1.4"
 core = "1.5.0-alpha01"
 coreKtxVersion = "1.9.0"
 crashreport = "latest.release"
-device = "flowtime-5.0.9.0-local"
+bleBaseApiVersion = "3.0.1-flowtime-local"
 dfu = "2.4.2"
 dfuVersion = "1.11.0"
 espressoCoreVersion = "3.1.0"
@@ -45,6 +45,7 @@ junitJunit = "4.12"
 kotlin = "1.9.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
+device = "0.0.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
@@ -91,7 +92,7 @@ base-v100flowtimelocal = { module = "cn.entertech.android:base", version.ref = "
 bcpkix-jdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bcprovJdk18on" }
 bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcprovJdk18on" }
 biomoduleble = { module = "cn.entertech.android:biomoduleble", version.ref = "biomoduleble" }
-biomoduleble_base_api = { module = "cn.entertech.android:biomoduleble_base_api", version.ref = "device" }
+biomoduleble_base_api = { module = "cn.entertech.android:biomoduleble_base_api", version.ref = "bleBaseApiVersion" }
 ble-common = { module = "no.nordicsemi.android:ble-common", version.ref = "bleCommon" }
 conscrypt-android = { module = "org.conscrypt:conscrypt-android", version.ref = "conscryptAndroid" }
 constraint-layout = { module = "com.android.support.constraint:constraint-layout", version.ref = "androidConstraintLayout" }

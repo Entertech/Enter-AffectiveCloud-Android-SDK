@@ -10,7 +10,7 @@ interface IAffectionConnectionServiceListener<Key> {
 
     }
 
-    fun hasConnected(key: Key){
+    fun hasConnected(key: Key,sessionId: String){
 
     }
 }

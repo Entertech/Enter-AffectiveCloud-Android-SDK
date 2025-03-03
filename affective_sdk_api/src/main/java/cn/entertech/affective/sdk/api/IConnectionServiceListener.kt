@@ -14,7 +14,7 @@ interface IConnectionServiceListener {
      * */
     fun connectionError(error: Error?)
 
-    fun hasConnected(){
+    fun hasConnected(sessionId:String){
 
     }
 }

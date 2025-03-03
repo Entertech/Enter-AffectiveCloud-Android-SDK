@@ -156,8 +156,8 @@ open class AffectiveManager<Key> {
                                 continuation.resumeWithException(RuntimeException("key $key service connect error"))
                             }
 
-                            override fun hasConnected() {
-                                super.hasConnected()
+                            override fun hasConnected(sessionId: String) {
+                                super.hasConnected(sessionId)
                                 startAffectiveService(key, startAffectiveServiceLister)
                             }
                         }
@@ -201,14 +201,20 @@ open class AffectiveManager<Key> {
                     startAffectiveService(key)
                 }
 
-                override fun hasConnected() {
-                    super.hasConnected()
+                override fun hasConnected(sessionId: String) {
+                    super.hasConnected(sessionId)
                     affectionConnectionServiceListeners.forEach {
-                        it.hasConnected(key)
+                        it.hasConnected(key, sessionId)
                     }
                 }
             }
         })
+    }
+
+    fun getSessionId(
+        key: Key, serviceType: AffectiveServiceWay = AffectiveServiceWay.AffectiveLocalService
+    ): String? {
+        return getAffectiveService(key, serviceType)?.getSessionId()
     }
 
     fun appendHeartRateData(
@@ -273,6 +279,16 @@ open class AffectiveManager<Key> {
         )
     }
 
+    suspend fun suspendCloseAffectiveServiceConnection(key: Key) {
+        getAffectiveService(key)?.apply {
+            if (hasConnectAffectiveService()) {
+                if (hasStartAffectiveService()) {
+                    suspendFinishAffectiveService()
+                }
+                closeAffectiveServiceConnection()
+            }
+        }
+    }
 
     private fun getStartAffectiveServiceLister(
         key: Key

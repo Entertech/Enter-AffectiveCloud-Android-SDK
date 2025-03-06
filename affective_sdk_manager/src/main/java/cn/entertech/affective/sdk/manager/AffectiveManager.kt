@@ -288,6 +288,7 @@ open class AffectiveManager<Key> {
                 closeAffectiveServiceConnection()
             }
         }
+        affectiveServiceMap.remove(key)
     }
 
     private fun getStartAffectiveServiceLister(

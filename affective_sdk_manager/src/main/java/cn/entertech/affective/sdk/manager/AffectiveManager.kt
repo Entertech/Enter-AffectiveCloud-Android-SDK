@@ -1,5 +1,6 @@
 package cn.entertech.affective.sdk.manager
 
+import android.content.Context
 import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService
 import cn.entertech.affective.sdk.api.IConnectionServiceListener
 import cn.entertech.affective.sdk.api.IFinishAffectiveServiceListener
@@ -11,6 +12,7 @@ import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affective.sdk.bean.UploadReportEntity
+import java.io.InputStream
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.coroutines.resume
@@ -99,6 +101,19 @@ open class AffectiveManager<Key> {
         }
     }
 
+    fun startAffectiveService(
+        key: Key,
+        authenticationInputStream: InputStream?,
+        context: Context?,
+        initListener: IStartAffectiveServiceLister
+    ) {
+        getAffectiveService(key)?.apply {
+            startAffectiveService(authenticationInputStream, context, initListener)
+        } ?: kotlin.run {
+            initListener.startFail(Error(-1, "key service is null"))
+        }
+    }
+
 
     fun connectAndStartAffectiveService(
         key: Key, configProxy: EnterAffectiveConfigProxy = EnterAffectiveConfigProxy()
@@ -121,6 +136,32 @@ open class AffectiveManager<Key> {
             }
         }
     }
+
+    fun connectAndStartAffectiveService(
+        key: Key,
+        authenticationInputStream: InputStream?,
+        context: Context?,
+        configProxy: EnterAffectiveConfigProxy = EnterAffectiveConfigProxy()
+    ) {
+        getAffectiveService(key)?.apply {
+            if (hasConnectAffectiveService()) {
+                if (hasStartAffectiveService()) {
+                    affectiveStartServiceLister.forEach {
+                        it.hasStarted(key)
+                    }
+                } else {
+                    startAffectiveService(key, authenticationInputStream, context)
+                }
+            } else {
+                connectAffectiveServiceConnection(getConnectionServiceListener(key), configProxy)
+            }
+        } ?: kotlin.run {
+            affectionConnectionServiceListeners.forEach {
+                it.connectionError(key, Error(-1, "key $key affective service is null"))
+            }
+        }
+    }
+
 
     suspend fun suspendConnectAndStartAffectiveService(key: Key) {
         suspendCoroutine { continuation ->
@@ -171,6 +212,55 @@ open class AffectiveManager<Key> {
     }
 
 
+    suspend fun suspendConnectAndStartAffectiveService(key: Key ,authenticationInputStream: InputStream?,
+                                                       context: Context?,) {
+        suspendCoroutine { continuation ->
+            getAffectiveService(key)?.apply {
+                if (hasStartAffectiveService()) {
+                    continuation.resume(Unit)
+                } else {
+                    val startAffectiveServiceLister = object : IStartAffectiveServiceLister {
+                        override fun startSuccess() {
+                            super.startSuccess()
+                            continuation.resume(Unit)
+                        }
+
+                        override fun hasStarted() {
+                            super.hasStarted()
+                            continuation.resume(Unit)
+                        }
+
+                        override fun startFail(error: Error?) {
+                            super.startFail(error)
+                            continuation.resumeWithException(RuntimeException("key $key service start error"))
+                        }
+                    }
+                    if (hasConnectAffectiveService()) {
+                        startAffectiveService(key,authenticationInputStream,context, startAffectiveServiceLister)
+                    } else {
+                        val connectionListener = object : IConnectionServiceListener {
+                            override fun connectionSuccess(sessionId: String?) {
+                                startAffectiveService(key,authenticationInputStream,context, startAffectiveServiceLister)
+                            }
+
+                            override fun connectionError(error: Error?) {
+                                continuation.resumeWithException(RuntimeException("key $key service connect error"))
+                            }
+
+                            override fun hasConnected(sessionId: String) {
+                                super.hasConnected(sessionId)
+                                startAffectiveService(key,authenticationInputStream,context, startAffectiveServiceLister)
+                            }
+                        }
+                        connectAffectiveServiceConnection(
+                            connectionListener, EnterAffectiveConfigProxy()
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     fun getAffectiveService(
         key: Key, serviceType: AffectiveServiceWay = AffectiveServiceWay.AffectiveLocalService
     ): IAffectiveDataAnalysisService? {
@@ -182,6 +272,16 @@ open class AffectiveManager<Key> {
     private fun startAffectiveService(key: Key) {
         getStartAffectiveServiceLister(key)?.apply {
             getAffectiveService(key)?.startAffectiveService(this)
+        }
+    }
+
+    private fun startAffectiveService(
+        key: Key, authenticationInputStream: InputStream?, context: Context?
+    ) {
+        getStartAffectiveServiceLister(key)?.apply {
+            getAffectiveService(key)?.startAffectiveService(
+                authenticationInputStream, context, this
+            )
         }
     }
 

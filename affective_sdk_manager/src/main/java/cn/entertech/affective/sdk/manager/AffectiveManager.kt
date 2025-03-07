@@ -153,7 +153,11 @@ open class AffectiveManager<Key> {
                     startAffectiveService(key, authenticationInputStream, context)
                 }
             } else {
-                connectAffectiveServiceConnection(getConnectionServiceListener(key), configProxy)
+                connectAffectiveServiceConnection(
+                    getConnectionServiceListener(
+                        key, authenticationInputStream, context
+                    ), configProxy
+                )
             }
         } ?: kotlin.run {
             affectionConnectionServiceListeners.forEach {
@@ -212,8 +216,10 @@ open class AffectiveManager<Key> {
     }
 
 
-    suspend fun suspendConnectAndStartAffectiveService(key: Key ,authenticationInputStream: InputStream?,
-                                                       context: Context?,) {
+    suspend fun suspendConnectAndStartAffectiveService(
+        key: Key, authenticationInputStream: InputStream?,
+        context: Context?,
+    ) {
         suspendCoroutine { continuation ->
             getAffectiveService(key)?.apply {
                 if (hasStartAffectiveService()) {
@@ -236,11 +242,18 @@ open class AffectiveManager<Key> {
                         }
                     }
                     if (hasConnectAffectiveService()) {
-                        startAffectiveService(key,authenticationInputStream,context, startAffectiveServiceLister)
+                        startAffectiveService(
+                            key, authenticationInputStream, context, startAffectiveServiceLister
+                        )
                     } else {
                         val connectionListener = object : IConnectionServiceListener {
                             override fun connectionSuccess(sessionId: String?) {
-                                startAffectiveService(key,authenticationInputStream,context, startAffectiveServiceLister)
+                                startAffectiveService(
+                                    key,
+                                    authenticationInputStream,
+                                    context,
+                                    startAffectiveServiceLister
+                                )
                             }
 
                             override fun connectionError(error: Error?) {
@@ -249,7 +262,12 @@ open class AffectiveManager<Key> {
 
                             override fun hasConnected(sessionId: String) {
                                 super.hasConnected(sessionId)
-                                startAffectiveService(key,authenticationInputStream,context, startAffectiveServiceLister)
+                                startAffectiveService(
+                                    key,
+                                    authenticationInputStream,
+                                    context,
+                                    startAffectiveServiceLister
+                                )
                             }
                         }
                         connectAffectiveServiceConnection(
@@ -285,7 +303,10 @@ open class AffectiveManager<Key> {
         }
     }
 
-    private fun getConnectionServiceListener(key: Key): IConnectionServiceListener? {
+    private fun getConnectionServiceListener(
+        key: Key, authenticationInputStream: InputStream? = null,
+        context: Context? = null,
+    ): IConnectionServiceListener? {
         return connectionServiceListenerMap.getValueWithInit(key, initValue = {
             object : IConnectionServiceListener {
                 override fun connectionError(error: Error?) {
@@ -298,7 +319,11 @@ open class AffectiveManager<Key> {
                     affectionConnectionServiceListeners.forEach {
                         it.connectionSuccess(key, sessionId)
                     }
-                    startAffectiveService(key)
+                    if (authenticationInputStream == null || context == null) {
+                        startAffectiveService(key)
+                    } else {
+                        startAffectiveService(key, authenticationInputStream, context)
+                    }
                 }
 
                 override fun hasConnected(sessionId: String) {

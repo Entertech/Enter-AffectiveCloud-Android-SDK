@@ -1,4 +1,4 @@
 rootProject.ext {
    groupId = "cn.entertech.android"
-   libraryVersion="1.2.9-demo-svm-local"
+   libraryVersion="1.2.9-demo-authentication-svm-local"
 }

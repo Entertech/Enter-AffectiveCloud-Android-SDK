@@ -31,6 +31,9 @@ interface IStartAffectiveServiceLister {
 
     }
 
+    /**
+     * 已经启动
+     * */
     fun hasStarted(){
 
     }

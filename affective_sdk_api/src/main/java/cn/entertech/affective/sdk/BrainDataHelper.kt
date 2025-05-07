@@ -1,6 +1,5 @@
 package cn.entertech.affective.sdk
 
-import cn.entertech.affective.sdk.utils.AffectiveLogHelper
 import cn.entertech.affective.sdk.utils.CharUtil
 
 object BrainDataHelper {
@@ -31,9 +30,6 @@ object BrainDataHelper {
         val result = ArrayList<ByteArray>()
         if (hasOrder) {
             val sceegDataSize = sceegData.size
-            AffectiveLogHelper.d(
-                TAG, "sceegData ${sceegData.contentToString()} size $sceegDataSize "
-            )
             if (sceegDataSize < 17) {
                 return emptyList()
             }
@@ -75,15 +71,14 @@ object BrainDataHelper {
             sceegDataCache.addLast(sceegData[i])
         }
         val cacheSize = sceegDataCache.size
-        AffectiveLogHelper.d(TAG, "sceegDataCache: $cacheSize")
         if (cacheSize >= 9) {
             result.addAll(sceegToEeg(ByteArray(0), false))
         }
-        if (hasOrder) {
+     /*   if (hasOrder) {
             result.forEach {
                 AffectiveLogHelper.d(TAG, "result ${it.contentToString()}")
             }
-        }
+        }*/
         return result
     }
 

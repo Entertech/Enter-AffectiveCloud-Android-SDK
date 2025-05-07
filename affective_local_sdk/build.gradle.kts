@@ -9,7 +9,7 @@ val groupIdString = (rootProject.ext.get("groupId") as? String) ?: "1.0.0"
 
 PublishInfo {
     groupId = groupIdString // 库的组织，使用域名表示
-    artifactId = "affective-offline-sdk-flowtime" // 库名称
+    artifactId = "affective-offline-sdk" // 库名称
     version = libraryVersion  // 库版本
 }
 
@@ -58,7 +58,8 @@ dependencies {
     implementation(libs.androidx.core.ktx.v190)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(project(mapOf("path" to ":affective_sdk_api")))
+    api("cn.entertech.android:affective_sdk_api:1.3.4-svm")
+//    implementation(project(mapOf("path" to ":affective_sdk_api")))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

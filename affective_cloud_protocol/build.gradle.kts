@@ -43,7 +43,8 @@ android {
 dependencies {
     implementation (libs.gson.v285)
     implementation(libs.androidx.appcompat)
-    implementation(project(":affective_sdk_api"))
+//    implementation(project(":affective_sdk_api"))
+    api("cn.entertech.android:affective_sdk_api:1.3.4-svm")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

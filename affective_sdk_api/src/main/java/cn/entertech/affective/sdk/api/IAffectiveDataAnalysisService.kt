@@ -6,7 +6,8 @@ import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affective.sdk.bean.UploadReportEntity
-import cn.entertech.ble.api.bean.MeditateDataType
+import cn.entertech.affective.sdk.bean.type.BioDataCategory
+import cn.entertech.affective.sdk.bean.type.IDataType
 import cn.entertech.device.api.IDeviceType
 import java.io.InputStream
 import java.util.ServiceLoader
@@ -158,28 +159,20 @@ interface IAffectiveDataAnalysisService {
 
     }
 
-    /**
-     * 发送数据
-     * */
-    @Deprecated("", ReplaceWith("appendByteArrayData(dataType, data)"))
-    fun appendData(dataType: MeditateDataType, data: ByteArray): Boolean {
-        return appendByteArrayData(dataType, data)
-    }
-
-    fun appendByteArrayData(dataType: MeditateDataType, data: ByteArray): Boolean {
+    fun appendByteArrayData(dataType: IDataType, data: ByteArray): Boolean {
         return when (dataType) {
-            MeditateDataType.EEG -> {
+            BioDataCategory.EEG -> {
                 appendEEGData(data, false)
                 true
             }
 
-            MeditateDataType.SCEEG -> {
+            BioDataCategory.SCEEG -> {
                 appendSCEEGData(data)
                 true
             }
 
 
-            MeditateDataType.PEPR -> {
+            BioDataCategory.PEPR -> {
                 appendPEPRData(data)
                 true
             }
@@ -190,24 +183,24 @@ interface IAffectiveDataAnalysisService {
         }
     }
 
-    fun appendDoubleData(dataType: MeditateDataType, data: Double): Boolean {
+    fun appendDoubleData(dataType: IDataType, data: Double): Boolean {
         return false
     }
 
-    fun appendIntData(dataType: MeditateDataType, data: Int): Boolean {
+    fun appendIntData(dataType: IDataType, data: Int): Boolean {
         if (!hasStartAffectiveService()) {
             return false
         }
         when (dataType) {
-            MeditateDataType.EEG -> {
+            BioDataCategory.EEG -> {
                 appendEEGData(data)
             }
 
-            MeditateDataType.SCEEG -> {
+            BioDataCategory.SCEEG -> {
                 appendSCEEGData(data)
             }
 
-            MeditateDataType.HEART_RATE -> {
+            BioDataCategory.HR -> {
                 appendHeartRateData(data)
             }
 
@@ -218,13 +211,13 @@ interface IAffectiveDataAnalysisService {
         return true
     }
 
-    fun appendIntListData(dataType: MeditateDataType, data: List<Int>): Boolean {
+    fun appendIntListData(dataType: IDataType, data: List<Int>): Boolean {
         when (dataType) {
-            MeditateDataType.EEG -> {
+            BioDataCategory.EEG -> {
                 appendEEGData(data)
             }
 
-            MeditateDataType.SCEEG -> {
+            BioDataCategory.SCEEG -> {
                 appendSCEEGData(data)
             }
 
@@ -235,7 +228,7 @@ interface IAffectiveDataAnalysisService {
         return true
     }
 
-    fun appendFloatData(dataType: MeditateDataType, data: Float): Boolean {
+    fun appendFloatData(dataType: IDataType, data: Float): Boolean {
         return false
     }
 

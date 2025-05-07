@@ -11,12 +11,12 @@ android {
             storePassword '123456'
         }
     }
-    namespace 'cn.entertech.android.affective.demo'
-    compileSdkVersion 32
+    namespace 'cn.entertech.biomoduledemo'
+    compileSdkVersion 34
     defaultConfig {
         applicationId "cn.entertech.biomoduledemo"
-        minSdkVersion 23
-        targetSdkVersion 32
+        minSdkVersion 24
+        targetSdkVersion 34
         versionCode 9
         versionName "1.8.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'

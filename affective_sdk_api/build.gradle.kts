@@ -42,7 +42,7 @@ android {
 }
 
 dependencies {
-    implementation ("cn.entertech.android:log-api:1.1.0")
+    api (libs.log.api)
     implementation(libs.androidx.core.ktx.v160)
     testImplementation(libs.junit)
     implementation(libs.gson.v2101)

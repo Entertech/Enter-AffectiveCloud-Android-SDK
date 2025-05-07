@@ -55,7 +55,6 @@ android {
 }
 
 dependencies {
-    implementation (libs.biomoduleble.base.api)
     implementation(libs.androidx.core.ktx.v190)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

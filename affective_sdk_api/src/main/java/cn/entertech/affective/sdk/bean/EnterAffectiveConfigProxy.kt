@@ -10,6 +10,7 @@ data class EnterAffectiveConfigProxy(
     val sex: String = "",
     val userId: String = "",
     val appSecret: String = "",
+    val limitWaveValue: Boolean = true,
     val appKey: String = "",
     val age: Int = 0,
 ) {

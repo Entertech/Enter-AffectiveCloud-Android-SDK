@@ -28,5 +28,4 @@ include(":affective_sdk_api")
 include(":affective_local_sdk")
 include(":affective_sdk_manager")
 include(":affective_cloud_protocol")
-
-
+include(":affective_data_provider")

@@ -13,7 +13,7 @@ PublishInfo {
 
 android {
     namespace = "cn.entertech.affective.clound.protocol"
-    compileSdk = 32
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 23
@@ -43,8 +43,8 @@ android {
 dependencies {
     implementation (libs.gson.v285)
     implementation(libs.androidx.appcompat)
-//    implementation(project(":affective_sdk_api"))
-    api("cn.entertech.android:affective_sdk_api:1.3.4-svm")
+    api(project(":affective_sdk_api"))
+//    api(libs.affective.sdk.api)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

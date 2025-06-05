@@ -1,4 +1,5 @@
 [versions]
+affective_sdk_api = "1.3.4-svm"
 affectivealgorithmlocalsdk = "1.0.4"
 agp = "8.6.0"
 androidConstraintLayout = "1.1.3"
@@ -23,6 +24,7 @@ bleCommon = "2.7.5"
 cardview = "1.0.0"
 cnBase = "0.0.7"
 cnBaseVersion = "1.0.0-flowtime-local"
+cnEntertechAndroidBase = "1.0.1-demo"
 conscryptAndroid = "2.4.0"
 constraintlayoutVersion = "2.1.4"
 core = "1.5.0-alpha01"
@@ -69,6 +71,7 @@ runner = "1.0.2"
 rxandroidble = "1.17.2"
 
 [libraries]
+affective_sdk_api = { module = "cn.entertech.android:affective_sdk_api", version.ref = "affective_sdk_api" }
 affectivealgorithmlocalsdk = { module = "cn.entertech.android:affectiveAlgorithmLocalSdk", version.ref = "affectivealgorithmlocalsdk" }
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
 androidx-appcompat-v100 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
@@ -89,6 +92,7 @@ base = { module = "cn.entertech.android:base", version.ref = "base" }
 base-v005 = { module = "cn.entertech.android:base", version.ref = "baseVersion" }
 base-v007 = { module = "cn.entertech.android:base", version.ref = "cnBase" }
 base-v100flowtimelocal = { module = "cn.entertech.android:base", version.ref = "cnBaseVersion" }
+base-v101demo = { module = "cn.entertech.android:base", version.ref = "cnEntertechAndroidBase" }
 bcpkix-jdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bcprovJdk18on" }
 bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcprovJdk18on" }
 biomoduleble = { module = "cn.entertech.android:biomoduleble", version.ref = "biomoduleble" }

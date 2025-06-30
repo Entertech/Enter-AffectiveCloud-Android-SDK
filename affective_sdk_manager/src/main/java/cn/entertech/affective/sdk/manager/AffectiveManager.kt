@@ -370,6 +370,36 @@ open class AffectiveManager<Key> {
         }
     }
 
+    fun appendEEGData(
+        key: Key,
+        eegData: ByteArray,
+        isEar: Boolean = false,
+        success: () -> Unit = {},
+        failure: (String) -> Unit = {}
+    ) {
+        getAffectiveService(key)?.apply {
+            this.appendEEGData(eegData, isEar)
+            success()
+        } ?: kotlin.run {
+            failure("key $key service is null")
+        }
+    }
+
+    fun appendEEGData(
+        key: Key,
+        eegData: Int,
+        isEar: Boolean = false,
+        success: () -> Unit = {},
+        failure: (String) -> Unit = {}
+    ) {
+        getAffectiveService(key)?.apply {
+            this.appendEEGData(eegData, isEar)
+            success()
+        } ?: kotlin.run {
+            failure("key $key service is null")
+        }
+    }
+
     fun subscribeData(key: Key) {
         val bioDataListener = bioDataListenerMap.getValueWithInit(key, initValue = {
             { bioData ->

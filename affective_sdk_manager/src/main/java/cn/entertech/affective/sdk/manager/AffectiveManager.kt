@@ -640,7 +640,9 @@ open class AffectiveManager<Key> {
         var value = get(key)
         if (!checkValidValue(value)) {
             value = initValue()
-            this[key] = value
+            if (value != null) {
+                this[key] = value
+            }
         }
         return value
     }

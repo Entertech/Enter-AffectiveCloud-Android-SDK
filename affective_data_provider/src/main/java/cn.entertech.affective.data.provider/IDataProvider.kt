@@ -17,7 +17,11 @@ interface IDataProvider<T> {
 
     }
 
-    fun limitData(t:T):T{
+    fun providerData(t: T, needLimit: Boolean = false) {
+
+    }
+
+    fun limitData(t: T): T {
         return t
     }
 

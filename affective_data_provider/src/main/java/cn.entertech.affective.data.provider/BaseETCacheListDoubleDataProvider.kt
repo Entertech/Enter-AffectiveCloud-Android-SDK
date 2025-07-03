@@ -2,16 +2,11 @@ package cn.entertech.affective.data.provider
 
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 abstract class BaseETCacheListDoubleDataProvider(
     private val maxCacheSize: Int = 300,
     interceptData: (Double) -> Boolean = { data -> data == 0.0 }
-) : BaseETCacheDataProvider<List<Double>, Double>(interceptData) {
-    private val _data = MutableStateFlow<List<Double>>(emptyList())
-    override val data: StateFlow<List<Double>> = _data.asStateFlow()
+) : BaseETCacheDataProvider<List<Double>, Double>(emptyList(), interceptData) {
 
     override fun providerData(affectiveData: RealtimeAffectiveData?) {
         super.providerData(affectiveData)

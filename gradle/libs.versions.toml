@@ -1,113 +1,57 @@
 [versions]
-affective_sdk_api = "1.3.4-svm"
+affective_sdk_api = "1.3.5-svm"
 affectivealgorithmlocalsdk = "1.0.4"
 agp = "8.6.0"
-androidConstraintLayout = "1.1.3"
-androidEspressoCore = "3.0.2"
-androidxAppcompat = "1.6.1"
 androidxConstraintlayout = "1.1.3"
 androidxCoreCoreKtx = "1.6.0"
-androidxCoreKtx = "1.10.1"
 androidxCoreKtxVersion = "1.13.1"
-androidxEspressoCore = "3.5.1"
-androidxJunit = "1.1.5"
 androidxJunitVersion = "1.1.1"
-annotation = "1.1.0"
-appcompatV7 = "28.0.0"
 appcompatVersion = "1.0.0"
 autoService = "1.0-rc6"
 base = "0.0.6"
-baseVersion = "0.0.5"
 bcprovJdk18on = "1.76"
 biomoduleble = "1.5.5"
-bleCommon = "2.7.5"
-cardview = "1.0.0"
-cnBase = "0.0.7"
-cnBaseVersion = "1.0.0-flowtime-local"
 cnEntertechAndroidBase = "1.0.1-demo"
 conscryptAndroid = "2.4.0"
-constraintlayoutVersion = "2.1.4"
-core = "1.5.0-alpha01"
 coreKtxVersion = "1.9.0"
 crashreport = "latest.release"
-bleBaseApiVersion = "3.0.1-flowtime-local"
-dfu = "2.4.2"
-dfuVersion = "1.11.0"
 espressoCoreVersion = "3.1.0"
-eventbus = "3.2.0"
 googleGson = "2.10.1"
 googleGsonVersion = "2.8.5"
-googleMaterial = "1.10.0"
 googleMaterialVersion = "1.0.0"
-gradle = "7.1.3"
-gson = "2.8.6"
 gsonVersion = "2.8.9"
 javaWebsocket = "1.4.0"
-junitJunit = "4.12"
 kotlin = "1.9.0"
-coreKtx = "1.15.0"
 junit = "4.13.2"
 device = "0.0.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
-kotlinBom = "1.8.0"
-kotlinBomVersion = "1.8.22"
-kotlinStdlib = "2.0.21"
-kotlinStdlibJdk7 = "1.9.0"
 legacySupportV4 = "1.0.0"
-localbroadcastmanager = "1.0.0"
-logger = "2.1.1"
 logLocal = "1.1.0"
-lottie = "5.2.0"
 material = "1.12.0"
-activity = "1.10.0"
-constraintlayout = "2.2.0"
-materialVersion = "1.9.0"
-meditate = "flowtime-5.0.9.0-local"
-mpandroidchart = "v3.1.0"
 powermockApiMockito = "1.6.5"
-runner = "1.0.2"
-rxandroidble = "1.17.2"
 
 [libraries]
 affective_sdk_api = { module = "cn.entertech.android:affective_sdk_api", version.ref = "affective_sdk_api" }
 affectivealgorithmlocalsdk = { module = "cn.entertech.android:affectiveAlgorithmLocalSdk", version.ref = "affectivealgorithmlocalsdk" }
-androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
 androidx-appcompat-v100 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
-androidx-appcompat-v161 = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppcompat" }
 androidx-constraintlayout-v113 = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidxConstraintlayout" }
 androidx-core-ktx-v1131 = { module = "androidx.core:core-ktx", version.ref = "androidxCoreKtxVersion" }
 androidx-core-ktx-v160 = { module = "androidx.core:core-ktx", version.ref = "androidxCoreCoreKtx" }
 androidx-core-ktx-v190 = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
 androidx-espresso-core-v310 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
-androidx-espresso-core-v351 = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxEspressoCore" }
 androidx-junit-v111 = { module = "androidx.test.ext:junit", version.ref = "androidxJunitVersion" }
-androidx-junit-v115 = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-legacy-support-v4 = { module = "androidx.legacy:legacy-support-v4", version.ref = "legacySupportV4" }
-androidx-localbroadcastmanager = { module = "androidx.localbroadcastmanager:localbroadcastmanager", version.ref = "localbroadcastmanager" }
-appcompat-v7 = { module = "com.android.support:appcompat-v7", version.ref = "appcompatV7" }
 auto-service = { module = "com.google.auto.service:auto-service", version.ref = "autoService" }
 base = { module = "cn.entertech.android:base", version.ref = "base" }
-base-v005 = { module = "cn.entertech.android:base", version.ref = "baseVersion" }
-base-v007 = { module = "cn.entertech.android:base", version.ref = "cnBase" }
-base-v100flowtimelocal = { module = "cn.entertech.android:base", version.ref = "cnBaseVersion" }
 base-v101demo = { module = "cn.entertech.android:base", version.ref = "cnEntertechAndroidBase" }
 bcpkix-jdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bcprovJdk18on" }
 bcprov-jdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bcprovJdk18on" }
 biomoduleble = { module = "cn.entertech.android:biomoduleble", version.ref = "biomoduleble" }
-biomoduleble_base_api = { module = "cn.entertech.android:biomoduleble_base_api", version.ref = "bleBaseApiVersion" }
-ble-common = { module = "no.nordicsemi.android:ble-common", version.ref = "bleCommon" }
 conscrypt-android = { module = "org.conscrypt:conscrypt-android", version.ref = "conscryptAndroid" }
-constraint-layout = { module = "com.android.support.constraint:constraint-layout", version.ref = "androidConstraintLayout" }
 crashreport = { module = "com.tencent.bugly:crashreport", version.ref = "crashreport" }
 device = { module = "cn.entertech.android:device", version.ref = "device" }
-dfu = { module = "no.nordicsemi.android:dfu", version.ref = "dfu" }
-dfu-v1110 = { module = "no.nordicsemi.android:dfu", version.ref = "dfuVersion" }
-espresso-core = { module = "com.android.support.test.espresso:espresso-core", version.ref = "androidEspressoCore" }
-eventbus = { module = "org.greenrobot:eventbus", version.ref = "eventbus" }
-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 gson-v2101 = { module = "com.google.code.gson:gson", version.ref = "googleGson" }
 gson-v285 = { module = "com.google.code.gson:gson", version.ref = "googleGsonVersion" }
 gson-v289 = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }
@@ -116,29 +60,11 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-junit-v412 = { module = "junit:junit", version.ref = "junitJunit" }
-kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlinBom" }
-kotlin-bom-v1822 = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlinBomVersion" }
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlinStdlibJdk7" }
-kotlin-stdlib-jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlinStdlibJdk7" }
-kotlin-stdlib-v2021 = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlinStdlib" }
 log-api = { module = "cn.entertech.android:log-api", version.ref = "logLocal" }
-log-local = { module = "cn.entertech.android:log-local", version.ref = "logLocal" }
-logger = { module = "com.orhanobut:logger", version.ref = "logger" }
-lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 material-v100 = { module = "com.google.android.material:material", version.ref = "googleMaterialVersion" }
-material-v1100 = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
-material-v190 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
-meditate = { module = "cn.entertech.android:meditate", version.ref = "meditate" }
-mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
 powermock-api-mockito = { module = "org.powermock:powermock-api-mockito", version.ref = "powermockApiMockito" }
 powermock-module-junit4 = { module = "org.powermock:powermock-module-junit4", version.ref = "powermockApiMockito" }
-recyclerview-v7 = { module = "com.android.support:recyclerview-v7", version.ref = "appcompatV7" }
-runner = { module = "com.android.support.test:runner", version.ref = "runner" }
-rxandroidble = { module = "com.polidea.rxandroidble2:rxandroidble", version.ref = "rxandroidble" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -600,7 +600,7 @@ open class AffectiveManager<Key> {
         affectiveFinishServiceListener.remove(listener)
     }
 
-    fun subscribeData(
+    fun addSubscribeDataListener(
         bioDataListener: ((Key, RealtimeBioData?) -> Unit)? = null,
         affectiveDataListener: ((Key, RealtimeAffectiveData?) -> Unit)? = null
     ) {
@@ -612,7 +612,7 @@ open class AffectiveManager<Key> {
         }
     }
 
-    fun unSubscribeData(
+    fun removeSubscribeDataListener(
         bioDataListener: ((Key, RealtimeBioData?) -> Unit)? = null,
         affectiveDataListener: ((Key, RealtimeAffectiveData?) -> Unit)? = null,
     ) {
@@ -622,6 +622,23 @@ open class AffectiveManager<Key> {
         affectiveDataListener?.apply {
             affectiveDataListeners.remove(this)
         }
+    }
+
+
+    @Deprecated("")
+    fun subscribeData(
+        bioDataListener: ((Key, RealtimeBioData?) -> Unit)? = null,
+        affectiveDataListener: ((Key, RealtimeAffectiveData?) -> Unit)? = null
+    ) {
+        addSubscribeDataListener(bioDataListener, affectiveDataListener)
+    }
+
+    @Deprecated("")
+    fun unSubscribeData(
+        bioDataListener: ((Key, RealtimeBioData?) -> Unit)? = null,
+        affectiveDataListener: ((Key, RealtimeAffectiveData?) -> Unit)? = null,
+    ) {
+        removeSubscribeDataListener(bioDataListener, affectiveDataListener)
     }
 
     private inline fun <reified T> MutableList<T>.addWithoutRepeat(t: T) {

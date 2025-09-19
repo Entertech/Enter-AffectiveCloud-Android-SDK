@@ -40,8 +40,8 @@ android {
 }
 
 dependencies {
-    api(libs.affective.sdk.api)
-//    api(project(":affective_sdk_api"))
+//    api(libs.affective.sdk.api)
+    api(project(":affective_sdk_api"))
     implementation(libs.androidx.core.ktx.v1131)
     implementation(libs.androidx.appcompat.v100)
     implementation(libs.material)

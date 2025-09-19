@@ -2,7 +2,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("custom.android.plugin")
-    id("kotlin-kapt")
+//    id("kotlin-kapt")
 }
 val libraryVersion = (rootProject.ext.get("libraryVersion") as? String) ?: "1.0.0"
 val groupIdString = (rootProject.ext.get("groupId") as? String) ?: "1.0.0"
@@ -64,8 +64,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    kapt(libs.auto.service)
-    implementation(libs.auto.service)
+//    kapt(libs.auto.service)
+//    implementation(libs.auto.service)
     testImplementation(libs.powermock.api.mockito)
     testImplementation(libs.powermock.module.junit4)
     implementation(libs.gson.v289)

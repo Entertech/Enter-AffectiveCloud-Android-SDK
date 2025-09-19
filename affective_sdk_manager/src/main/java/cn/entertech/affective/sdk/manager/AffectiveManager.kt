@@ -283,8 +283,20 @@ open class AffectiveManager<Key> {
         key: Key, serviceType: AffectiveServiceWay = AffectiveServiceWay.AffectiveLocalService
     ): IAffectiveDataAnalysisService? {
         return affectiveServiceMap.getValueWithInit(key, initValue = {
-            IAffectiveDataAnalysisService.getService(serviceType)
+            initAffectiveService(serviceType)
         })
+    }
+
+    fun getAffectiveService(
+        key: Key, default: IAffectiveDataAnalysisService?
+    ): IAffectiveDataAnalysisService? {
+        return affectiveServiceMap.getValueWithInit(key, initValue = {
+            default
+        })
+    }
+
+    protected open fun initAffectiveService(serviceType: AffectiveServiceWay): IAffectiveDataAnalysisService? {
+        return IAffectiveDataAnalysisService.getService(serviceType)
     }
 
     private fun startAffectiveService(key: Key) {

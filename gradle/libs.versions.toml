@@ -1,5 +1,5 @@
 [versions]
-affective_sdk_api = "1.3.5-svm"
+affective_sdk_api = "1.3.6-svm"
 affectivealgorithmlocalsdk = "1.0.4"
 agp = "8.6.0"
 androidxConstraintlayout = "1.1.3"

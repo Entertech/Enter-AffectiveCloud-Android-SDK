@@ -4,16 +4,21 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+def releaseKeystoreFile = rootProject.file('entertech.jks')
+
 android {
     signingConfigs {
         config {
             keyAlias 'entertech'
             keyPassword '123456'
-            storeFile file('../entertech.jks')
+            if (releaseKeystoreFile.exists()) {
+                storeFile releaseKeystoreFile
+            }
             storePassword '123456'
         }
     }
     compileSdkVersion 28
+    namespace 'cn.entertech.biomoduledemo'
     defaultConfig {
         applicationId "cn.entertech.biomoduledemo"
         minSdkVersion 21
@@ -27,7 +32,9 @@ android {
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
+            if (releaseKeystoreFile.exists()) {
+                signingConfig signingConfigs.config
+            }
         }
     }
     compileOptions {
@@ -37,6 +44,10 @@ android {
 
     packagingOptions {
         exclude 'META-INF/ble_release.kotlin_module'
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
     }
 
 }

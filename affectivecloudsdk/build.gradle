@@ -5,6 +5,8 @@ apply from: './push.gradle'
 android {
     compileSdkVersion 28
 
+    namespace 'cn.entertech.affectivecloudsdk'
+
 
 
     defaultConfig {
@@ -24,10 +26,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-////
-//    testOptions{
-//        unitTests.returnDefaultValues = true
-//    }
+    testOptions {
+        unitTests.all {
+            jvmArgs(
+                    '--add-opens=java.base/java.lang=ALL-UNNAMED',
+                    '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED',
+                    '--add-opens=java.base/java.io=ALL-UNNAMED',
+                    '--add-opens=java.base/java.util=ALL-UNNAMED'
+            )
+        }
+    }
 
 }
 /*PublishInfo {

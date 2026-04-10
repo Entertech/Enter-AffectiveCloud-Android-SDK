@@ -48,7 +48,7 @@
 ### Gradle自动集成
 在module的build.gradle文件下添加以下依赖
 ```groovy
-implementation 'cn.entertech.android:affectivecloud:2.1.0'
+implementation 'cn.entertech.android:affectivecloud:2.6.6'
 ```
 在项目根目录的build.gradle文件下添加以下依赖地址
 ```groovy

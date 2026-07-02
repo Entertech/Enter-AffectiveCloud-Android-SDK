@@ -33,6 +33,7 @@ material = "1.12.0"
 powermockApiMockito = "1.6.5"
 
 [libraries]
+android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 affective_sdk_api = { module = "cn.entertech.android:affective_sdk_api", version.ref = "affective_sdk_api" }
 affectivealgorithmlocalsdk = { module = "cn.entertech.android:affectiveAlgorithmLocalSdk", version.ref = "affectivealgorithmlocalsdk" }
 androidx-appcompat-v100 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
@@ -57,6 +58,7 @@ gson-v285 = { module = "com.google.code.gson:gson", version.ref = "googleGsonVer
 gson-v289 = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }
 java-websocket = { module = "org.java-websocket:Java-WebSocket", version.ref = "javaWebsocket" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }

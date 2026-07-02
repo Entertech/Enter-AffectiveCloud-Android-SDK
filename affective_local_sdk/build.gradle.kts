@@ -1,7 +1,5 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    id("custom.android.plugin")
+    id("enter.android.library")
 }
 val libraryVersion = (rootProject.ext.get("libraryVersion") as? String) ?: "1.0.0"
 val localSdkGroupId = "cn.entertech.android"
@@ -17,33 +15,17 @@ PublishInfo {
 
 android {
     namespace = "cn.entertech.affectivesdk"
-    compileSdk = 34
 
     buildFeatures {
         buildConfig = true
     }
 
     defaultConfig {
-        minSdk = 23
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-
         externalNativeBuild {
             cmake {
                 cppFlags("-std=c++11 -fexceptions")
 //                cppFlags "-std=c++11 -frtti -fexceptions -Who-format"
             }
-        }
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
         }
     }
     flavorDimensions += listOf("project", "authentication")
@@ -65,13 +47,6 @@ android {
         cmake {
             path("CMakeLists.txt")
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
 }
 

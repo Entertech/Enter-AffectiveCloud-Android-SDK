@@ -1,44 +1,17 @@
-import org.gradle.api.publish.PublishingExtension
-import org.gradle.api.publish.maven.MavenPublication
-
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("custom.android.plugin")
 }
 val libraryVersion = (rootProject.ext.get("libraryVersion") as? String) ?: "1.0.0"
-val groupIdString = (rootProject.ext.get("groupId") as? String) ?: "1.0.0"
+val localSdkGroupId = "cn.entertech.android"
 val baseArtifactId = "affective-offline-sdk"
 val projectFlavors = listOf("breath", "obsession", "flowtime", "sdk")
-val authenticationFlavors = listOf("auth", "noAuth")
-
-data class ReleaseFlavorPublication(
-    val variantName: String,
-    val publicationName: String,
-    val artifactId: String
-)
-
-fun String.uppercaseFirstChar(): String = replaceFirstChar { char ->
-    if (char.isLowerCase()) char.titlecase() else char.toString()
-}
-
-val releaseFlavorPublications = projectFlavors.flatMap { projectFlavor ->
-    authenticationFlavors.map { authenticationFlavor ->
-        val variantName = "${projectFlavor}${authenticationFlavor.uppercaseFirstChar()}Release"
-        val projectArtifactPart = if (projectFlavor == "sdk") "" else "-$projectFlavor"
-        val authenticationArtifactPart = if (authenticationFlavor == "auth") "-authentication" else ""
-
-        ReleaseFlavorPublication(
-            variantName = variantName,
-            publicationName = variantName,
-            artifactId = "$baseArtifactId$projectArtifactPart$authenticationArtifactPart"
-        )
-    }
-}
+val authenticationFlavors = mapOf("auth" to true, "noAuth" to false)
 
 PublishInfo {
-    groupId = groupIdString // 库的组织，使用域名表示
-    artifactId = baseArtifactId // 库名称
+    groupId = localSdkGroupId // 库的组织，使用域名表示
+    artifactId = baseArtifactId // 库名称，发布插件按 product 前缀和 authentication 后缀生成变体 artifactId
     version = libraryVersion  // 库版本
 }
 
@@ -81,13 +54,11 @@ android {
                 buildConfigField("String", "AFFECTIVE_PROJECT", "\"$projectFlavor\"")
             }
         }
-        create("auth") {
-            dimension = "authentication"
-            buildConfigField("boolean", "REQUIRE_AUTHENTICATION", "true")
-        }
-        create("noAuth") {
-            dimension = "authentication"
-            buildConfigField("boolean", "REQUIRE_AUTHENTICATION", "false")
+        authenticationFlavors.forEach { (authenticationFlavor, requireAuthentication) ->
+            create(authenticationFlavor) {
+                dimension = "authentication"
+                buildConfigField("boolean", "REQUIRE_AUTHENTICATION", requireAuthentication.toString())
+            }
         }
     }
     externalNativeBuild {
@@ -120,19 +91,4 @@ dependencies {
     implementation(libs.bcprov.jdk18on)
     implementation(libs.bcpkix.jdk18on)
     implementation(libs.device)
-}
-
-afterEvaluate {
-    extensions.configure(PublishingExtension::class.java) {
-        publications {
-            releaseFlavorPublications.forEach { publication ->
-                create(publication.publicationName, MavenPublication::class.java) {
-                    from(project.components[publication.variantName])
-                    groupId = groupIdString
-                    artifactId = publication.artifactId
-                    version = libraryVersion
-                }
-            }
-        }
-    }
 }

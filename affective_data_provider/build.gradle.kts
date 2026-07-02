@@ -4,9 +4,9 @@ plugins {
     id("custom.android.plugin")
 }
 val libraryVersion = (rootProject.ext.get("libraryVersion") as? String) ?: "1.0.0"
-val groupIdString = (rootProject.ext.get("groupId") as? String) ?: "1.0.0"
+val dataProviderGroupId = "cn.entertech.android"
 PublishInfo {
-    groupId = groupIdString // 库的组织，使用域名表示
+    groupId = dataProviderGroupId // 库的组织，使用域名表示
     artifactId = "affective-data-provider" // 库名称
     version = libraryVersion // 库版本
 }

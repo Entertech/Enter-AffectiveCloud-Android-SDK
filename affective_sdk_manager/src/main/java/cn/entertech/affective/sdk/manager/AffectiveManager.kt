@@ -138,6 +138,28 @@ open class AffectiveManager<Key> {
     }
 
     fun connectAndStartAffectiveService(
+        key: Key, configProxy: EnterAffectiveConfigProxy = EnterAffectiveConfigProxy()
+    ) {
+        getAffectiveService(key)?.apply {
+            if (hasConnectAffectiveService()) {
+                if (hasStartAffectiveService()) {
+                    affectiveStartServiceLister.forEach {
+                        it.hasStarted(key)
+                    }
+                } else {
+                    startAffectiveService(key)
+                }
+            } else {
+                connectAffectiveServiceConnection(getConnectionServiceListener(key), configProxy)
+            }
+        } ?: kotlin.run {
+            affectionConnectionServiceListeners.forEach {
+                it.connectionError(key, Error(-1, "key $key affective service is null"))
+            }
+        }
+    }
+
+    fun connectAndStartAffectiveService(
         key: Key,
         authenticationInputStream: InputStream?,
         context: Context?,
@@ -313,6 +335,32 @@ open class AffectiveManager<Key> {
                 authenticationInputStream, context, this
             )
         }
+    }
+
+    private fun getConnectionServiceListener(key: Key): IConnectionServiceListener? {
+        return connectionServiceListenerMap.getValueWithInit(key, initValue = {
+            object : IConnectionServiceListener {
+                override fun connectionError(error: Error?) {
+                    affectionConnectionServiceListeners.forEach {
+                        it.connectionError(key, error)
+                    }
+                }
+
+                override fun connectionSuccess(sessionId: String?) {
+                    affectionConnectionServiceListeners.forEach {
+                        it.connectionSuccess(key, sessionId)
+                    }
+                    startAffectiveService(key)
+                }
+
+                override fun hasConnected(sessionId: String) {
+                    super.hasConnected(sessionId)
+                    affectionConnectionServiceListeners.forEach {
+                        it.hasConnected(key, sessionId)
+                    }
+                }
+            }
+        })
     }
 
     private fun getConnectionServiceListener(

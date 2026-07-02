@@ -75,6 +75,13 @@ interface IAffectiveDataAnalysisService {
      * 启动情感服务
      * */
     fun startAffectiveService(
+        initListener: IStartAffectiveServiceLister
+    )
+
+    /**
+     * 启动情感服务
+     * */
+    fun startAffectiveService(
         authenticationInputStream: InputStream?,
         context: Context?,
         initListener: IStartAffectiveServiceLister

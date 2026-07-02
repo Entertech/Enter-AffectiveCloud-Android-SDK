@@ -7,10 +7,26 @@ val baseArtifactId = "affective-offline-sdk"
 val projectFlavors = listOf("breath", "obsession", "flowtime", "sdk")
 val authenticationFlavors = mapOf("auth" to true, "noAuth" to false)
 
+fun buildLocalSdkArtifactId(
+    project: String,
+    requireAuthentication: Boolean,
+): String {
+    val projectPrefix = project.takeIf { it.isNotBlank() }?.let { "$it-" } ?: ""
+    val authenticationSuffix = if (requireAuthentication) "-authentication" else ""
+    return "$projectPrefix$baseArtifactId$authenticationSuffix"
+}
+
 PublishInfo {
     groupId = localSdkGroupId // 库的组织，使用域名表示
-    artifactId = baseArtifactId // 库名称，发布插件按 product 前缀和 authentication 后缀生成变体 artifactId
+    artifactId = baseArtifactId // 库名称，作为单 publication 或动态规则缺省值
     version = libraryVersion  // 库版本
+
+    artifactIdForVariant { variant ->
+        buildLocalSdkArtifactId(
+            project = variant.flavor("project"),
+            requireAuthentication = variant.flavor("authentication") == "auth",
+        )
+    }
 }
 
 android {

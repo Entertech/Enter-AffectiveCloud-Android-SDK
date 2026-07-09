@@ -1,0 +1,77 @@
+name: Sync Publish Branch
+
+on:
+  create:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-publish-${{ github.event.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.event.ref_type == 'branch' && contains(github.event.ref, 'dev_')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BASE_BRANCH: svm-main
+      ALGORITHM_REPO: wk1995/AffectiveCloud-Algorithm-SDK
+      GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN || github.token }}
+    steps:
+      - name: Checkout parent repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ env.GH_TOKEN }}
+
+      - name: Configure bot git identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "release-bot"
+          git config user.email "release-bot@users.noreply.github.com"
+
+      - name: Resolve branch mapping
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/release_flow.py map-branches --parent-branch "${GITHUB_REF_NAME}" > branch.env
+          cat branch.env >> "${GITHUB_ENV}"
+
+      - name: Create or rebase parent publish branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${BASE_BRANCH}"
+          if git ls-remote --exit-code --heads origin "${parent_publish_branch}" >/dev/null 2>&1; then
+            git fetch origin "${parent_publish_branch}"
+            git switch --detach "origin/${parent_publish_branch}"
+            git rebase "origin/${BASE_BRANCH}"
+            git push --force-with-lease origin HEAD:"refs/heads/${parent_publish_branch}"
+          else
+            git push origin "origin/${BASE_BRANCH}:refs/heads/${parent_publish_branch}"
+          fi
+
+      - name: Create or sync child dev and publish branches
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/${ALGORITHM_REPO}.git" algorithm-repo
+          git -C algorithm-repo config user.name "release-bot"
+          git -C algorithm-repo config user.email "release-bot@users.noreply.github.com"
+          git -C algorithm-repo fetch origin "${BASE_BRANCH}"
+
+          if ! git -C algorithm-repo ls-remote --exit-code --heads origin "${child_dev_branch}" >/dev/null 2>&1; then
+            git -C algorithm-repo push origin "origin/${BASE_BRANCH}:refs/heads/${child_dev_branch}"
+          fi
+
+          if git -C algorithm-repo ls-remote --exit-code --heads origin "${child_publish_branch}" >/dev/null 2>&1; then
+            git -C algorithm-repo fetch origin "${child_publish_branch}"
+            git -C algorithm-repo switch --detach "origin/${child_publish_branch}"
+            git -C algorithm-repo rebase "origin/${BASE_BRANCH}"
+            git -C algorithm-repo push --force-with-lease origin HEAD:"refs/heads/${child_publish_branch}"
+          else
+            git -C algorithm-repo push origin "origin/${BASE_BRANCH}:refs/heads/${child_publish_branch}"
+          fi

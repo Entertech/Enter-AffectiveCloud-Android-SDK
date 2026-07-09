@@ -1,0 +1,238 @@
+name: Release Publish
+
+on:
+  push:
+    branches:
+      - publish_*
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      BASE_BRANCH: svm-main
+      ALGORITHM_REPO: wk1995/AffectiveCloud-Algorithm-SDK
+      CHILD_WORKFLOW: build-so.yml
+      MAVEN_LOCAL_DIR: ${{ github.workspace }}/.ci-maven-local
+      GRADLE_OPTS: -Dfile.encoding=UTF-8 -Dmaven.repo.local=${{ github.workspace }}/.ci-maven-local
+      GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN || github.token }}
+      PUBLISH_MODULES: >-
+        :affective_sdk_api
+        :affective_cloud_protocol
+        :affective_data_provider
+        :affective_sdk_manager
+        :affective_local_sdk
+
+    steps:
+      - name: Checkout parent repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ env.GH_TOKEN }}
+
+      - name: Configure credentials and bot identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
+          git config user.name "release-bot"
+          git config user.email "release-bot@users.noreply.github.com"
+          chmod +x ./gradlew
+          rm -rf "${MAVEN_LOCAL_DIR}" release-artifacts algorithm-artifacts
+          mkdir -p "${MAVEN_LOCAL_DIR}" release-artifacts/aar algorithm-artifacts
+
+      - name: Resolve release refs
+        shell: bash
+        run: |
+          set -euo pipefail
+          parent_publish_branch="${GITHUB_REF_NAME}"
+          release_key="${parent_publish_branch#publish_}"
+          if [[ "${release_key}" == "${parent_publish_branch}" || -z "${release_key}" ]]; then
+            echo "Release publish must run from publish_V; current ref is ${parent_publish_branch}." >&2
+            exit 1
+          fi
+          child_publish_branch="algorithm-android-publish_${release_key}"
+          child_sha="$(git ls-tree HEAD affective_local_sdk/src/main | awk '{print $3}')"
+          if [[ -z "${child_sha}" ]]; then
+            echo "Unable to resolve child submodule SHA." >&2
+            exit 1
+          fi
+          {
+            echo "release_key=${release_key}"
+            echo "parent_publish_branch=${parent_publish_branch}"
+            echo "child_publish_branch=${child_publish_branch}"
+            echo "child_sha=${child_sha}"
+          } >> "${GITHUB_ENV}"
+
+      - name: Initialize submodule and verify child branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git submodule update --init --recursive
+          python3 scripts/release_flow.py verify-submodule \
+            --parent-ref HEAD \
+            --child-repo-dir affective_local_sdk/src/main \
+            --child-branch "${child_publish_branch}"
+
+      - name: Trigger child SO build
+        shell: bash
+        run: |
+          set -euo pipefail
+          start_time="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "child_dispatch_start=${start_time}" >> "${GITHUB_ENV}"
+          gh api \
+            --method POST \
+            "repos/${ALGORITHM_REPO}/actions/workflows/${CHILD_WORKFLOW}/dispatches" \
+            -f ref="${child_publish_branch}" \
+            -f inputs[release_key]="${release_key}" \
+            -f inputs[child_sha]="${child_sha}" \
+            -f inputs[parent_repo]="${GITHUB_REPOSITORY}" \
+            -f inputs[parent_run_id]="${GITHUB_RUN_ID}"
+
+      - name: Wait for child SO build
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_id=""
+          for _ in {1..60}; do
+            run_id="$(gh run list \
+              --repo "${ALGORITHM_REPO}" \
+              --workflow "${CHILD_WORKFLOW}" \
+              --branch "${child_publish_branch}" \
+              --event workflow_dispatch \
+              --json databaseId,createdAt \
+              --jq ".[] | select(.createdAt >= \"${child_dispatch_start}\") | .databaseId" | head -n 1)"
+            if [[ -n "${run_id}" ]]; then
+              break
+            fi
+            sleep 5
+          done
+          if [[ -z "${run_id}" ]]; then
+            echo "Child workflow run was not found." >&2
+            exit 1
+          fi
+          gh run watch "${run_id}" --repo "${ALGORITHM_REPO}" --exit-status --interval 15
+          echo "child_run_id=${run_id}" >> "${GITHUB_ENV}"
+
+      - name: Download child SO artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          artifact_name="algorithm-so-${release_key}-${child_sha}"
+          gh run download "${child_run_id}" \
+            --repo "${ALGORITHM_REPO}" \
+            --name "${artifact_name}" \
+            --dir algorithm-artifacts
+          test -f algorithm-artifacts/manifest.json
+          find algorithm-artifacts -type f -name "*.so" -print -quit | grep -q .
+
+      - name: Assemble release AARs
+        shell: bash
+        run: |
+          set -euo pipefail
+          read -r -a modules <<< "${PUBLISH_MODULES}"
+          tasks=()
+          for module in "${modules[@]}"; do
+            tasks+=("${module}:assembleRelease")
+          done
+          ./gradlew --no-daemon --stacktrace --console=plain "${tasks[@]}"
+
+      - name: Publish to local Maven with PublishPlugin
+        shell: bash
+        run: |
+          set -euo pipefail
+          read -r -a modules <<< "${PUBLISH_MODULES}"
+          tasks=()
+          for module in "${modules[@]}"; do
+            tasks+=("${module}:PublishLibraryLocalTask")
+          done
+          ./gradlew --no-daemon --stacktrace --console=plain "${tasks[@]}"
+
+      - name: Verify publications and collect AARs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/release_flow.py publication-tags \
+            --maven-local-dir "${MAVEN_LOCAL_DIR}" \
+            --output release-artifacts/tags.txt
+
+          read -r -a modules <<< "${PUBLISH_MODULES}"
+          for module in "${modules[@]}"; do
+            module_dir="${module#:}"
+            module_dir="${module_dir//://}"
+            find "${module_dir}/build/outputs/aar" -maxdepth 1 -type f -name "*-release.aar" -print0 |
+              while IFS= read -r -d '' aar_file; do
+                cp "${aar_file}" "release-artifacts/aar/${module_dir}-$(basename "${aar_file}")"
+              done
+          done
+
+          if ! find release-artifacts/aar -maxdepth 1 -type f -name "*.aar" -print -quit | grep -q .; then
+            echo "No release AARs were collected." >&2
+            exit 1
+          fi
+
+      - name: Upload release AAR artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-aar-${{ github.sha }}
+          path: release-artifacts/aar/*.aar
+          if-no-files-found: error
+
+      - name: Create release tags
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r tag_name; do
+            [[ -n "${tag_name}" ]] || continue
+            if git ls-remote --exit-code --tags origin "refs/tags/${tag_name}" >/dev/null 2>&1; then
+              echo "Tag already exists: ${tag_name}" >&2
+              exit 1
+            fi
+            git tag -a "${tag_name}" -m "Release ${tag_name}"
+          done < release-artifacts/tags.txt
+          git push origin --tags
+
+          source_version="$(sed -nE 's/^[[:space:]]*libraryVersion[[:space:]]*=[[:space:]]*"([^"]+)".*$/\1/p' version.gradle | head -n 1)"
+          child_tag="affective-algorithm-sdk-${source_version}"
+          git -C affective_local_sdk/src/main fetch origin "${child_publish_branch}"
+          git -C affective_local_sdk/src/main tag -a "${child_tag}" "${child_sha}" -m "Release ${child_tag}"
+          git -C affective_local_sdk/src/main push origin "refs/tags/${child_tag}"
+
+      - name: Create main PRs and enable auto-merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          parent_pr_url="$(gh pr list --base "${BASE_BRANCH}" --head "${parent_publish_branch}" --state open --json url --jq '.[0].url')"
+          if [[ -z "${parent_pr_url}" || "${parent_pr_url}" == "null" ]]; then
+            parent_pr_url="$(gh pr create \
+              --base "${BASE_BRANCH}" \
+              --head "${parent_publish_branch}" \
+              --title "Release ${release_key}" \
+              --body "Automated release PR for ${release_key}.")"
+          fi
+          gh pr merge "${parent_pr_url}" --auto --merge
+
+          child_pr_url="$(gh pr list \
+            --repo "${ALGORITHM_REPO}" \
+            --base "${BASE_BRANCH}" \
+            --head "${child_publish_branch}" \
+            --state open \
+            --json url --jq '.[0].url')"
+          if [[ -z "${child_pr_url}" || "${child_pr_url}" == "null" ]]; then
+            child_pr_url="$(gh pr create \
+              --repo "${ALGORITHM_REPO}" \
+              --base "${BASE_BRANCH}" \
+              --head "${child_publish_branch}" \
+              --title "Release ${release_key}" \
+              --body "Automated algorithm release PR for ${release_key}.")"
+          fi
+          gh pr merge "${child_pr_url}" --repo "${ALGORITHM_REPO}" --auto --merge

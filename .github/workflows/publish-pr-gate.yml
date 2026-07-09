@@ -1,0 +1,113 @@
+name: Publish PR Gate
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+    branches:
+      - publish_*
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: publish-pr-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ALGORITHM_REPO: wk1995/AffectiveCloud-Algorithm-SDK
+      GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN || github.token }}
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+          token: ${{ env.GH_TOKEN }}
+
+      - name: Configure credentials and bot identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
+          git config user.name "release-bot"
+          git config user.email "release-bot@users.noreply.github.com"
+
+      - name: Resolve and validate branch mapping
+        shell: bash
+        run: |
+          set -euo pipefail
+          head_branch="${{ github.event.pull_request.head.ref }}"
+          base_branch="${{ github.event.pull_request.base.ref }}"
+          python3 scripts/release_flow.py map-branches --parent-branch "${head_branch}" > branch.env
+          cat branch.env >> "${GITHUB_ENV}"
+          source branch.env
+          if [[ "${base_branch}" != "${parent_publish_branch}" ]]; then
+            echo "Invalid release PR: ${head_branch} must target ${parent_publish_branch}, not ${base_branch}." >&2
+            exit 1
+          fi
+
+      - name: Check parent merge conflicts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${parent_publish_branch}"
+          if ! git merge --no-commit --no-ff "origin/${parent_publish_branch}"; then
+            git merge --abort || true
+            echo "Parent repository has merge conflicts with ${parent_publish_branch}." >&2
+            exit 1
+          fi
+          git merge --abort
+
+      - name: Version gate and optional patch bump
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/release_flow.py version-gate \
+            --base-ref "origin/${parent_publish_branch}" \
+            --head-ref WORKTREE \
+            --write-bump
+          if ! git diff --quiet -- version.gradle; then
+            git add version.gradle
+            git commit -m "[codex] bump release patch version"
+            git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
+          fi
+
+      - name: Reject open PRs targeting the dev branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          open_prs="$(gh pr list --state open --base "${parent_dev_branch}" --json number,url --jq '.[] | "#\(.number) \(.url)"')"
+          if [[ -n "${open_prs}" ]]; then
+            echo "Open PRs still target ${parent_dev_branch}; merge or close them before publishing:" >&2
+            echo "${open_prs}" >&2
+            exit 1
+          fi
+
+      - name: Check child submodule commit and conflicts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git submodule update --init --recursive
+          python3 scripts/release_flow.py verify-submodule \
+            --parent-ref HEAD \
+            --child-repo-dir affective_local_sdk/src/main \
+            --child-branch "${child_dev_branch}"
+
+          git -C affective_local_sdk/src/main fetch origin "${child_publish_branch}" "${child_dev_branch}"
+          git -C affective_local_sdk/src/main switch --detach "origin/${child_publish_branch}"
+          if ! git -C affective_local_sdk/src/main merge --no-commit --no-ff "origin/${child_dev_branch}"; then
+            git -C affective_local_sdk/src/main merge --abort || true
+            echo "Child repository has merge conflicts: ${child_dev_branch} -> ${child_publish_branch}." >&2
+            exit 1
+          fi
+          git -C affective_local_sdk/src/main merge --abort

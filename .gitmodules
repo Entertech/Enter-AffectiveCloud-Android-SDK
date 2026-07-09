@@ -1,0 +1,4 @@
+[submodule "affective_local_sdk/src/main"]
+	path = affective_local_sdk/src/main
+	url = https://github.com/wk1995/AffectiveCloud-Algorithm-SDK.git
+	branch = svm-main

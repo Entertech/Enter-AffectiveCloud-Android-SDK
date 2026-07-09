@@ -1,0 +1,55 @@
+name: Release Aftercare
+
+on:
+  pull_request_target:
+    types:
+      - closed
+    branches:
+      - svm-main
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  cleanup:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'publish_')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ALGORITHM_REPO: wk1995/AffectiveCloud-Algorithm-SDK
+      GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN || github.token }}
+    steps:
+      - name: Checkout parent repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ env.GH_TOKEN }}
+
+      - name: Delete release branches after main merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          parent_publish_branch="${{ github.event.pull_request.head.ref }}"
+          release_key="${parent_publish_branch#publish_}"
+          child_publish_branch="algorithm-android-publish_${release_key}"
+
+          dev_branch="$(gh pr list \
+            --base "${parent_publish_branch}" \
+            --state merged \
+            --json headRefName,mergedAt \
+            --jq 'sort_by(.mergedAt) | last.headRefName')"
+
+          child_dev_branch=""
+          if [[ -n "${dev_branch}" && "${dev_branch}" != "null" ]]; then
+            child_dev_branch="algorithm-android-${dev_branch}"
+            git push origin --delete "${dev_branch}" || true
+          fi
+          git push origin --delete "${parent_publish_branch}" || true
+
+          if [[ -n "${child_dev_branch}" ]]; then
+            git ls-remote --exit-code --heads "https://x-access-token:${GH_TOKEN}@github.com/${ALGORITHM_REPO}.git" "${child_dev_branch}" >/dev/null 2>&1 &&
+              git push "https://x-access-token:${GH_TOKEN}@github.com/${ALGORITHM_REPO}.git" --delete "${child_dev_branch}" || true
+          fi
+          git ls-remote --exit-code --heads "https://x-access-token:${GH_TOKEN}@github.com/${ALGORITHM_REPO}.git" "${child_publish_branch}" >/dev/null 2>&1 &&
+            git push "https://x-access-token:${GH_TOKEN}@github.com/${ALGORITHM_REPO}.git" --delete "${child_publish_branch}" || true

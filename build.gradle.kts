@@ -7,7 +7,6 @@ plugins {
 apply( "version.gradle")
 buildscript {
     dependencies {
-//        classpath("cn.entertech.android:publish:1.0.5")
-        classpath("cn.entertech.android:publish:1.1.0-local")
+        classpath("cn.entertech.android:publish:1.2.1")
     }
 }

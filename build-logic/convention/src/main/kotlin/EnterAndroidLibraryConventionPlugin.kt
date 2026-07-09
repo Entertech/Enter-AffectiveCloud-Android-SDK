@@ -10,7 +10,7 @@ class EnterAndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
         pluginManager.apply("com.android.library")
         pluginManager.apply("org.jetbrains.kotlin.android")
-        pluginManager.apply("custom.android.plugin")
+        pluginManager.apply("cn.entertech.publish")
 
         extensions.configure<LibraryExtension> {
             compileSdk = 34

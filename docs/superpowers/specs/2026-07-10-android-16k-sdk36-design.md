@@ -96,10 +96,13 @@ silent regression if the effective native toolchain changes.
   or triggering a second terminal callback.
 - Reconnect the demo to `affective_cloud_sdk`, replace the removed Kotlin
   synthetic view access in `AuthActivity` with `findViewById`, and correct the
-  stale `MainActivity` R import. Exclude the legacy published
-  `affective_sdk_api:1.0.7` transitively pulled by the demo's remote local
-  algorithm dependency so the app has one API definition: the current local
-  `:affective_sdk_api` project.
+  stale `MainActivity` R import. Replace the legacy published local algorithm
+  dependency with this repository's `:affective_local_sdk`, selecting its
+  `flowtime`/`noAuth` variant, so the demo packages the newly aligned native
+  library and one current local API definition.
+- Upgrade Conscrypt Android from 2.4.0 to stable 2.6.0. The 2.6 line builds
+  Android native code with NDK r28; direct inspection of the published 2.6.0
+  AAR confirms every arm64-v8a `LOAD` segment is `0x4000` aligned.
 
 ### Native configuration
 
@@ -144,6 +147,9 @@ silent regression if the effective native toolchain changes.
   default values for the new deterministic offline service tests.
 - `demo/src/main/java/cn/entertech/biomoduledemo/activity/AuthActivity.kt` and
   `MainActivity.kt`: clear the two legacy Kotlin compilation blockers.
+- `demo/build.gradle` and `gradle/libs.versions.toml`: resolve the local
+  Flowtime/no-authentication SDK variant and use Conscrypt 2.6.0, eliminating
+  the two 4 KB-aligned transitive libraries found by final APK verification.
 
 ### Release version
 
@@ -193,6 +199,8 @@ The final acceptance criteria are:
   require the live cloud service are not compiled or executed by `test`.
 - The demo resolves only one `affective_sdk_api` implementation and has no
   duplicate Kotlin `DefaultImpls` classes at dex merge time.
+- The demo packages the repository-built `libaffective.so` and Conscrypt 2.6.0;
+  it contains no arm64 native library with `LOAD` alignment below `0x4000`.
 - Both flowtime Release AARs build successfully.
 - `:affective_sdk_api:compileReleaseKotlin` succeeds without duplicate overload
   or unresolved deque API errors.

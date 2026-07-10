@@ -129,6 +129,7 @@ class EnterAffectiveCloudServiceSuspendTest {
 
         successThread.isDaemon = true
         failureThread.isDaemon = true
+        var primaryFailure: Throwable? = null
         try {
             successThread.start()
             failureThread.start()
@@ -143,28 +144,68 @@ class EnterAffectiveCloudServiceSuspendTest {
                 finished.await(10, TimeUnit.SECONDS)
             )
             assertEquals(1, results.size)
+        } catch (failure: Throwable) {
+            primaryFailure = failure
+            throw failure
         } finally {
             start.countDown()
-            try {
-                joinOrInterrupt(successThread)
-            } finally {
-                try {
-                    joinOrInterrupt(failureThread)
-                } finally {
-                    assertTrue(
-                        "competing terminal signal threads did not stop",
-                        !successThread.isAlive && !failureThread.isAlive
+            var cleanupFailure: Throwable? = null
+            var cleanupInterrupted = false
+            fun recordCleanupFailure(failure: Throwable) {
+                if (failure is InterruptedException) {
+                    cleanupInterrupted = true
+                }
+                val recordedFailure = cleanupFailure
+                if (recordedFailure == null) {
+                    cleanupFailure = failure
+                } else {
+                    recordedFailure.addSuppressed(failure)
+                }
+            }
+
+            cleanupWorker(successThread, ::recordCleanupFailure)
+            cleanupWorker(failureThread, ::recordCleanupFailure)
+            if (successThread.isAlive || failureThread.isAlive) {
+                recordCleanupFailure(
+                    AssertionError(
+                        "competing terminal signal threads did not stop: " +
+                            "successAlive=${successThread.isAlive}, " +
+                            "failureAlive=${failureThread.isAlive}"
                     )
+                )
+            }
+            if (cleanupInterrupted) {
+                Thread.currentThread().interrupt()
+            }
+            val recordedCleanupFailure = cleanupFailure
+            if (recordedCleanupFailure != null) {
+                val recordedPrimaryFailure = primaryFailure
+                if (recordedPrimaryFailure != null) {
+                    recordedPrimaryFailure.addSuppressed(recordedCleanupFailure)
+                } else {
+                    throw recordedCleanupFailure
                 }
             }
         }
     }
 
-    private fun joinOrInterrupt(thread: Thread) {
-        thread.join(10_000L)
-        if (thread.isAlive) {
-            thread.interrupt()
+    private fun cleanupWorker(thread: Thread, onFailure: (Throwable) -> Unit) {
+        try {
             thread.join(10_000L)
+        } catch (failure: Throwable) {
+            onFailure(failure)
+        }
+        if (thread.isAlive) {
+            try {
+                thread.interrupt()
+            } catch (failure: Throwable) {
+                onFailure(failure)
+            }
+            try {
+                thread.join(10_000L)
+            } catch (failure: Throwable) {
+                onFailure(failure)
+            }
         }
     }
 

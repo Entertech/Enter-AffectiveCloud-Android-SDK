@@ -60,7 +60,7 @@ bootstrap 会执行：
 git submodule update --init --recursive
 ```
 
-并安装本地 hooks：
+并安装本地 hooks。hooks 会复制到 Git 自己的 hooks 目录，并把 `core.hooksPath` 指向该稳定目录，所以切换到不包含 `.githooks` 的旧分支时仍然可以继续同步：
 
 - 父仓库 `post-checkout`：切换父仓库分支时，自动切换子仓库到对应分支。
 - 子仓库 `post-commit`：子仓库提交后，自动在父仓库中 stage `affective_local_sdk/src/main` 的 submodule commit id。
@@ -75,6 +75,12 @@ git submodule update --init --recursive
 | `svm-main` | `svm-main` |
 
 当父仓库切到一个新建分支时，如果对应的子仓库分支不存在，hook 会从父仓库当前记录的 submodule commit 创建该子仓库分支。
+
+如果已经切换了父仓库分支，但子仓库没有同步到对应分支，重新执行 bootstrap 或安装脚本即可立即同步当前分支：
+
+```bash
+./scripts/install_submodule_branch_hooks.sh
+```
 
 默认情况下，子仓库提交后只会自动 stage 父仓库中的 submodule 指针，需要开发者手动提交父仓库。如果需要子仓库提交后自动创建父仓库指针提交，可以临时设置：
 
@@ -363,7 +369,6 @@ affectiveSourceDataApi.deleteSourceDataRecordById(recordId, fun() {
 
 # 更新日志
 [更新日志](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/wiki/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)
-
 
 
 

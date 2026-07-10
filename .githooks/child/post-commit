@@ -2,7 +2,14 @@
 set -eu
 
 CHILD_ROOT="$(git rev-parse --show-toplevel)"
-PARENT_ROOT="$(cd "${CHILD_ROOT}/../../.." && pwd)"
+PARENT_ROOT="${SUBMODULE_SYNC_ROOT:-$(cd "${CHILD_ROOT}/../../.." && pwd)}"
+SYNC_SCRIPT="${SUBMODULE_SYNC_SCRIPT:-${PARENT_ROOT}/scripts/submodule_branch_sync.py}"
+SYNC_LOG="${SUBMODULE_SYNC_LOG:-${PARENT_ROOT}/.git/codex-submodule-sync/sync.log}"
+
+log_sync() {
+  mkdir -p "$(dirname "${SYNC_LOG}")" 2>/dev/null || true
+  printf '%s child post-commit %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$*" >> "${SYNC_LOG}" 2>/dev/null || true
+}
 
 run_python() {
   if command -v python3 >/dev/null 2>&1; then
@@ -17,7 +24,14 @@ run_python() {
   fi
 }
 
-run_python "${PARENT_ROOT}/scripts/submodule_branch_sync.py" record-child
+log_sync "start child=${CHILD_ROOT}"
+if SUBMODULE_SYNC_ROOT="${PARENT_ROOT}" run_python "${SYNC_SCRIPT}" record-child; then
+  log_sync "ok child=${CHILD_ROOT}"
+else
+  status=$?
+  log_sync "failed status=${status} child=${CHILD_ROOT}"
+  exit "${status}"
+fi
 
 if [ "${SUBMODULE_SYNC_AUTO_PARENT_COMMIT:-0}" = "1" ]; then
   if ! git -C "${PARENT_ROOT}" diff --cached --quiet -- affective_local_sdk/src/main; then

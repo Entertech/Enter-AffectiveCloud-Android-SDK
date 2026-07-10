@@ -2,6 +2,13 @@
 set -eu
 
 ROOT="$(git rev-parse --show-toplevel)"
+SYNC_SCRIPT="${SUBMODULE_SYNC_SCRIPT:-${ROOT}/scripts/submodule_branch_sync.py}"
+SYNC_LOG="${SUBMODULE_SYNC_LOG:-${ROOT}/.git/codex-submodule-sync/sync.log}"
+
+log_sync() {
+  mkdir -p "$(dirname "${SYNC_LOG}")" 2>/dev/null || true
+  printf '%s parent post-checkout %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$*" >> "${SYNC_LOG}" 2>/dev/null || true
+}
 
 run_python() {
   if command -v python3 >/dev/null 2>&1; then
@@ -16,4 +23,11 @@ run_python() {
   fi
 }
 
-run_python "${ROOT}/scripts/submodule_branch_sync.py" sync-checkout --create-missing --stage-parent
+log_sync "start root=${ROOT} args=$*"
+if SUBMODULE_SYNC_ROOT="${ROOT}" run_python "${SYNC_SCRIPT}" sync-checkout --create-missing --stage-parent; then
+  log_sync "ok root=${ROOT}"
+else
+  status=$?
+  log_sync "failed status=${status} root=${ROOT}"
+  exit "${status}"
+fi

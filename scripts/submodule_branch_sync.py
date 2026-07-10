@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+def repo_root():
+    configured_root = os.environ.get("SUBMODULE_SYNC_ROOT")
+    if configured_root:
+        return Path(configured_root).resolve()
+    return Path(__file__).resolve().parents[1]
+
+
+ROOT = repo_root()
 SUBMODULE_PATH = "affective_local_sdk/src/main"
 CHILD_BRANCH_PREFIX = "algorithm-android-"
 BASE_BRANCHES = {"svm-main"}

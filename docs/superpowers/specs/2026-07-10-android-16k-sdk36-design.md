@@ -19,6 +19,10 @@ publication is outside this change.
   current arm64-v8a `libaffective.so` output.
 - `demo/src/jniLibs/arm64-v8a/libaffective.so` is an unused, nonstandard source
   path containing another `0x1000`-aligned binary.
+- The demo does not declare a Kotlin JVM target. When Gradle runs on the
+  repository's JDK 21 environment, Kotlin Gradle Plugin 1.9.0 attempts to use
+  JVM target 21 and fails before compilation with `Unknown Kotlin JVM target:
+  21`.
 - The native source has no page-size constants or direct `mmap` usage requiring
   runtime code changes.
 
@@ -57,7 +61,8 @@ silent regression if the effective native toolchain changes.
   change the shared library `compileSdk` from 34 to 36 and keep existing
   `minSdk` and JVM compatibility behavior.
 - `demo/build.gradle`: change `compileSdkVersion` and `targetSdkVersion` from 34
-  to 36. Keep `minSdkVersion 24`.
+  to 36. Keep `minSdkVersion 24`, Java 1.8, and explicitly set Kotlin
+  `jvmTarget` to 1.8 so the build does not inherit JDK 21 as its bytecode target.
 
 ### Native configuration
 
@@ -105,6 +110,8 @@ The final acceptance criteria are:
 
 - Gradle reports version 8.13 and configures AGP 8.13.2 successfully.
 - All active modules compile against SDK 36; the demo targets SDK 36.
+- The demo Kotlin compile tasks target JVM 1.8 and do not inherit the Gradle
+  runtime JDK version.
 - Both flowtime Release AARs build successfully.
 - Every arm64-v8a `libaffective.so` in those AARs has all `LOAD` alignments at
   least `0x4000`.

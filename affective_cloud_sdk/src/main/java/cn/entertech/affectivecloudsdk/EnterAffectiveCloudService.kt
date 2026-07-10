@@ -18,6 +18,7 @@ import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.utils.AffectiveLogHelper
 import cn.entertech.base.net.NetworkUtils
 import java.io.InputStream
+import java.util.concurrent.CancellationException
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -32,14 +33,29 @@ internal class OneShotContinuation<T>(private val continuation: Continuation<T>)
     }
 }
 
-internal fun runCallbackOperation(
-    operation: () -> Unit,
-    onFailure: (Exception) -> Unit
+internal class CallbackOperationBoundary(
+    private val onFailure: (Exception) -> Unit
 ) {
-    try {
-        operation()
-    } catch (failure: Exception) {
-        onFailure(failure)
+    private val callbackStarted = AtomicBoolean(false)
+
+    fun run(operation: () -> Unit) {
+        try {
+            operation()
+        } catch (failure: CancellationException) {
+            throw failure
+        } catch (failure: Exception) {
+            if (callbackStarted.get()) {
+                throw failure
+            }
+            callback {
+                onFailure(failure)
+            }
+        }
+    }
+
+    fun callback(callback: () -> Unit) {
+        callbackStarted.set(true)
+        callback()
     }
 }
 
@@ -195,22 +211,54 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
     override fun finishAffectiveService(listener: IFinishAffectiveServiceListener) {
         AffectiveLogHelper.d(TAG, "finishAffectiveService")
         val manager = mEnterAffectiveCloudManager
+        val boundary = CallbackOperationBoundary { failure ->
+            listener.finishError(failure.toAffectiveError("finish affective service failed"))
+        }
         if (manager == null) {
-            listener.hasFinished()
+            boundary.callback {
+                listener.hasFinished()
+            }
             return
         }
-        runCallbackOperation(
-            operation = {
-                if (manager.isWebSocketOpen()) {
-                    manager.release(listener)
-                } else {
+        boundary.run {
+            if (manager.isWebSocketOpen()) {
+                manager.release(object : IFinishAffectiveServiceListener {
+                    override fun finishBioFail(error: Error?) {
+                        boundary.callback {
+                            listener.finishBioFail(error)
+                        }
+                    }
+
+                    override fun finishAffectiveFail(error: Error?) {
+                        boundary.callback {
+                            listener.finishAffectiveFail(error)
+                        }
+                    }
+
+                    override fun finishError(error: Error?) {
+                        boundary.callback {
+                            listener.finishError(error)
+                        }
+                    }
+
+                    override fun finishSuccess() {
+                        boundary.callback {
+                            listener.finishSuccess()
+                        }
+                    }
+
+                    override fun hasFinished() {
+                        boundary.callback {
+                            listener.hasFinished()
+                        }
+                    }
+                })
+            } else {
+                boundary.callback {
                     listener.hasFinished()
                 }
-            },
-            onFailure = { failure ->
-                listener.finishError(failure.toAffectiveError("finish affective service failed"))
             }
-        )
+        }
     }
 
     override suspend fun suspendFinishAffectiveService() = suspendCoroutine { continuation ->
@@ -298,29 +346,33 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         listener: IGetReportListener, isEar: Boolean, needFinishService: Boolean
     ) {
         val manager = mEnterAffectiveCloudManager
+        val boundary = CallbackOperationBoundary { failure ->
+            listener.onError(failure.toAffectiveError("get biodata report failed"))
+        }
         if (manager == null) {
-            listener.onError(Error(-1, "affective cloud service is not connected"))
+            boundary.callback {
+                listener.onError(Error(-1, "affective cloud service is not connected"))
+            }
             return
         }
-        runCallbackOperation(
-            operation = {
-                manager.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
-                    override fun onError(error: Error?) {
+        boundary.run {
+            manager.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
+                override fun onError(error: Error?) {
+                    boundary.callback {
                         AffectiveLogHelper.e(TAG, "getBiodataReport error $error")
                         listener.getBioReportError(error)
                         requestAffectiveReport(manager, listener, needFinishService)
                     }
+                }
 
-                    override fun onSuccess(t: HashMap<Any, Any?>?) {
+                override fun onSuccess(t: HashMap<Any, Any?>?) {
+                    boundary.callback {
                         AffectiveLogHelper.e(TAG, "getBiodataReport onSuccess ")
                         requestAffectiveReport(manager, listener, needFinishService)
                     }
-                })
-            },
-            onFailure = { failure ->
-                listener.onError(failure.toAffectiveError("get biodata report failed"))
-            }
-        )
+                }
+            })
+        }
     }
 
     private fun requestAffectiveReport(
@@ -328,63 +380,73 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         listener: IGetReportListener,
         needFinishService: Boolean
     ) {
-        runCallbackOperation(
-            operation = {
-                manager.getAffectiveDataReport(object : Callback2<HashMap<Any, Any?>> {
-                    override fun onError(error: Error?) {
+        val boundary = CallbackOperationBoundary { failure ->
+            listener.onError(failure.toAffectiveError("get affective report failed"))
+        }
+        boundary.run {
+            manager.getAffectiveDataReport(object : Callback2<HashMap<Any, Any?>> {
+                override fun onError(error: Error?) {
+                    boundary.callback {
                         AffectiveLogHelper.e(TAG, "getAffectiveDataReport error $error")
                         listener.getAffectiveReportError(error)
                         listener.onError(error)
                     }
+                }
 
-                    override fun onSuccess(t: HashMap<Any, Any?>?) {
+                override fun onSuccess(t: HashMap<Any, Any?>?) {
+                    boundary.callback {
                         AffectiveLogHelper.e(TAG, "getAffectiveDataReport onSuccess ")
                         if (!needFinishService) {
                             listener.onSuccess(null)
-                            return
+                            return@callback
                         }
                         finishReport(manager, listener)
                     }
-                })
-            },
-            onFailure = { failure ->
-                listener.onError(failure.toAffectiveError("get affective report failed"))
-            }
-        )
+                }
+            })
+        }
     }
 
     private fun finishReport(
         manager: EnterAffectiveCloudManager,
         listener: IGetReportListener
     ) {
-        runCallbackOperation(
-            operation = {
-                manager.release(object : IFinishAffectiveServiceListener {
-                    override fun finishBioFail(error: Error?) {
+        val boundary = CallbackOperationBoundary {
+            listener.onSuccess(null)
+        }
+        boundary.run {
+            manager.release(object : IFinishAffectiveServiceListener {
+                override fun finishBioFail(error: Error?) {
+                    boundary.callback {
                         listener.onSuccess(null)
                     }
+                }
 
-                    override fun finishAffectiveFail(error: Error?) {
+                override fun finishAffectiveFail(error: Error?) {
+                    boundary.callback {
                         listener.onSuccess(null)
                     }
+                }
 
-                    override fun finishError(error: Error?) {
+                override fun finishError(error: Error?) {
+                    boundary.callback {
                         listener.onSuccess(null)
                     }
+                }
 
-                    override fun finishSuccess() {
+                override fun finishSuccess() {
+                    boundary.callback {
                         listener.onSuccess(null)
                     }
+                }
 
-                    override fun hasFinished() {
+                override fun hasFinished() {
+                    boundary.callback {
                         listener.onSuccess(null)
                     }
-                })
-            },
-            onFailure = {
-                listener.onSuccess(null)
-            }
-        )
+                }
+            })
+        }
     }
 
     override suspend fun suspendGetReport(needFinishService: Boolean): UploadReportEntity? =

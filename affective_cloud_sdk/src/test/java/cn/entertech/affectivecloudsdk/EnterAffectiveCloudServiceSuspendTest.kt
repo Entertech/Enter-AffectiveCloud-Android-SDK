@@ -1,8 +1,11 @@
 package cn.entertech.affectivecloudsdk
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.concurrent.CancellationException
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -38,18 +41,58 @@ class EnterAffectiveCloudServiceSuspendTest {
         var operationCalls = 0
         var failureCalls = 0
 
-        runCallbackOperation(
-            operation = {
-                operationCalls += 1
-                throw IllegalStateException("synchronous failure")
-            },
+        CallbackOperationBoundary(
+            onFailure = {
+                failureCalls += 1
+            }
+        ).run {
+            operationCalls += 1
+            throw IllegalStateException("synchronous failure")
+        }
+
+        assertEquals(1, operationCalls)
+        assertEquals(1, failureCalls)
+    }
+
+    @Test
+    fun cancellationIsRethrownWithoutInvokingManagerFailureHandler() {
+        val expected = CancellationException("cancelled")
+        var failureCalls = 0
+
+        val actual = assertThrows(CancellationException::class.java) {
+            CallbackOperationBoundary(
+                onFailure = {
+                    failureCalls += 1
+                }
+            ).run {
+                throw expected
+            }
+        }
+
+        assertSame(expected, actual)
+        assertEquals(0, failureCalls)
+    }
+
+    @Test
+    fun consumerCallbackExceptionIsRethrownWithoutInvokingManagerFailureHandler() {
+        val expected = IllegalStateException("consumer callback failed")
+        var failureCalls = 0
+        val boundary = CallbackOperationBoundary(
             onFailure = {
                 failureCalls += 1
             }
         )
 
-        assertEquals(1, operationCalls)
-        assertEquals(1, failureCalls)
+        val actual = assertThrows(IllegalStateException::class.java) {
+            boundary.run {
+                boundary.callback {
+                    throw expected
+                }
+            }
+        }
+
+        assertSame(expected, actual)
+        assertEquals(0, failureCalls)
     }
 
     @Test
@@ -62,10 +105,12 @@ class EnterAffectiveCloudServiceSuspendTest {
                 results += result
             }
         })
+        val ready = CountDownLatch(2)
         val start = CountDownLatch(1)
         val finished = CountDownLatch(2)
         val successThread = Thread {
             try {
+                ready.countDown()
                 start.await()
                 completion.resumeWith(Result.success("success"))
             } finally {
@@ -74,6 +119,7 @@ class EnterAffectiveCloudServiceSuspendTest {
         }
         val failureThread = Thread {
             try {
+                ready.countDown()
                 start.await()
                 completion.resumeWith(Result.failure(IllegalStateException("failure")))
             } finally {
@@ -83,6 +129,7 @@ class EnterAffectiveCloudServiceSuspendTest {
 
         successThread.start()
         failureThread.start()
+        assertTrue("competing terminal signals were not ready", ready.await(1, TimeUnit.SECONDS))
         start.countDown()
 
         assertTrue("competing terminal signals did not finish", finished.await(1, TimeUnit.SECONDS))

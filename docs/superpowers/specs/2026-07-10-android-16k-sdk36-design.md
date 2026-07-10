@@ -150,6 +150,10 @@ silent regression if the effective native toolchain changes.
 - `demo/build.gradle` and `gradle/libs.versions.toml`: resolve the local
   Flowtime/no-authentication SDK variant and use Conscrypt 2.6.0, eliminating
   the two 4 KB-aligned transitive libraries found by final APK verification.
+- `affective_local_sdk/src/main/resources/META-INF/services/...`: register
+  `EnterAffectiveLocalService` explicitly. The previous published algorithm
+  dependency supplied local service discovery; switching the demo to the
+  repository module requires the repository AAR to carry its own provider.
 
 ### Release version
 
@@ -201,6 +205,9 @@ The final acceptance criteria are:
   duplicate Kotlin `DefaultImpls` classes at dex merge time.
 - The demo packages the repository-built `libaffective.so` and Conscrypt 2.6.0;
   it contains no arm64 native library with `LOAD` alignment below `0x4000`.
+- Both Flowtime AARs expose the local `IAffectiveDataAnalysisService` provider,
+  and the demo's merged provider resource contains both local and cloud
+  implementations.
 - Both flowtime Release AARs build successfully.
 - `:affective_sdk_api:compileReleaseKotlin` succeeds without duplicate overload
   or unresolved deque API errors.

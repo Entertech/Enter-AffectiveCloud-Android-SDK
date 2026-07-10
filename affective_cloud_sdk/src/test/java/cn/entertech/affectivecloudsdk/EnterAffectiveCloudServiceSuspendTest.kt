@@ -127,17 +127,16 @@ class EnterAffectiveCloudServiceSuspendTest {
             }
         }
 
-        successThread.start()
-        failureThread.start()
+        successThread.isDaemon = true
+        failureThread.isDaemon = true
         try {
-            try {
-                assertTrue(
-                    "competing terminal signals were not ready",
-                    ready.await(10, TimeUnit.SECONDS)
-                )
-            } finally {
-                start.countDown()
-            }
+            successThread.start()
+            failureThread.start()
+            assertTrue(
+                "competing terminal signals were not ready",
+                ready.await(10, TimeUnit.SECONDS)
+            )
+            start.countDown()
 
             assertTrue(
                 "competing terminal signals did not finish",
@@ -145,11 +144,27 @@ class EnterAffectiveCloudServiceSuspendTest {
             )
             assertEquals(1, results.size)
         } finally {
+            start.countDown()
             try {
-                successThread.join(10_000L)
+                joinOrInterrupt(successThread)
             } finally {
-                failureThread.join(10_000L)
+                try {
+                    joinOrInterrupt(failureThread)
+                } finally {
+                    assertTrue(
+                        "competing terminal signal threads did not stop",
+                        !successThread.isAlive && !failureThread.isAlive
+                    )
+                }
             }
+        }
+    }
+
+    private fun joinOrInterrupt(thread: Thread) {
+        thread.join(10_000L)
+        if (thread.isAlive) {
+            thread.interrupt()
+            thread.join(10_000L)
         }
     }
 

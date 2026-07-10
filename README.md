@@ -1,6 +1,7 @@
 [English Readme](/README_EN.md)
 # Enter-AffectiveCloud-Andriod-SDK [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.entertech.android/affectivecloud/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.entertech.android/affectivecloud)
 - [简介](#简介)
+- [仓库开发初始化](#仓库开发初始化)
 - [Demo](#demo)
 - [集成](#集成)
     + [Gradle自动集成](#gradle自动集成)
@@ -28,6 +29,60 @@
 在开始开发前，请先查看回车情感云的[开发文档](https://docs.affectivecloud.com)，了解情感云平台的架构和所能提供的服务具体说明，确定好你的应用中所需要的服务。你还需要联系管理员注册好测试应用，然后再进行开发。
 
 为了方便你进行 Android 平台的快速开发，我们提供了情感云快速开发 SDK，通过本 SDK 你可以快速地将情感云的能力集成到你的 app 中。
+
+# 仓库开发初始化
+
+本仓库通过 Git submodule 记录 `affective_local_sdk/src/main` 对应的算法子仓库提交。父仓库每次提交都会保存子仓库的精确 commit id，用于保证不同设备、CI 和发布流程构建到同一份算法源码。
+
+新设备 clone 后先执行 bootstrap：
+
+**macOS / Linux / Git Bash**
+
+```bash
+./scripts/bootstrap.sh
+```
+
+**Windows CMD**
+
+```bat
+scripts\bootstrap.cmd
+```
+
+**Windows PowerShell**
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\bootstrap.ps1
+```
+
+bootstrap 会执行：
+
+```bash
+git submodule update --init --recursive
+```
+
+并安装本地 hooks：
+
+- 父仓库 `post-checkout`：切换父仓库分支时，自动切换子仓库到对应分支。
+- 子仓库 `post-commit`：子仓库提交后，自动在父仓库中 stage `affective_local_sdk/src/main` 的 submodule commit id。
+
+分支映射规则：
+
+| 父仓库分支 | 子仓库分支 |
+| --- | --- |
+| `dev_2.0` | `algorithm-android-dev_2.0` |
+| `team/dev_1.2.3` | `algorithm-android-team/dev_1.2.3` |
+| `publish_1.2.3` | `algorithm-android-publish_1.2.3` |
+| `svm-main` | `svm-main` |
+
+当父仓库切到一个新建分支时，如果对应的子仓库分支不存在，hook 会从父仓库当前记录的 submodule commit 创建该子仓库分支。
+
+默认情况下，子仓库提交后只会自动 stage 父仓库中的 submodule 指针，需要开发者手动提交父仓库。如果需要子仓库提交后自动创建父仓库指针提交，可以临时设置：
+
+```bash
+SUBMODULE_SYNC_AUTO_PARENT_COMMIT=1 git -C affective_local_sdk/src/main commit -m "message"
+```
+
+> Git hooks 是本机配置，不会随 Git 自动启用。每台新设备都需要执行一次 bootstrap。
 
 # Demo
 
@@ -308,7 +363,6 @@ affectiveSourceDataApi.deleteSourceDataRecordById(recordId, fun() {
 
 # 更新日志
 [更新日志](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/wiki/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)
-
 
 
 

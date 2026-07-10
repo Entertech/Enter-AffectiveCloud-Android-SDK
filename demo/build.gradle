@@ -55,6 +55,7 @@ dependencies {
     implementation libs.androidx.legacy.support.v4
     implementation libs.material.v100
     testImplementation libs.junit
+    testImplementation "org.jetbrains.kotlin:kotlin-test:${libs.versions.kotlin.get()}"
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
     implementation libs.biomoduleble
@@ -64,4 +65,7 @@ dependencies {
     implementation project(":affective_sdk_api")
     implementation libs.crashreport
     implementation project(':affective_local_sdk')
+    implementation project(':affective_sdk_manager')
+    implementation project(':affective_cloud_protocol')
+    implementation project(':affective_data_provider')
 }

@@ -21,6 +21,7 @@ internal class FakeAffectiveService : IAffectiveDataAnalysisService {
     val heartRateSamples = mutableListOf<Int>()
     var failOnEeg = false
     var finishListener: IFinishAffectiveServiceListener? = null
+    var autoFinish = false
     var bioListener: ((RealtimeBioData?) -> Unit)? = null
     var affectiveListener: ((RealtimeAffectiveData?) -> Unit)? = null
 
@@ -37,7 +38,10 @@ internal class FakeAffectiveService : IAffectiveDataAnalysisService {
     override fun startAffectiveService(initListener: IStartAffectiveServiceLister) { started = true; initListener.startSuccess() }
     override fun startAffectiveService(authenticationInputStream: InputStream?, context: Context?, initListener: IStartAffectiveServiceLister) = startAffectiveService(initListener)
     override fun restoreAffectiveService(listener: IStartAffectiveServiceLister) = startAffectiveService(listener)
-    override fun finishAffectiveService(listener: IFinishAffectiveServiceListener) { finishListener = listener }
+    override fun finishAffectiveService(listener: IFinishAffectiveServiceListener) {
+        finishListener = listener
+        if (autoFinish) listener.finishSuccess()
+    }
     override suspend fun suspendFinishAffectiveService() { started = false }
     override fun getReport(listener: IGetReportListener, isEar: Boolean, needFinishService: Boolean) { listener.onSuccess(null) }
     override suspend fun suspendGetReport(needFinishService: Boolean): UploadReportEntity? = null

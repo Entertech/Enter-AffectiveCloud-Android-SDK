@@ -22,4 +22,5 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     api(libs.device)
+    api(libs.kotlinx.coroutines.core)
 }

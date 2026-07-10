@@ -89,7 +89,9 @@ silent regression if the effective native toolchain changes.
   manager session ID, accept and ignore the local-only `isEar` arguments, and
   provide callback-backed suspend wrappers. Those wrappers must terminate on
   every callback or missing-manager path and must ignore duplicate terminal
-  callbacks after the first completion.
+  callbacks after the first completion. Each operation captures one manager
+  instance and converts synchronous manager/API exceptions into the same
+  terminal callback contract.
 - Reconnect the demo to `affective_cloud_sdk`, replace the removed Kotlin
   synthetic view access in `AuthActivity` with `findViewById`, and correct the
   stale `MainActivity` R import. Exclude the legacy published
@@ -183,8 +185,8 @@ The final acceptance criteria are:
   project and remains discoverable through `ServiceLoader`.
 - Cloud suspend finish/report calls never remain suspended when the service is
   disconnected, the manager is absent, or release reports a service-specific
-  failure; concurrent duplicate terminal callbacks complete the continuation
-  only once.
+  failure, or a manager/API call throws synchronously; concurrent duplicate
+  terminal callbacks complete the continuation only once.
 - Default cloud JVM tests are deterministic and offline; historical tests that
   require the live cloud service are not compiled or executed by `test`.
 - The demo resolves only one `affective_sdk_api` implementation and has no

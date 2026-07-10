@@ -20,6 +20,8 @@ android {
         versionCode 9
         versionName "1.8.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        missingDimensionStrategy 'project', 'flowtime'
+        missingDimensionStrategy 'authentication', 'noAuth'
     }
     buildTypes {
         release {
@@ -61,7 +63,5 @@ dependencies {
     implementation project(':affective_cloud_sdk')
     implementation project(":affective_sdk_api")
     implementation libs.crashreport
-    implementation(libs.affectivealgorithmlocalsdk) {
-        exclude group: 'cn.entertech.affective_sdk_api', module: 'affective_sdk_api'
-    }
+    implementation project(':affective_local_sdk')
 }

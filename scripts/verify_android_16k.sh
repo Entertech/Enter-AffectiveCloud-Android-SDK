@@ -104,7 +104,7 @@ for input in "$@"; do
             input_index=$((input_index + 1))
             extract_dir="$TEMP_ROOT/input-$input_index"
             mkdir -p "$extract_dir"
-            if ! unzip -qq "$input" -d "$extract_dir"; then
+            if ! unzip -oqq "$input" -d "$extract_dir"; then
                 printf 'FAIL: cannot extract archive: %s\n' "$input" >&2
                 failures=$((failures + 1))
                 continue

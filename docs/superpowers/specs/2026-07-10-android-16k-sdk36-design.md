@@ -90,7 +90,10 @@ silent regression if the effective native toolchain changes.
   provide callback-backed suspend wrappers.
 - Reconnect the demo to `affective_cloud_sdk`, replace the removed Kotlin
   synthetic view access in `AuthActivity` with `findViewById`, and correct the
-  stale `MainActivity` R import.
+  stale `MainActivity` R import. Exclude the legacy published
+  `affective_sdk_api:1.0.7` transitively pulled by the demo's remote local
+  algorithm dependency so the app has one API definition: the current local
+  `:affective_sdk_api` project.
 
 ### Native configuration
 
@@ -170,6 +173,8 @@ The final acceptance criteria are:
   runtime JDK version.
 - The re-enabled cloud SDK compiles against the repository's current API
   project and remains discoverable through `ServiceLoader`.
+- The demo resolves only one `affective_sdk_api` implementation and has no
+  duplicate Kotlin `DefaultImpls` classes at dex merge time.
 - Both flowtime Release AARs build successfully.
 - `:affective_sdk_api:compileReleaseKotlin` succeeds without duplicate overload
   or unresolved deque API errors.

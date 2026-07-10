@@ -90,6 +90,10 @@ silent regression if the effective native toolchain changes.
 - `affective_sdk_api/src/main/java/cn/entertech/affective/sdk/BrainDataHelper.kt`:
   replace `sceegDataCache.addLast(value)` with `sceegDataCache.add(value)` to
   retain tail insertion through the Kotlin-visible mutable collection API.
+- `affective_sdk_api/src/test/java/cn/entertech/affective/sdk/bean/report/HrV2Test.kt`:
+  replace the uncompilable reference to the never-defined `HrV2Deserializer`
+  with a direct Gson test that asserts the existing `hr_avg` integer field is
+  mapped to `HrV2.hrAvg`.
 
 ### Release version
 
@@ -132,6 +136,8 @@ The final acceptance criteria are:
 - Both flowtime Release AARs build successfully.
 - `:affective_sdk_api:compileReleaseKotlin` succeeds without duplicate overload
   or unresolved deque API errors.
+- `:affective_sdk_api:testReleaseUnitTest` compiles and executes a real
+  `HrV2` JSON mapping assertion.
 - Every arm64-v8a `libaffective.so` in those AARs has all `LOAD` alignments at
   least `0x4000`.
 - The demo Release APK builds, passes 16 KB zip alignment, and contains no

@@ -50,7 +50,7 @@ inspect_so() {
     local alignments
     local alignment
 
-    if ! output="$($LLVM_READELF_BIN -lW "$so" 2>&1)"; then
+    if ! output="$("$LLVM_READELF_BIN" -lW "$so" 2>&1)"; then
         printf 'FAIL: llvm-readelf could not inspect %s\n%s\n' "$label" "$output" >&2
         failures=$((failures + 1))
         return

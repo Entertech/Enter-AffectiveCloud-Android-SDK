@@ -32,6 +32,17 @@ internal class OneShotContinuation<T>(private val continuation: Continuation<T>)
     }
 }
 
+internal fun runCallbackOperation(
+    operation: () -> Unit,
+    onFailure: (Exception) -> Unit
+) {
+    try {
+        operation()
+    } catch (failure: Exception) {
+        onFailure(failure)
+    }
+}
+
 /**
  * 同一个useid 不能频繁创建连接
  * 15之内未触发append方法，也就是15之内未收到源消息；或者15s之内未收到情感云数据，需要断开重连
@@ -183,11 +194,23 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
 
     override fun finishAffectiveService(listener: IFinishAffectiveServiceListener) {
         AffectiveLogHelper.d(TAG, "finishAffectiveService")
-        if (hasConnectAffectiveService()) {
-            mEnterAffectiveCloudManager?.release(listener)
-        } else {
+        val manager = mEnterAffectiveCloudManager
+        if (manager == null) {
             listener.hasFinished()
+            return
         }
+        runCallbackOperation(
+            operation = {
+                if (manager.isWebSocketOpen()) {
+                    manager.release(listener)
+                } else {
+                    listener.hasFinished()
+                }
+            },
+            onFailure = { failure ->
+                listener.finishError(failure.toAffectiveError("finish affective service failed"))
+            }
+        )
     }
 
     override suspend fun suspendFinishAffectiveService() = suspendCoroutine { continuation ->
@@ -279,12 +302,35 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
             listener.onError(Error(-1, "affective cloud service is not connected"))
             return
         }
-        manager.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
-            override fun onError(error: Error?) {
-                AffectiveLogHelper.e(TAG, "getBiodataReport error $error")
-                listener.getBioReportError(error)
-                manager.getAffectiveDataReport(object :
-                    Callback2<HashMap<Any, Any?>> {
+        runCallbackOperation(
+            operation = {
+                manager.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
+                    override fun onError(error: Error?) {
+                        AffectiveLogHelper.e(TAG, "getBiodataReport error $error")
+                        listener.getBioReportError(error)
+                        requestAffectiveReport(manager, listener, needFinishService)
+                    }
+
+                    override fun onSuccess(t: HashMap<Any, Any?>?) {
+                        AffectiveLogHelper.e(TAG, "getBiodataReport onSuccess ")
+                        requestAffectiveReport(manager, listener, needFinishService)
+                    }
+                })
+            },
+            onFailure = { failure ->
+                listener.onError(failure.toAffectiveError("get biodata report failed"))
+            }
+        )
+    }
+
+    private fun requestAffectiveReport(
+        manager: EnterAffectiveCloudManager,
+        listener: IGetReportListener,
+        needFinishService: Boolean
+    ) {
+        runCallbackOperation(
+            operation = {
+                manager.getAffectiveDataReport(object : Callback2<HashMap<Any, Any?>> {
                     override fun onError(error: Error?) {
                         AffectiveLogHelper.e(TAG, "getAffectiveDataReport error $error")
                         listener.getAffectiveReportError(error)
@@ -300,58 +346,45 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
                         finishReport(manager, listener)
                     }
                 })
+            },
+            onFailure = { failure ->
+                listener.onError(failure.toAffectiveError("get affective report failed"))
             }
-
-            override fun onSuccess(t: HashMap<Any, Any?>?) {
-                AffectiveLogHelper.e(TAG, "getBiodataReport onSuccess ")
-                manager.getAffectiveDataReport(object :
-                    Callback2<HashMap<Any, Any?>> {
-                    override fun onError(error: Error?) {
-                        AffectiveLogHelper.e(TAG, "getAffectiveDataReport error $error")
-                        listener.getAffectiveReportError(error)
-                        listener.onError(error)
-                    }
-
-                    override fun onSuccess(t: HashMap<Any, Any?>?) {
-                        AffectiveLogHelper.e(TAG, "getAffectiveDataReport onSuccess ")
-                        if (!needFinishService) {
-                            listener.onSuccess(null)
-                            return
-                        }
-
-                        finishReport(manager, listener)
-                    }
-                })
-            }
-
-        })
+        )
     }
 
     private fun finishReport(
         manager: EnterAffectiveCloudManager,
         listener: IGetReportListener
     ) {
-        manager.release(object : IFinishAffectiveServiceListener {
-            override fun finishBioFail(error: Error?) {
-                listener.onSuccess(null)
-            }
+        runCallbackOperation(
+            operation = {
+                manager.release(object : IFinishAffectiveServiceListener {
+                    override fun finishBioFail(error: Error?) {
+                        listener.onSuccess(null)
+                    }
 
-            override fun finishAffectiveFail(error: Error?) {
-                listener.onSuccess(null)
-            }
+                    override fun finishAffectiveFail(error: Error?) {
+                        listener.onSuccess(null)
+                    }
 
-            override fun finishError(error: Error?) {
-                listener.onSuccess(null)
-            }
+                    override fun finishError(error: Error?) {
+                        listener.onSuccess(null)
+                    }
 
-            override fun finishSuccess() {
-                listener.onSuccess(null)
-            }
+                    override fun finishSuccess() {
+                        listener.onSuccess(null)
+                    }
 
-            override fun hasFinished() {
+                    override fun hasFinished() {
+                        listener.onSuccess(null)
+                    }
+                })
+            },
+            onFailure = {
                 listener.onSuccess(null)
             }
-        })
+        )
     }
 
     override suspend fun suspendGetReport(needFinishService: Boolean): UploadReportEntity? =
@@ -384,3 +417,6 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
 
     override fun getAffectiveWay() = AffectiveServiceWay.AffectiveCloudService
 }
+
+private fun Exception.toAffectiveError(fallbackMessage: String): Error =
+    Error(-1, message ?: fallbackMessage)

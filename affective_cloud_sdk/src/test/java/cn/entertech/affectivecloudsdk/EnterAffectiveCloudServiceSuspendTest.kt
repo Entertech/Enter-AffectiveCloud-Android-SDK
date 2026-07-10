@@ -3,6 +3,7 @@ package cn.entertech.affectivecloudsdk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.Continuation
@@ -33,8 +34,27 @@ class EnterAffectiveCloudServiceSuspendTest {
     }
 
     @Test
-    fun oneShotCompletionIgnoresTerminalSignalsAfterTheFirst() {
-        val results = mutableListOf<Result<String>>()
+    fun synchronousOperationFailureInvokesTerminalHandlerExactlyOnce() {
+        var operationCalls = 0
+        var failureCalls = 0
+
+        runCallbackOperation(
+            operation = {
+                operationCalls += 1
+                throw IllegalStateException("synchronous failure")
+            },
+            onFailure = {
+                failureCalls += 1
+            }
+        )
+
+        assertEquals(1, operationCalls)
+        assertEquals(1, failureCalls)
+    }
+
+    @Test
+    fun oneShotCompletionResumesOnceWhenTerminalSignalsRace() {
+        val results = CopyOnWriteArrayList<Result<String>>()
         val completion = OneShotContinuation(object : Continuation<String> {
             override val context = EmptyCoroutineContext
 
@@ -42,12 +62,31 @@ class EnterAffectiveCloudServiceSuspendTest {
                 results += result
             }
         })
+        val start = CountDownLatch(1)
+        val finished = CountDownLatch(2)
+        val successThread = Thread {
+            try {
+                start.await()
+                completion.resumeWith(Result.success("success"))
+            } finally {
+                finished.countDown()
+            }
+        }
+        val failureThread = Thread {
+            try {
+                start.await()
+                completion.resumeWith(Result.failure(IllegalStateException("failure")))
+            } finally {
+                finished.countDown()
+            }
+        }
 
-        completion.resumeWith(Result.success("first"))
-        completion.resumeWith(Result.failure(IllegalStateException("second")))
+        successThread.start()
+        failureThread.start()
+        start.countDown()
 
+        assertTrue("competing terminal signals did not finish", finished.await(1, TimeUnit.SECONDS))
         assertEquals(1, results.size)
-        assertEquals("first", results.single().getOrThrow())
     }
 
     private fun <T> awaitCompletion(block: suspend () -> T): Result<T> {

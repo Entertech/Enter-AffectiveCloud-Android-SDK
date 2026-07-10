@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.base.v101demo)
     api(project(mapOf("path" to ":affective_sdk_api")))
     testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.powermock.api.mockito)

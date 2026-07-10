@@ -30,6 +30,15 @@ The root cause is therefore the native build toolchain and the absence of an
 explicit alignment guarantee, rather than page-size-dependent application
 logic.
 
+During the first clean SDK 36 build, two pre-existing Kotlin source errors were
+also exposed before AAR packaging: a duplicated
+`startAffectiveService(IStartAffectiveServiceLister)` declaration and a call to
+`kotlin.collections.ArrayDeque.addLast` that Kotlin 1.9.0 does not expose to
+Kotlin callers. These are build prerequisites, not 16 KB runtime changes. The
+minimal correction is to remove the identical duplicate declaration and use
+the deque's public `add` operation, which appends to the tail and preserves the
+existing cache order.
+
 ## Selected Approach
 
 Use a current, mutually compatible Android toolchain and retain an explicit
@@ -74,6 +83,14 @@ silent regression if the effective native toolchain changes.
   this nonstandard directory, and retaining a known-incompatible binary would
   make repository-level compatibility checks misleading.
 
+### Clean-build prerequisites
+
+- `affective_sdk_api/src/main/java/cn/entertech/affective/sdk/api/IAffectiveDataAnalysisService.kt`:
+  remove the second identical `startAffectiveService` declaration.
+- `affective_sdk_api/src/main/java/cn/entertech/affective/sdk/BrainDataHelper.kt`:
+  replace `sceegDataCache.addLast(value)` with `sceegDataCache.add(value)` to
+  retain tail insertion through the Kotlin-visible mutable collection API.
+
 ### Release version
 
 - `version.gradle`: change `libraryVersion` from `1.3.6-svm` to `2.0.0-svm`.
@@ -113,6 +130,8 @@ The final acceptance criteria are:
 - The demo Kotlin compile tasks target JVM 1.8 and do not inherit the Gradle
   runtime JDK version.
 - Both flowtime Release AARs build successfully.
+- `:affective_sdk_api:compileReleaseKotlin` succeeds without duplicate overload
+  or unresolved deque API errors.
 - Every arm64-v8a `libaffective.so` in those AARs has all `LOAD` alignments at
   least `0x4000`.
 - The demo Release APK builds, passes 16 KB zip alignment, and contains no

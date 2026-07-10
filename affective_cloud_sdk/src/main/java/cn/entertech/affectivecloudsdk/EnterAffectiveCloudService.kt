@@ -18,8 +18,19 @@ import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.utils.AffectiveLogHelper
 import cn.entertech.base.net.NetworkUtils
 import java.io.InputStream
-import kotlin.coroutines.resume
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
+
+internal class OneShotContinuation<T>(private val continuation: Continuation<T>) {
+    private val hasCompleted = AtomicBoolean(false)
+
+    fun resumeWith(result: Result<T>) {
+        if (hasCompleted.compareAndSet(false, true)) {
+            continuation.resumeWith(result)
+        }
+    }
+}
 
 /**
  * 同一个useid 不能频繁创建连接
@@ -174,22 +185,45 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         AffectiveLogHelper.d(TAG, "finishAffectiveService")
         if (hasConnectAffectiveService()) {
             mEnterAffectiveCloudManager?.release(listener)
+        } else {
+            listener.hasFinished()
         }
     }
 
     override suspend fun suspendFinishAffectiveService() = suspendCoroutine { continuation ->
+        val completion = OneShotContinuation(continuation)
         val listener = object : IFinishAffectiveServiceListener {
+            override fun finishBioFail(error: Error?) {
+                completion.resumeWith(
+                    Result.failure(
+                        IllegalStateException(error?.toString() ?: "finish affective service failed")
+                    )
+                )
+            }
+
+            override fun finishAffectiveFail(error: Error?) {
+                completion.resumeWith(
+                    Result.failure(
+                        IllegalStateException(error?.toString() ?: "finish affective service failed")
+                    )
+                )
+            }
+
             override fun finishError(error: Error?) {
-                continuation.resumeWith(Result.failure(IllegalStateException(error?.toString())))
+                completion.resumeWith(
+                    Result.failure(
+                        IllegalStateException(error?.toString() ?: "finish affective service failed")
+                    )
+                )
             }
 
             override fun finishSuccess() {
-                continuation.resume(Unit)
+                completion.resumeWith(Result.success(Unit))
             }
 
             override fun hasFinished() {
                 super.hasFinished()
-                continuation.resume(Unit)
+                completion.resumeWith(Result.success(Unit))
             }
         }
         finishAffectiveService(listener)
@@ -240,11 +274,16 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
     override fun getReport(
         listener: IGetReportListener, isEar: Boolean, needFinishService: Boolean
     ) {
-        mEnterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
+        val manager = mEnterAffectiveCloudManager
+        if (manager == null) {
+            listener.onError(Error(-1, "affective cloud service is not connected"))
+            return
+        }
+        manager.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onError(error: Error?) {
                 AffectiveLogHelper.e(TAG, "getBiodataReport error $error")
                 listener.getBioReportError(error)
-                mEnterAffectiveCloudManager?.getAffectiveDataReport(object :
+                manager.getAffectiveDataReport(object :
                     Callback2<HashMap<Any, Any?>> {
                     override fun onError(error: Error?) {
                         AffectiveLogHelper.e(TAG, "getAffectiveDataReport error $error")
@@ -258,23 +297,14 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
                             listener.onSuccess(null)
                             return
                         }
-                        mEnterAffectiveCloudManager?.release(object :
-                            IFinishAffectiveServiceListener {
-                            override fun finishError(error: Error?) {
-                                listener.onSuccess(null)
-                            }
-
-                            override fun finishSuccess() {
-                                listener.onSuccess(null)
-                            }
-                        })
+                        finishReport(manager, listener)
                     }
                 })
             }
 
             override fun onSuccess(t: HashMap<Any, Any?>?) {
                 AffectiveLogHelper.e(TAG, "getBiodataReport onSuccess ")
-                mEnterAffectiveCloudManager?.getAffectiveDataReport(object :
+                manager.getAffectiveDataReport(object :
                     Callback2<HashMap<Any, Any?>> {
                     override fun onError(error: Error?) {
                         AffectiveLogHelper.e(TAG, "getAffectiveDataReport error $error")
@@ -289,16 +319,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
                             return
                         }
 
-                        mEnterAffectiveCloudManager?.release(object :
-                            IFinishAffectiveServiceListener {
-                            override fun finishError(error: Error?) {
-                                listener.onSuccess(null)
-                            }
-
-                            override fun finishSuccess() {
-                                listener.onSuccess(null)
-                            }
-                        })
+                        finishReport(manager, listener)
                     }
                 })
             }
@@ -306,15 +327,47 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         })
     }
 
+    private fun finishReport(
+        manager: EnterAffectiveCloudManager,
+        listener: IGetReportListener
+    ) {
+        manager.release(object : IFinishAffectiveServiceListener {
+            override fun finishBioFail(error: Error?) {
+                listener.onSuccess(null)
+            }
+
+            override fun finishAffectiveFail(error: Error?) {
+                listener.onSuccess(null)
+            }
+
+            override fun finishError(error: Error?) {
+                listener.onSuccess(null)
+            }
+
+            override fun finishSuccess() {
+                listener.onSuccess(null)
+            }
+
+            override fun hasFinished() {
+                listener.onSuccess(null)
+            }
+        })
+    }
+
     override suspend fun suspendGetReport(needFinishService: Boolean): UploadReportEntity? =
         suspendCoroutine { continuation ->
+            val completion = OneShotContinuation(continuation)
             val listener = object : IGetReportListener {
                 override fun onError(error: Error?) {
-                    continuation.resumeWith(Result.failure(IllegalStateException(error?.toString())))
+                    completion.resumeWith(
+                        Result.failure(
+                            IllegalStateException(error?.toString() ?: "get affective report failed")
+                        )
+                    )
                 }
 
                 override fun onSuccess(entity: UploadReportEntity?) {
-                    continuation.resume(entity)
+                    completion.resumeWith(Result.success(entity))
                 }
 
                 override fun getBioReportError(error: Error?) = Unit

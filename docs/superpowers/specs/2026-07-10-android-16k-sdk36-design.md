@@ -91,7 +91,9 @@ silent regression if the effective native toolchain changes.
   every callback or missing-manager path and must ignore duplicate terminal
   callbacks after the first completion. Each operation captures one manager
   instance and converts synchronous manager/API exceptions into the same
-  terminal callback contract.
+  terminal callback contract. Cancellation and exceptions thrown by consumer
+  callbacks are rethrown rather than being misclassified as manager failures
+  or triggering a second terminal callback.
 - Reconnect the demo to `affective_cloud_sdk`, replace the removed Kotlin
   synthetic view access in `AuthActivity` with `findViewById`, and correct the
   stale `MainActivity` R import. Exclude the legacy published

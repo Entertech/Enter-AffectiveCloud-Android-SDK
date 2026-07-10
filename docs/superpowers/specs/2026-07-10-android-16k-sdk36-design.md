@@ -72,6 +72,9 @@ silent regression if the effective native toolchain changes.
 - `demo/build.gradle`: change `compileSdkVersion` and `targetSdkVersion` from 34
   to 36. Keep `minSdkVersion 24`, Java 1.8, and explicitly set Kotlin
   `jvmTarget` to 1.8 so the build does not inherit JDK 21 as its bytecode target.
+  Bind the existing Release signing configuration only when
+  `../entertech.jks` exists; otherwise produce an unsigned Release APK for
+  reproducible local/CI compatibility verification.
 
 ### Native configuration
 
@@ -94,6 +97,10 @@ silent regression if the effective native toolchain changes.
   replace the uncompilable reference to the never-defined `HrV2Deserializer`
   with a direct Gson test that asserts the existing `hr_avg` integer field is
   mapped to `HrV2.hrAvg`.
+- `affective_sdk_manager/src/main/java/cn/entertech/affective/sdk/manager/AffectiveManager.kt`:
+  remove the second identical
+  `connectAndStartAffectiveService(Key, EnterAffectiveConfigProxy)` method that
+  was introduced by the same historical duplication as the SDK API overload.
 
 ### Release version
 
@@ -142,6 +149,9 @@ The final acceptance criteria are:
   least `0x4000`.
 - The demo Release APK builds, passes 16 KB zip alignment, and contains no
   arm64-v8a native library with a `LOAD` alignment below `0x4000`.
+- With the ignored private keystore absent, the demo artifact is explicitly an
+  unsigned Release APK; when that keystore is present, existing signing values
+  and signed-Release behavior remain unchanged.
 - Automated unit tests pass.
 
 ## Error Handling and Diagnostics

@@ -121,6 +121,9 @@ silent regression if the effective native toolchain changes.
   `affective_cloud_sdk/src/main/resources/META-INF/services/...`:
   make the cloud implementation an SDK 36 build participant and retain its
   runtime service-provider registration without kapt.
+- `affective_cloud_sdk/src/main/AndroidManifest.xml`: remove the obsolete
+  source-manifest `package` attribute; the Gradle `namespace` remains the
+  authoritative namespace as required by AGP 8.13.
 - `affective_cloud_sdk/src/main/java/cn/entertech/affectivecloudsdk/EnterAffectiveCloudService.kt`:
   implement the current local API interface while preserving its existing
   callback and WebSocket behavior.

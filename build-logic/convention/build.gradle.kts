@@ -13,6 +13,7 @@ java {
 dependencies {
     compileOnly(libs.android.gradle.plugin)
     compileOnly(libs.kotlin.gradle.plugin)
+    testImplementation(kotlin("test"))
 }
 
 gradlePlugin {
@@ -20,6 +21,10 @@ gradlePlugin {
         register("androidLibrary") {
             id = "enter.android.library"
             implementationClass = "EnterAndroidLibraryConventionPlugin"
+        }
+        register("moduleDependencyAnalysis") {
+            id = "enter.module-dependency-analysis"
+            implementationClass = "ModuleDependencyAnalysisPlugin"
         }
     }
 }

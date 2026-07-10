@@ -10,6 +10,7 @@ affective_local_sdk/.cxx
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
+**/build/
 /captures
 .externalNativeBuild
 /.idea

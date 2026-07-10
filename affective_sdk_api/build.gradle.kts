@@ -21,5 +21,5 @@ dependencies {
     implementation(libs.gson.v2101)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation (libs.device)
+    api(libs.device)
 }

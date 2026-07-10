@@ -1,0 +1,1113 @@
+public final class cn/entertech/affective/sdk/BrainDataHelper {
+	public static final field INSTANCE Lcn/entertech/affective/sdk/BrainDataHelper;
+	public final fun sceegToEeg ([BZ)Ljava/util/List;
+	public static synthetic fun sceegToEeg$default (Lcn/entertech/affective/sdk/BrainDataHelper;[BZILjava/lang/Object;)Ljava/util/List;
+}
+
+public abstract interface class cn/entertech/affective/sdk/api/Callback {
+	public abstract fun onError (Lcn/entertech/affective/sdk/bean/Error;)V
+	public abstract fun onSuccess ()V
+}
+
+public abstract interface class cn/entertech/affective/sdk/api/Callback2 {
+	public abstract fun log (Ljava/lang/String;)V
+	public abstract fun onError (Lcn/entertech/affective/sdk/bean/Error;)V
+	public abstract fun onSuccess (Ljava/lang/Object;)V
+}
+
+public final class cn/entertech/affective/sdk/api/Callback2$DefaultImpls {
+	public static fun log (Lcn/entertech/affective/sdk/api/Callback2;Ljava/lang/String;)V
+}
+
+public abstract interface class cn/entertech/affective/sdk/api/IAffectiveDataAnalysisService {
+	public static final field Companion Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService$Companion;
+	public static final field UPLOAD_BCG_PACKAGE_COUNT I
+	public static final field UPLOAD_GYRO_PACKAGE_COUNT I
+	public abstract fun addServiceConnectStatueListener (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun appendBCGData ([BI)V
+	public abstract fun appendByteArrayData (Lcn/entertech/affective/sdk/bean/type/IDataType;[B)Z
+	public abstract fun appendDCEEGData ([B)V
+	public abstract fun appendDevicePosition (Lcn/entertech/device/api/IDeviceType;Ljava/lang/String;)V
+	public abstract fun appendDoubleData (Lcn/entertech/affective/sdk/bean/type/IDataType;D)Z
+	public abstract fun appendEEGData (IZ)V
+	public abstract fun appendEEGData (Ljava/util/List;Z)V
+	public abstract fun appendEEGData ([BZ)V
+	public abstract fun appendFloatData (Lcn/entertech/affective/sdk/bean/type/IDataType;F)Z
+	public abstract fun appendGyroData ([BI)V
+	public abstract fun appendHeartRateData (I)V
+	public abstract fun appendIntData (Lcn/entertech/affective/sdk/bean/type/IDataType;I)Z
+	public abstract fun appendIntListData (Lcn/entertech/affective/sdk/bean/type/IDataType;Ljava/util/List;)Z
+	public abstract fun appendMCEEGData ([B)V
+	public abstract fun appendPEPRData ([B)V
+	public abstract fun appendSCEEGData (IZ)V
+	public abstract fun appendSCEEGData (Ljava/util/List;Z)V
+	public abstract fun appendSCEEGData ([BZ)V
+	public abstract fun checkEnvironment (Landroid/content/Context;)Z
+	public abstract fun checkInitStatue ()V
+	public abstract fun closeAffectiveServiceConnection ()V
+	public abstract fun connectAffectiveServiceConnection (Lcn/entertech/affective/sdk/api/IConnectionServiceListener;Lcn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy;)V
+	public abstract fun finishAffectiveService (Lcn/entertech/affective/sdk/api/IFinishAffectiveServiceListener;)V
+	public abstract fun getAffectiveWay ()Lcn/entertech/affective/sdk/bean/AffectiveServiceWay;
+	public abstract fun getReport (Lcn/entertech/affective/sdk/api/IGetReportListener;ZZ)V
+	public abstract fun getSessionId ()Ljava/lang/String;
+	public abstract fun hasConnectAffectiveService ()Z
+	public abstract fun hasStartAffectiveService ()Z
+	public abstract fun isGoodQuality (D)Z
+	public abstract fun readFileAnalysisData (Ljava/io/InputStream;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lcn/entertech/affective/sdk/api/Callback;)V
+	public abstract fun removeServiceConnectStatueListener (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun restoreAffectiveService (Lcn/entertech/affective/sdk/api/IStartAffectiveServiceLister;)V
+	public abstract fun startAffectiveService (Lcn/entertech/affective/sdk/api/IStartAffectiveServiceLister;)V
+	public abstract fun startAffectiveService (Ljava/io/InputStream;Landroid/content/Context;Lcn/entertech/affective/sdk/api/IStartAffectiveServiceLister;)V
+	public abstract fun subscribeData (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun suspendFinishAffectiveService (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun suspendGetReport (ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun unSubscribeData (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class cn/entertech/affective/sdk/api/IAffectiveDataAnalysisService$Companion {
+	public static final field UPLOAD_BCG_PACKAGE_COUNT I
+	public static final field UPLOAD_GYRO_PACKAGE_COUNT I
+	public final fun getService (Lcn/entertech/affective/sdk/bean/AffectiveServiceWay;)Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;
+}
+
+public final class cn/entertech/affective/sdk/api/IAffectiveDataAnalysisService$DefaultImpls {
+	public static synthetic fun addServiceConnectStatueListener$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun appendBCGData$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;[BIILjava/lang/Object;)V
+	public static fun appendByteArrayData (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/bean/type/IDataType;[B)Z
+	public static fun appendDevicePosition (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/device/api/IDeviceType;Ljava/lang/String;)V
+	public static fun appendDoubleData (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/bean/type/IDataType;D)Z
+	public static synthetic fun appendEEGData$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;IZILjava/lang/Object;)V
+	public static synthetic fun appendEEGData$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Ljava/util/List;ZILjava/lang/Object;)V
+	public static synthetic fun appendEEGData$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;[BZILjava/lang/Object;)V
+	public static fun appendFloatData (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/bean/type/IDataType;F)Z
+	public static synthetic fun appendGyroData$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;[BIILjava/lang/Object;)V
+	public static fun appendIntData (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/bean/type/IDataType;I)Z
+	public static fun appendIntListData (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/bean/type/IDataType;Ljava/util/List;)Z
+	public static synthetic fun appendSCEEGData$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;IZILjava/lang/Object;)V
+	public static synthetic fun appendSCEEGData$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Ljava/util/List;ZILjava/lang/Object;)V
+	public static synthetic fun appendSCEEGData$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;[BZILjava/lang/Object;)V
+	public static fun checkEnvironment (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Landroid/content/Context;)Z
+	public static fun checkInitStatue (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;)V
+	public static synthetic fun getReport$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/api/IGetReportListener;ZZILjava/lang/Object;)V
+	public static synthetic fun readFileAnalysisData$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Ljava/io/InputStream;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lcn/entertech/affective/sdk/api/Callback;ILjava/lang/Object;)V
+	public static synthetic fun removeServiceConnectStatueListener$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun subscribeData$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static synthetic fun unSubscribeData$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+}
+
+public abstract interface class cn/entertech/affective/sdk/api/IAffectiveServiceConnectionListener {
+	public abstract fun connectFail ()V
+	public abstract fun connectSuccess ()V
+	public abstract fun disconnect ()V
+}
+
+public abstract interface class cn/entertech/affective/sdk/api/IConnectionServiceListener {
+	public abstract fun connectionError (Lcn/entertech/affective/sdk/bean/Error;)V
+	public abstract fun connectionSuccess (Ljava/lang/String;)V
+	public abstract fun hasConnected (Ljava/lang/String;)V
+}
+
+public final class cn/entertech/affective/sdk/api/IConnectionServiceListener$DefaultImpls {
+	public static fun hasConnected (Lcn/entertech/affective/sdk/api/IConnectionServiceListener;Ljava/lang/String;)V
+}
+
+public abstract interface class cn/entertech/affective/sdk/api/IFinishAffectiveServiceListener {
+	public abstract fun finishAffectiveFail (Lcn/entertech/affective/sdk/bean/Error;)V
+	public abstract fun finishBioFail (Lcn/entertech/affective/sdk/bean/Error;)V
+	public abstract fun finishError (Lcn/entertech/affective/sdk/bean/Error;)V
+	public abstract fun finishSuccess ()V
+	public abstract fun hasFinished ()V
+}
+
+public final class cn/entertech/affective/sdk/api/IFinishAffectiveServiceListener$DefaultImpls {
+	public static fun finishAffectiveFail (Lcn/entertech/affective/sdk/api/IFinishAffectiveServiceListener;Lcn/entertech/affective/sdk/bean/Error;)V
+	public static fun finishBioFail (Lcn/entertech/affective/sdk/api/IFinishAffectiveServiceListener;Lcn/entertech/affective/sdk/bean/Error;)V
+	public static fun hasFinished (Lcn/entertech/affective/sdk/api/IFinishAffectiveServiceListener;)V
+}
+
+public abstract interface class cn/entertech/affective/sdk/api/IGetReportListener {
+	public abstract fun getAffectiveReportError (Lcn/entertech/affective/sdk/bean/Error;)V
+	public abstract fun getBioReportError (Lcn/entertech/affective/sdk/bean/Error;)V
+	public abstract fun onError (Lcn/entertech/affective/sdk/bean/Error;)V
+	public abstract fun onSuccess (Lcn/entertech/affective/sdk/bean/UploadReportEntity;)V
+}
+
+public abstract interface class cn/entertech/affective/sdk/api/IStartAffectiveServiceLister {
+	public abstract fun hasStarted ()V
+	public abstract fun startAffectionFail (Lcn/entertech/affective/sdk/bean/Error;)V
+	public abstract fun startBioFail (Lcn/entertech/affective/sdk/bean/Error;)V
+	public abstract fun startFail (Lcn/entertech/affective/sdk/bean/Error;)V
+	public abstract fun startSuccess ()V
+}
+
+public final class cn/entertech/affective/sdk/api/IStartAffectiveServiceLister$DefaultImpls {
+	public static fun hasStarted (Lcn/entertech/affective/sdk/api/IStartAffectiveServiceLister;)V
+	public static fun startAffectionFail (Lcn/entertech/affective/sdk/api/IStartAffectiveServiceLister;Lcn/entertech/affective/sdk/bean/Error;)V
+	public static fun startBioFail (Lcn/entertech/affective/sdk/api/IStartAffectiveServiceLister;Lcn/entertech/affective/sdk/bean/Error;)V
+	public static fun startFail (Lcn/entertech/affective/sdk/api/IStartAffectiveServiceLister;Lcn/entertech/affective/sdk/bean/Error;)V
+	public static fun startSuccess (Lcn/entertech/affective/sdk/api/IStartAffectiveServiceLister;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/AffectiveServiceWay : java/lang/Enum {
+	public static final field AffectiveCloudService Lcn/entertech/affective/sdk/bean/AffectiveServiceWay;
+	public static final field AffectiveLocalService Lcn/entertech/affective/sdk/bean/AffectiveServiceWay;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcn/entertech/affective/sdk/bean/AffectiveServiceWay;
+	public static fun values ()[Lcn/entertech/affective/sdk/bean/AffectiveServiceWay;
+}
+
+public final class cn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy {
+	public static final field Companion Lcn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy$Companion;
+	public static final field SEX_MAN Ljava/lang/String;
+	public static final field SEX_OTHER Ljava/lang/String;
+	public static final field SEX_WOMEN Ljava/lang/String;
+	public fun <init> ()V
+	public fun <init> (Ljava/util/List;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;I)V
+	public synthetic fun <init> (Ljava/util/List;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Z
+	public final fun component7 ()Ljava/lang/String;
+	public final fun component8 ()I
+	public final fun copy (Ljava/util/List;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;I)Lcn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy;Ljava/util/List;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;IILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAge ()I
+	public final fun getAppKey ()Ljava/lang/String;
+	public final fun getAppSecret ()Ljava/lang/String;
+	public final fun getAvailableAffectiveCategories ()Ljava/util/List;
+	public final fun getAvailableBiaCategory ()Ljava/util/List;
+	public final fun getLimitWaveValue ()Z
+	public final fun getSex ()Ljava/lang/String;
+	public final fun getUserId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy$Companion {
+}
+
+public final class cn/entertech/affective/sdk/bean/Error {
+	public fun <init> (ILjava/lang/String;)V
+	public final fun component1 ()I
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (ILjava/lang/String;)Lcn/entertech/affective/sdk/bean/Error;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/Error;ILjava/lang/String;ILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/Error;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCode ()I
+	public final fun getMsg ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun setCode (I)V
+	public final fun setMsg (Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/MCEEGQualityData : java/io/Serializable {
+	public fun <init> (Ljava/util/Map;)V
+	public final fun getFp1_fpz ()D
+	public final fun getFp2_fpz ()D
+	public final fun getO1_fpz ()D
+	public final fun getO2_fpz ()D
+	public final fun getPo3_fpz ()D
+	public final fun getPo4_fpz ()D
+}
+
+public final class cn/entertech/affective/sdk/bean/MCEEGWaveData : java/io/Serializable {
+	public fun <init> (Ljava/util/Map;)V
+	public final fun getFp1_fpz ()Ljava/util/List;
+	public final fun getFp2_fpz ()Ljava/util/List;
+	public final fun getO1_fpz ()Ljava/util/List;
+	public final fun getO2_fpz ()Ljava/util/List;
+	public final fun getPo3_fpz ()Ljava/util/List;
+	public final fun getPo4_fpz ()Ljava/util/List;
+}
+
+public final class cn/entertech/affective/sdk/bean/MCEOGQualityData : java/io/Serializable {
+	public fun <init> (Ljava/util/Map;)V
+	public final fun getVEOG_L ()D
+	public final fun getVEOG_R ()D
+}
+
+public final class cn/entertech/affective/sdk/bean/MCEOGWaveData : java/io/Serializable {
+	public fun <init> (Ljava/util/Map;)V
+	public final fun getVEOG_L ()Ljava/util/List;
+	public final fun getVEOG_R ()Ljava/util/List;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeAffectiveData : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Lcn/entertech/affective/sdk/bean/RealtimeAttentionData;Lcn/entertech/affective/sdk/bean/RealtimeRelaxationData;Lcn/entertech/affective/sdk/bean/RealtimePressureData;Lcn/entertech/affective/sdk/bean/RealtimePleasureData;Lcn/entertech/affective/sdk/bean/RealtimeArousalData;Lcn/entertech/affective/sdk/bean/RealtimeSleepData;Lcn/entertech/affective/sdk/bean/RealtimeCoherenceData;Lcn/entertech/affective/sdk/bean/RealtimeSsvepMultiClassifyData;Lcn/entertech/affective/sdk/bean/RealtimeFlowData;)V
+	public synthetic fun <init> (Lcn/entertech/affective/sdk/bean/RealtimeAttentionData;Lcn/entertech/affective/sdk/bean/RealtimeRelaxationData;Lcn/entertech/affective/sdk/bean/RealtimePressureData;Lcn/entertech/affective/sdk/bean/RealtimePleasureData;Lcn/entertech/affective/sdk/bean/RealtimeArousalData;Lcn/entertech/affective/sdk/bean/RealtimeSleepData;Lcn/entertech/affective/sdk/bean/RealtimeCoherenceData;Lcn/entertech/affective/sdk/bean/RealtimeSsvepMultiClassifyData;Lcn/entertech/affective/sdk/bean/RealtimeFlowData;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getRealtimeArousalData ()Lcn/entertech/affective/sdk/bean/RealtimeArousalData;
+	public final fun getRealtimeAttentionData ()Lcn/entertech/affective/sdk/bean/RealtimeAttentionData;
+	public final fun getRealtimeCoherenceData ()Lcn/entertech/affective/sdk/bean/RealtimeCoherenceData;
+	public final fun getRealtimeFlowData ()Lcn/entertech/affective/sdk/bean/RealtimeFlowData;
+	public final fun getRealtimePleasureData ()Lcn/entertech/affective/sdk/bean/RealtimePleasureData;
+	public final fun getRealtimePressureData ()Lcn/entertech/affective/sdk/bean/RealtimePressureData;
+	public final fun getRealtimeRelaxationData ()Lcn/entertech/affective/sdk/bean/RealtimeRelaxationData;
+	public final fun getRealtimeSleepData ()Lcn/entertech/affective/sdk/bean/RealtimeSleepData;
+	public final fun getRealtimeSsvepMultiClassifyData ()Lcn/entertech/affective/sdk/bean/RealtimeSsvepMultiClassifyData;
+	public final fun setRealtimeArousalData (Lcn/entertech/affective/sdk/bean/RealtimeArousalData;)V
+	public final fun setRealtimeAttentionData (Lcn/entertech/affective/sdk/bean/RealtimeAttentionData;)V
+	public final fun setRealtimeCoherenceData (Lcn/entertech/affective/sdk/bean/RealtimeCoherenceData;)V
+	public final fun setRealtimeFlowData (Lcn/entertech/affective/sdk/bean/RealtimeFlowData;)V
+	public final fun setRealtimePleasureData (Lcn/entertech/affective/sdk/bean/RealtimePleasureData;)V
+	public final fun setRealtimePressureData (Lcn/entertech/affective/sdk/bean/RealtimePressureData;)V
+	public final fun setRealtimeRelaxationData (Lcn/entertech/affective/sdk/bean/RealtimeRelaxationData;)V
+	public final fun setRealtimeSleepData (Lcn/entertech/affective/sdk/bean/RealtimeSleepData;)V
+	public final fun setRealtimeSsvepMultiClassifyData (Lcn/entertech/affective/sdk/bean/RealtimeSsvepMultiClassifyData;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeArousalData : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Double;)V
+	public synthetic fun <init> (Ljava/lang/Double;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Double;
+	public final fun copy (Ljava/lang/Double;)Lcn/entertech/affective/sdk/bean/RealtimeArousalData;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/RealtimeArousalData;Ljava/lang/Double;ILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/RealtimeArousalData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getArousal ()Ljava/lang/Double;
+	public fun hashCode ()I
+	public final fun setArousal (Ljava/lang/Double;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeAttentionData : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Double;)V
+	public synthetic fun <init> (Ljava/lang/Double;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Double;
+	public final fun copy (Ljava/lang/Double;)Lcn/entertech/affective/sdk/bean/RealtimeAttentionData;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/RealtimeAttentionData;Ljava/lang/Double;ILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/RealtimeAttentionData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAttention ()Ljava/lang/Double;
+	public fun hashCode ()I
+	public final fun setAttention (Ljava/lang/Double;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeBCGData : java/io/Serializable {
+	public fun <init> ()V
+	public final fun getBcgQuality ()Ljava/lang/Double;
+	public final fun getBcgWave ()Ljava/util/ArrayList;
+	public final fun getHr ()Ljava/lang/Double;
+	public final fun getHrv ()Ljava/lang/Double;
+	public final fun setBcgQuality (Ljava/lang/Double;)V
+	public final fun setBcgWave (Ljava/util/ArrayList;)V
+	public final fun setHr (Ljava/lang/Double;)V
+	public final fun setHrv (Ljava/lang/Double;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeBioData : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Lcn/entertech/affective/sdk/bean/RealtimeEEGData;Lcn/entertech/affective/sdk/bean/RealtimeHrData;Lcn/entertech/affective/sdk/bean/RealtimeMCEEGData;Lcn/entertech/affective/sdk/bean/RealtimeSCEEGData;Lcn/entertech/affective/sdk/bean/RealtimeBCGData;Lcn/entertech/affective/sdk/bean/RealtimePEPRData;Lcn/entertech/affective/sdk/bean/RealtimeDceegSsvepData;)V
+	public synthetic fun <init> (Lcn/entertech/affective/sdk/bean/RealtimeEEGData;Lcn/entertech/affective/sdk/bean/RealtimeHrData;Lcn/entertech/affective/sdk/bean/RealtimeMCEEGData;Lcn/entertech/affective/sdk/bean/RealtimeSCEEGData;Lcn/entertech/affective/sdk/bean/RealtimeBCGData;Lcn/entertech/affective/sdk/bean/RealtimePEPRData;Lcn/entertech/affective/sdk/bean/RealtimeDceegSsvepData;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lcn/entertech/affective/sdk/bean/RealtimeEEGData;
+	public final fun component2 ()Lcn/entertech/affective/sdk/bean/RealtimeHrData;
+	public final fun component3 ()Lcn/entertech/affective/sdk/bean/RealtimeMCEEGData;
+	public final fun component4 ()Lcn/entertech/affective/sdk/bean/RealtimeSCEEGData;
+	public final fun component5 ()Lcn/entertech/affective/sdk/bean/RealtimeBCGData;
+	public final fun component6 ()Lcn/entertech/affective/sdk/bean/RealtimePEPRData;
+	public final fun component7 ()Lcn/entertech/affective/sdk/bean/RealtimeDceegSsvepData;
+	public final fun copy (Lcn/entertech/affective/sdk/bean/RealtimeEEGData;Lcn/entertech/affective/sdk/bean/RealtimeHrData;Lcn/entertech/affective/sdk/bean/RealtimeMCEEGData;Lcn/entertech/affective/sdk/bean/RealtimeSCEEGData;Lcn/entertech/affective/sdk/bean/RealtimeBCGData;Lcn/entertech/affective/sdk/bean/RealtimePEPRData;Lcn/entertech/affective/sdk/bean/RealtimeDceegSsvepData;)Lcn/entertech/affective/sdk/bean/RealtimeBioData;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/RealtimeBioData;Lcn/entertech/affective/sdk/bean/RealtimeEEGData;Lcn/entertech/affective/sdk/bean/RealtimeHrData;Lcn/entertech/affective/sdk/bean/RealtimeMCEEGData;Lcn/entertech/affective/sdk/bean/RealtimeSCEEGData;Lcn/entertech/affective/sdk/bean/RealtimeBCGData;Lcn/entertech/affective/sdk/bean/RealtimePEPRData;Lcn/entertech/affective/sdk/bean/RealtimeDceegSsvepData;ILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/RealtimeBioData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRealtimeBCGData ()Lcn/entertech/affective/sdk/bean/RealtimeBCGData;
+	public final fun getRealtimeDceegSsvepData ()Lcn/entertech/affective/sdk/bean/RealtimeDceegSsvepData;
+	public final fun getRealtimeEEGData ()Lcn/entertech/affective/sdk/bean/RealtimeEEGData;
+	public final fun getRealtimeHrData ()Lcn/entertech/affective/sdk/bean/RealtimeHrData;
+	public final fun getRealtimeMCEEGData ()Lcn/entertech/affective/sdk/bean/RealtimeMCEEGData;
+	public final fun getRealtimePEPRData ()Lcn/entertech/affective/sdk/bean/RealtimePEPRData;
+	public final fun getRealtimeSCEEGData ()Lcn/entertech/affective/sdk/bean/RealtimeSCEEGData;
+	public fun hashCode ()I
+	public final fun setRealtimeBCGData (Lcn/entertech/affective/sdk/bean/RealtimeBCGData;)V
+	public final fun setRealtimeDceegSsvepData (Lcn/entertech/affective/sdk/bean/RealtimeDceegSsvepData;)V
+	public final fun setRealtimeEEGData (Lcn/entertech/affective/sdk/bean/RealtimeEEGData;)V
+	public final fun setRealtimeHrData (Lcn/entertech/affective/sdk/bean/RealtimeHrData;)V
+	public final fun setRealtimeMCEEGData (Lcn/entertech/affective/sdk/bean/RealtimeMCEEGData;)V
+	public final fun setRealtimePEPRData (Lcn/entertech/affective/sdk/bean/RealtimePEPRData;)V
+	public final fun setRealtimeSCEEGData (Lcn/entertech/affective/sdk/bean/RealtimeSCEEGData;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeCoherenceData : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Double;)V
+	public synthetic fun <init> (Ljava/lang/Double;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Double;
+	public final fun copy (Ljava/lang/Double;)Lcn/entertech/affective/sdk/bean/RealtimeCoherenceData;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/RealtimeCoherenceData;Ljava/lang/Double;ILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/RealtimeCoherenceData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCoherence ()Ljava/lang/Double;
+	public fun hashCode ()I
+	public final fun setCoherence (Ljava/lang/Double;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeDceegSsvepData : java/io/Serializable {
+	public fun <init> ()V
+	public final fun getEegAlphaPower ()Ljava/lang/Double;
+	public final fun getEegBetaPower ()Ljava/lang/Double;
+	public final fun getEegDeltaPower ()Ljava/lang/Double;
+	public final fun getEegGammaPower ()Ljava/lang/Double;
+	public final fun getEegQuality ()Ljava/lang/Integer;
+	public final fun getEegThetaPower ()Ljava/lang/Double;
+	public final fun getEeglWave ()Ljava/util/List;
+	public final fun getEegrWave ()Ljava/util/List;
+	public final fun getSsvepFreqCorr ()Ljava/util/Map;
+	public final fun getSsvepFreqPower ()Ljava/util/Map;
+	public final fun setEegAlphaPower (Ljava/lang/Double;)V
+	public final fun setEegBetaPower (Ljava/lang/Double;)V
+	public final fun setEegDeltaPower (Ljava/lang/Double;)V
+	public final fun setEegGammaPower (Ljava/lang/Double;)V
+	public final fun setEegQuality (Ljava/lang/Integer;)V
+	public final fun setEegThetaPower (Ljava/lang/Double;)V
+	public final fun setEeglWave (Ljava/util/List;)V
+	public final fun setEegrWave (Ljava/util/List;)V
+	public final fun setSsvepFreqCorr (Ljava/util/Map;)V
+	public final fun setSsvepFreqPower (Ljava/util/Map;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeEEGData : java/io/Serializable {
+	public fun <init> ()V
+	public final fun getAlphaPower ()Ljava/lang/Double;
+	public final fun getBetaPower ()Ljava/lang/Double;
+	public final fun getDeltaPower ()Ljava/lang/Double;
+	public final fun getGammaPower ()Ljava/lang/Double;
+	public final fun getLeftwave ()Ljava/util/ArrayList;
+	public final fun getQuality ()Ljava/lang/Double;
+	public final fun getRightwave ()Ljava/util/ArrayList;
+	public final fun getThetaPower ()Ljava/lang/Double;
+	public final fun setAlphaPower (Ljava/lang/Double;)V
+	public final fun setBetaPower (Ljava/lang/Double;)V
+	public final fun setDeltaPower (Ljava/lang/Double;)V
+	public final fun setGammaPower (Ljava/lang/Double;)V
+	public final fun setLeftwave (Ljava/util/ArrayList;)V
+	public final fun setQuality (Ljava/lang/Double;)V
+	public final fun setRightwave (Ljava/util/ArrayList;)V
+	public final fun setThetaPower (Ljava/lang/Double;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeFlowData : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Double;Ljava/lang/Double;)V
+	public synthetic fun <init> (Ljava/lang/Double;Ljava/lang/Double;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Double;
+	public final fun component2 ()Ljava/lang/Double;
+	public final fun copy (Ljava/lang/Double;Ljava/lang/Double;)Lcn/entertech/affective/sdk/bean/RealtimeFlowData;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/RealtimeFlowData;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/RealtimeFlowData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMeditation ()Ljava/lang/Double;
+	public final fun getMeditationTips ()Ljava/lang/Double;
+	public fun hashCode ()I
+	public final fun setMeditation (Ljava/lang/Double;)V
+	public final fun setMeditationTips (Ljava/lang/Double;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeHrData : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Double;Ljava/lang/Double;)V
+	public synthetic fun <init> (Ljava/lang/Double;Ljava/lang/Double;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Double;
+	public final fun component2 ()Ljava/lang/Double;
+	public final fun copy (Ljava/lang/Double;Ljava/lang/Double;)Lcn/entertech/affective/sdk/bean/RealtimeHrData;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/RealtimeHrData;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/RealtimeHrData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHr ()Ljava/lang/Double;
+	public final fun getHrv ()Ljava/lang/Double;
+	public fun hashCode ()I
+	public final fun setHr (Ljava/lang/Double;)V
+	public final fun setHrv (Ljava/lang/Double;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeMCEEGData : java/io/Serializable {
+	public fun <init> ()V
+	public final fun getEegAlphaPower ()Ljava/lang/Double;
+	public final fun getEegBetaPower ()Ljava/lang/Double;
+	public final fun getEegDeltaPower ()Ljava/lang/Double;
+	public final fun getEegGammaPower ()Ljava/lang/Double;
+	public final fun getEegThetaPower ()Ljava/lang/Double;
+	public final fun getMceegAlphaPower ()Ljava/lang/Double;
+	public final fun getMceegBetaPower ()Ljava/lang/Double;
+	public final fun getMceegDeltaPower ()Ljava/lang/Double;
+	public final fun getMceegGammaPower ()Ljava/lang/Double;
+	public final fun getMceegQuality ()Lcn/entertech/affective/sdk/bean/MCEEGQualityData;
+	public final fun getMceegThetaPower ()Ljava/lang/Double;
+	public final fun getMceegWave ()Lcn/entertech/affective/sdk/bean/MCEEGWaveData;
+	public final fun getMceogQuality ()Lcn/entertech/affective/sdk/bean/MCEOGQualityData;
+	public final fun getMceogWave ()Lcn/entertech/affective/sdk/bean/MCEOGWaveData;
+	public final fun setEegAlphaPower (Ljava/lang/Double;)V
+	public final fun setEegBetaPower (Ljava/lang/Double;)V
+	public final fun setEegDeltaPower (Ljava/lang/Double;)V
+	public final fun setEegGammaPower (Ljava/lang/Double;)V
+	public final fun setEegThetaPower (Ljava/lang/Double;)V
+	public final fun setMceegAlphaPower (Ljava/lang/Double;)V
+	public final fun setMceegBetaPower (Ljava/lang/Double;)V
+	public final fun setMceegDeltaPower (Ljava/lang/Double;)V
+	public final fun setMceegGammaPower (Ljava/lang/Double;)V
+	public final fun setMceegQuality (Lcn/entertech/affective/sdk/bean/MCEEGQualityData;)V
+	public final fun setMceegThetaPower (Ljava/lang/Double;)V
+	public final fun setMceegWave (Lcn/entertech/affective/sdk/bean/MCEEGWaveData;)V
+	public final fun setMceogQuality (Lcn/entertech/affective/sdk/bean/MCEOGQualityData;)V
+	public final fun setMceogWave (Lcn/entertech/affective/sdk/bean/MCEOGWaveData;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimePEPRData : java/io/Serializable {
+	public fun <init> ()V
+	public final fun getBcgQuality ()Ljava/lang/Integer;
+	public final fun getBcgWave ()Ljava/util/ArrayList;
+	public final fun getHr ()Ljava/lang/Double;
+	public final fun getHrv ()Ljava/lang/Double;
+	public final fun getRr ()Ljava/lang/Double;
+	public final fun getRwQuality ()Ljava/lang/Integer;
+	public final fun getRwWave ()Ljava/util/ArrayList;
+	public final fun setBcgQuality (Ljava/lang/Integer;)V
+	public final fun setBcgWave (Ljava/util/ArrayList;)V
+	public final fun setHr (Ljava/lang/Double;)V
+	public final fun setHrv (Ljava/lang/Double;)V
+	public final fun setRr (Ljava/lang/Double;)V
+	public final fun setRwQuality (Ljava/lang/Integer;)V
+	public final fun setRwWave (Ljava/util/ArrayList;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimePleasureData : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Double;)V
+	public synthetic fun <init> (Ljava/lang/Double;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Double;
+	public final fun copy (Ljava/lang/Double;)Lcn/entertech/affective/sdk/bean/RealtimePleasureData;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/RealtimePleasureData;Ljava/lang/Double;ILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/RealtimePleasureData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPleasure ()Ljava/lang/Double;
+	public fun hashCode ()I
+	public final fun setPleasure (Ljava/lang/Double;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimePressureData : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Double;)V
+	public synthetic fun <init> (Ljava/lang/Double;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Double;
+	public final fun copy (Ljava/lang/Double;)Lcn/entertech/affective/sdk/bean/RealtimePressureData;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/RealtimePressureData;Ljava/lang/Double;ILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/RealtimePressureData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPressure ()Ljava/lang/Double;
+	public fun hashCode ()I
+	public final fun setPressure (Ljava/lang/Double;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeRelaxationData : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Double;)V
+	public synthetic fun <init> (Ljava/lang/Double;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Double;
+	public final fun copy (Ljava/lang/Double;)Lcn/entertech/affective/sdk/bean/RealtimeRelaxationData;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/RealtimeRelaxationData;Ljava/lang/Double;ILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/RealtimeRelaxationData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getRelaxation ()Ljava/lang/Double;
+	public fun hashCode ()I
+	public final fun setRelaxation (Ljava/lang/Double;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeSCEEGData : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/List;DDDDDD)V
+	public synthetic fun <init> (Ljava/util/List;DDDDDDILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()D
+	public final fun component3 ()D
+	public final fun component4 ()D
+	public final fun component5 ()D
+	public final fun component6 ()D
+	public final fun component7 ()D
+	public final fun copy (Ljava/util/List;DDDDDD)Lcn/entertech/affective/sdk/bean/RealtimeSCEEGData;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/RealtimeSCEEGData;Ljava/util/List;DDDDDDILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/RealtimeSCEEGData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSceegAlphaPower ()D
+	public final fun getSceegBetaPower ()D
+	public final fun getSceegDeltaPower ()D
+	public final fun getSceegGammaPower ()D
+	public final fun getSceegQuality ()D
+	public final fun getSceegThetaPower ()D
+	public final fun getSceegWave ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeSleepData : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (DDDZI)V
+	public synthetic fun <init> (DDDZIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()D
+	public final fun component2 ()D
+	public final fun component3 ()D
+	public final fun component4 ()Z
+	public final fun component5 ()I
+	public final fun copy (DDDZI)Lcn/entertech/affective/sdk/bean/RealtimeSleepData;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/bean/RealtimeSleepData;DDDZIILjava/lang/Object;)Lcn/entertech/affective/sdk/bean/RealtimeSleepData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSleepDegree ()D
+	public final fun getSleepSpindle ()D
+	public final fun getSleepStage ()I
+	public final fun getSleepState ()D
+	public final fun getUpdateFlag ()Z
+	public fun hashCode ()I
+	public final fun setSleepDegree (D)V
+	public final fun setSleepSpindle (D)V
+	public final fun setSleepStage (I)V
+	public final fun setSleepState (D)V
+	public final fun setUpdateFlag (Z)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/RealtimeSsvepMultiClassifyData : java/io/Serializable {
+	public fun <init> ()V
+	public final fun getSsvepClass ()Ljava/lang/Integer;
+	public final fun getSsvepProb ()Ljava/util/Map;
+	public final fun setSsvepClass (Ljava/lang/Integer;)V
+	public final fun setSsvepProb (Ljava/util/Map;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/UploadReportEntity : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (ILcn/entertech/affective/sdk/bean/report/Data;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcn/entertech/affective/sdk/bean/report/TimePoints;ILcn/entertech/affective/sdk/bean/report/Version;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (ILcn/entertech/affective/sdk/bean/report/Data;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcn/entertech/affective/sdk/bean/report/TimePoints;ILcn/entertech/affective/sdk/bean/report/Version;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getCode ()I
+	public final fun getData ()Lcn/entertech/affective/sdk/bean/report/Data;
+	public final fun getDeviceString ()Ljava/lang/String;
+	public final fun getMAC ()Ljava/lang/String;
+	public final fun getMsg ()Ljava/lang/String;
+	public final fun getReportVersion ()Ljava/lang/String;
+	public final fun getSessionId ()Ljava/lang/String;
+	public final fun getStart ()Ljava/lang/String;
+	public final fun getTimePoints ()Lcn/entertech/affective/sdk/bean/report/TimePoints;
+	public final fun getUser_id ()I
+	public final fun getVersion ()Lcn/entertech/affective/sdk/bean/report/Version;
+	public final fun setCode (I)V
+	public final fun setData (Lcn/entertech/affective/sdk/bean/report/Data;)V
+	public final fun setDeviceString (Ljava/lang/String;)V
+	public final fun setMAC (Ljava/lang/String;)V
+	public final fun setMsg (Ljava/lang/String;)V
+	public final fun setReportVersion (Ljava/lang/String;)V
+	public final fun setSessionId (Ljava/lang/String;)V
+	public final fun setStart (Ljava/lang/String;)V
+	public final fun setTimePoints (Lcn/entertech/affective/sdk/bean/report/TimePoints;)V
+	public final fun setUser_id (I)V
+	public final fun setVersion (Lcn/entertech/affective/sdk/bean/report/Version;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Affective : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Lcn/entertech/affective/sdk/bean/report/Arousal;Lcn/entertech/affective/sdk/bean/report/Attention;Lcn/entertech/affective/sdk/bean/report/Coherence;Lcn/entertech/affective/sdk/bean/report/Pleasure;Lcn/entertech/affective/sdk/bean/report/Pressure;Lcn/entertech/affective/sdk/bean/report/Relaxation;Lcn/entertech/affective/sdk/bean/report/Meditation;Lcn/entertech/affective/sdk/bean/report/Sleep;)V
+	public final fun getArousal ()Lcn/entertech/affective/sdk/bean/report/Arousal;
+	public final fun getAttention ()Lcn/entertech/affective/sdk/bean/report/Attention;
+	public final fun getCoherence ()Lcn/entertech/affective/sdk/bean/report/Coherence;
+	public final fun getMeditation ()Lcn/entertech/affective/sdk/bean/report/Meditation;
+	public final fun getPleasure ()Lcn/entertech/affective/sdk/bean/report/Pleasure;
+	public final fun getPressure ()Lcn/entertech/affective/sdk/bean/report/Pressure;
+	public final fun getRelaxation ()Lcn/entertech/affective/sdk/bean/report/Relaxation;
+	public final fun getSleep ()Lcn/entertech/affective/sdk/bean/report/Sleep;
+	public final fun setArousal (Lcn/entertech/affective/sdk/bean/report/Arousal;)V
+	public final fun setAttention (Lcn/entertech/affective/sdk/bean/report/Attention;)V
+	public final fun setCoherence (Lcn/entertech/affective/sdk/bean/report/Coherence;)V
+	public final fun setMeditation (Lcn/entertech/affective/sdk/bean/report/Meditation;)V
+	public final fun setPleasure (Lcn/entertech/affective/sdk/bean/report/Pleasure;)V
+	public final fun setPressure (Lcn/entertech/affective/sdk/bean/report/Pressure;)V
+	public final fun setRelaxation (Lcn/entertech/affective/sdk/bean/report/Relaxation;)V
+	public final fun setSleep (Lcn/entertech/affective/sdk/bean/report/Sleep;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/AffectiveTimePoints : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)V
+	public final fun getArousal ()Ljava/util/List;
+	public final fun getAttention ()Ljava/util/List;
+	public final fun getCoherence ()Ljava/util/List;
+	public final fun getMeditation ()Ljava/util/List;
+	public final fun getPleasure ()Ljava/util/List;
+	public final fun getPressure ()Ljava/util/List;
+	public final fun getRelaxation ()Ljava/util/List;
+	public final fun getSleep ()Ljava/util/List;
+	public final fun setArousal (Ljava/util/List;)V
+	public final fun setAttention (Ljava/util/List;)V
+	public final fun setCoherence (Ljava/util/List;)V
+	public final fun setMeditation (Ljava/util/List;)V
+	public final fun setPleasure (Ljava/util/List;)V
+	public final fun setPressure (Ljava/util/List;)V
+	public final fun setRelaxation (Ljava/util/List;)V
+	public final fun setSleep (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/AffectiveVersion : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun getArousal ()Ljava/lang/String;
+	public final fun getAttention ()Ljava/lang/String;
+	public final fun getCoherence ()Ljava/lang/String;
+	public final fun getMeditation ()Ljava/lang/String;
+	public final fun getPleasure ()Ljava/lang/String;
+	public final fun getPressure ()Ljava/lang/String;
+	public final fun getRelaxation ()Ljava/lang/String;
+	public final fun setArousal (Ljava/lang/String;)V
+	public final fun setAttention (Ljava/lang/String;)V
+	public final fun setCoherence (Ljava/lang/String;)V
+	public final fun setMeditation (Ljava/lang/String;)V
+	public final fun setPleasure (Ljava/lang/String;)V
+	public final fun setPressure (Ljava/lang/String;)V
+	public final fun setRelaxation (Ljava/lang/String;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Arousal : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (ILjava/lang/Object;)V
+	public final fun getArousal_avg ()I
+	public final fun getArousal_rec ()Ljava/lang/Object;
+	public final fun setArousal_avg (I)V
+	public final fun setArousal_rec (Ljava/lang/Object;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Attention : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (DLjava/util/List;)V
+	public final fun getAttentionAvg ()D
+	public final fun getAttentionRec ()Ljava/util/List;
+	public final fun setAttentionAvg (D)V
+	public final fun setAttentionRec (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Biodata : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Lcn/entertech/affective/sdk/bean/report/Sceeg;Lcn/entertech/affective/sdk/bean/report/Eeg;Lcn/entertech/affective/sdk/bean/report/HrV2;Lcn/entertech/affective/sdk/bean/report/HrData;Lcn/entertech/affective/sdk/bean/report/PEPR;Lcn/entertech/affective/sdk/bean/report/TagData;)V
+	public final fun getEeg ()Lcn/entertech/affective/sdk/bean/report/Eeg;
+	public final fun getHr ()Lcn/entertech/affective/sdk/bean/report/HrV2;
+	public final fun getHrData ()Lcn/entertech/affective/sdk/bean/report/HrData;
+	public final fun getPepr ()Lcn/entertech/affective/sdk/bean/report/PEPR;
+	public final fun getSceegData ()Lcn/entertech/affective/sdk/bean/report/Sceeg;
+	public final fun getTag ()Lcn/entertech/affective/sdk/bean/report/TagData;
+	public final fun setEeg (Lcn/entertech/affective/sdk/bean/report/Eeg;)V
+	public final fun setHr (Lcn/entertech/affective/sdk/bean/report/HrV2;)V
+	public final fun setHrData (Lcn/entertech/affective/sdk/bean/report/HrData;)V
+	public final fun setPepr (Lcn/entertech/affective/sdk/bean/report/PEPR;)V
+	public final fun setSceegData (Lcn/entertech/affective/sdk/bean/report/Sceeg;)V
+	public final fun setTag (Lcn/entertech/affective/sdk/bean/report/TagData;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/BiodataTimePoints : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)V
+	public final fun getEeg ()Ljava/util/List;
+	public final fun getHr ()Ljava/util/List;
+	public final fun getPepr ()Ljava/util/List;
+	public final fun getTag ()Ljava/util/List;
+	public final fun setEeg (Ljava/util/List;)V
+	public final fun setHr (Ljava/util/List;)V
+	public final fun setPepr (Ljava/util/List;)V
+	public final fun setTag (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/BiodataVersion : java/io/Serializable {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun getEeg ()Ljava/lang/String;
+	public final fun getHr ()Ljava/lang/String;
+	public final fun getPepr ()Ljava/lang/String;
+	public final fun getTag ()Ljava/lang/String;
+	public final fun setEeg (Ljava/lang/String;)V
+	public final fun setHr (Ljava/lang/String;)V
+	public final fun setPepr (Ljava/lang/String;)V
+	public final fun setTag (Ljava/lang/String;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Coherence : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (DLjava/lang/Integer;Ljava/util/List;Ljava/util/List;)V
+	public final fun getCoherenceAvg ()D
+	public final fun getCoherenceDuration ()Ljava/lang/Integer;
+	public final fun getCoherenceFlag ()Ljava/util/List;
+	public final fun getCoherenceRec ()Ljava/util/List;
+	public final fun setCoherenceAvg (D)V
+	public final fun setCoherenceDuration (Ljava/lang/Integer;)V
+	public final fun setCoherenceFlag (Ljava/util/List;)V
+	public final fun setCoherenceRec (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Data : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Lcn/entertech/affective/sdk/bean/report/Affective;Lcn/entertech/affective/sdk/bean/report/Biodata;)V
+	public final fun getAffective ()Lcn/entertech/affective/sdk/bean/report/Affective;
+	public final fun getBiodata ()Lcn/entertech/affective/sdk/bean/report/Biodata;
+	public final fun setAffective (Lcn/entertech/affective/sdk/bean/report/Affective;)V
+	public final fun setBiodata (Lcn/entertech/affective/sdk/bean/report/Biodata;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Eeg : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)V
+	public final fun getEegAlphaCurve ()Ljava/util/List;
+	public final fun getEegBetaCurve ()Ljava/util/List;
+	public final fun getEegDeltaCurve ()Ljava/util/List;
+	public final fun getEegGammaCurve ()Ljava/util/List;
+	public final fun getEegQualityRec ()Ljava/util/List;
+	public final fun getEegThetaCurve ()Ljava/util/List;
+	public final fun setEegAlphaCurve (Ljava/util/List;)V
+	public final fun setEegBetaCurve (Ljava/util/List;)V
+	public final fun setEegDeltaCurve (Ljava/util/List;)V
+	public final fun setEegGammaCurve (Ljava/util/List;)V
+	public final fun setEegQualityRec (Ljava/util/List;)V
+	public final fun setEegThetaCurve (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/HrData : java/io/Serializable {
+	public fun <init> ()V
+	public final fun getHrAvg ()Ljava/lang/Integer;
+	public final fun getHrMax ()Ljava/lang/Integer;
+	public final fun getHrMin ()Ljava/lang/Integer;
+	public final fun getHrRec ()Ljava/util/List;
+	public final fun getHrvAvg ()Ljava/lang/Double;
+	public final fun getHrvRec ()Ljava/util/List;
+}
+
+public final class cn/entertech/affective/sdk/bean/report/HrV2 : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/List;Ljava/lang/Double;Ljava/util/List;)V
+	public final fun getHrAvg ()Ljava/lang/Integer;
+	public final fun getHrMax ()Ljava/lang/Integer;
+	public final fun getHrMin ()Ljava/lang/Integer;
+	public final fun getHrRec ()Ljava/util/List;
+	public final fun getHrvAvg ()Ljava/lang/Double;
+	public final fun getHrvRec ()Ljava/util/List;
+	public final fun setHrAvg (Ljava/lang/Integer;)V
+	public final fun setHrMax (Ljava/lang/Integer;)V
+	public final fun setHrMin (Ljava/lang/Integer;)V
+	public final fun setHrRec (Ljava/util/List;)V
+	public final fun setHrvAvg (Ljava/lang/Double;)V
+	public final fun setHrvRec (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Meditation : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (DLjava/util/List;Ljava/util/List;DIIIDII)V
+	public final fun getFlowBackNum ()I
+	public final fun getFlowCombo ()I
+	public final fun getFlowDepth ()D
+	public final fun getFlowDuration ()I
+	public final fun getFlowLatency ()I
+	public final fun getFlowLossNum ()I
+	public final fun getFlowPercent ()D
+	public final fun getMeditationAvg ()D
+	public final fun getMeditationRec ()Ljava/util/List;
+	public final fun getMeditationTipsRec ()Ljava/util/List;
+	public final fun setFlowBackNum (I)V
+	public final fun setFlowCombo (I)V
+	public final fun setFlowDepth (D)V
+	public final fun setFlowDuration (I)V
+	public final fun setFlowLatency (I)V
+	public final fun setFlowLossNum (I)V
+	public final fun setFlowPercent (D)V
+	public final fun setMeditationAvg (D)V
+	public final fun setMeditationRec (Ljava/util/List;)V
+	public final fun setMeditationTipsRec (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/PEPR : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (IIILjava/util/List;DLjava/util/List;DLjava/util/List;Ljava/util/List;Ljava/util/List;)V
+	public final fun getBcgQualityRec ()Ljava/util/List;
+	public final fun getHrAvg ()I
+	public final fun getHrMax ()I
+	public final fun getHrMin ()I
+	public final fun getHrRec ()Ljava/util/List;
+	public final fun getHrvAvg ()D
+	public final fun getHrvRec ()Ljava/util/List;
+	public final fun getRrAvg ()D
+	public final fun getRrRec ()Ljava/util/List;
+	public final fun getRwQualityRec ()Ljava/util/List;
+	public final fun setBcgQualityRec (Ljava/util/List;)V
+	public final fun setHrAvg (I)V
+	public final fun setHrMax (I)V
+	public final fun setHrMin (I)V
+	public final fun setHrRec (Ljava/util/List;)V
+	public final fun setHrvAvg (D)V
+	public final fun setHrvRec (Ljava/util/List;)V
+	public final fun setRrAvg (D)V
+	public final fun setRrRec (Ljava/util/List;)V
+	public final fun setRwQualityRec (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Pleasure : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (DLjava/util/List;)V
+	public final fun getPleasureAvg ()D
+	public final fun getPleasureRec ()Ljava/util/List;
+	public final fun setPleasureAvg (D)V
+	public final fun setPleasureRec (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Pressure : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (DLjava/util/List;)V
+	public final fun getPressureAvg ()D
+	public final fun getPressureRec ()Ljava/util/List;
+	public final fun setPressureAvg (D)V
+	public final fun setPressureRec (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Relaxation : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (DLjava/util/List;)V
+	public final fun getRelaxationAvg ()D
+	public final fun getRelaxationRec ()Ljava/util/List;
+	public final fun setRelaxationAvg (D)V
+	public final fun setRelaxationRec (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Sceeg : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)V
+	public final fun getSceegAlphaCurve ()Ljava/util/List;
+	public final fun getSceegDeltaCurve ()Ljava/util/List;
+	public final fun getSceegGammaCurve ()Ljava/util/List;
+	public final fun getSceegQualityRec ()Ljava/util/List;
+	public final fun getSceegThetaCurve ()Ljava/util/List;
+	public final fun getScegBetaCurve ()Ljava/util/List;
+	public final fun setSceegAlphaCurve (Ljava/util/List;)V
+	public final fun setSceegDeltaCurve (Ljava/util/List;)V
+	public final fun setSceegGammaCurve (Ljava/util/List;)V
+	public final fun setSceegQualityRec (Ljava/util/List;)V
+	public final fun setSceegThetaCurve (Ljava/util/List;)V
+	public final fun setScegBetaCurve (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Sleep : java/io/Serializable {
+	public static final field Companion Lcn/entertech/affective/sdk/bean/report/Sleep$Companion;
+	public static final field SLEEP_STAGE_AWAKE I
+	public static final field SLEEP_STAGE_NREM1 I
+	public static final field SLEEP_STAGE_NREM2 I
+	public static final field SLEEP_STAGE_NREM3 I
+	public static final field SLEEP_STAGE_REM I
+	public fun <init> ()V
+	public fun <init> (Ljava/util/ArrayList;IIDIIIDDLjava/util/List;ILjava/util/List;DLjava/util/List;Ljava/util/List;DLjava/util/List;IIDLjava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;Ljava/util/List;)V
+	public final fun getArousalCount ()I
+	public final fun getAwakeDuration ()I
+	public final fun getDeepDuration ()I
+	public final fun getDisturbTolerance ()D
+	public final fun getHrvScore ()D
+	public final fun getLightDuration ()I
+	public final fun getMovementCount ()I
+	public final fun getRemDuration ()I
+	public final fun getScore ()D
+	public final fun getSleepArousalRec ()Ljava/util/List;
+	public final fun getSleepCurve ()Ljava/util/ArrayList;
+	public final fun getSleepEegAlphaCurve ()Ljava/util/List;
+	public final fun getSleepEegBetaCurve ()Ljava/util/List;
+	public final fun getSleepEegDeltaCurve ()Ljava/util/List;
+	public final fun getSleepEegGammaCurve ()Ljava/util/List;
+	public final fun getSleepEegQualityRec ()Ljava/util/List;
+	public final fun getSleepEegThetaCurve ()Ljava/util/List;
+	public final fun getSleepLatency ()I
+	public final fun getSleepMovement ()D
+	public final fun getSleepMovementRec ()Ljava/util/List;
+	public final fun getSleepPoint ()I
+	public final fun getSleepPosition ()Ljava/util/List;
+	public final fun getSleepSpindle ()D
+	public final fun getSleepSpindleRec ()Ljava/util/List;
+	public final fun getSleepStage ()Ljava/util/List;
+	public final fun getTemperature ()D
+	public final fun getTemperatureRec ()Ljava/util/List;
+	public final fun setArousalCount (I)V
+	public final fun setAwakeDuration (I)V
+	public final fun setDeepDuration (I)V
+	public final fun setDisturbTolerance (D)V
+	public final fun setHrvScore (D)V
+	public final fun setLightDuration (I)V
+	public final fun setMovementCount (I)V
+	public final fun setRemDuration (I)V
+	public final fun setScore (D)V
+	public final fun setSleepArousalRec (Ljava/util/List;)V
+	public final fun setSleepCurve (Ljava/util/ArrayList;)V
+	public final fun setSleepEegAlphaCurve (Ljava/util/List;)V
+	public final fun setSleepEegBetaCurve (Ljava/util/List;)V
+	public final fun setSleepEegDeltaCurve (Ljava/util/List;)V
+	public final fun setSleepEegGammaCurve (Ljava/util/List;)V
+	public final fun setSleepEegQualityRec (Ljava/util/List;)V
+	public final fun setSleepEegThetaCurve (Ljava/util/List;)V
+	public final fun setSleepLatency (I)V
+	public final fun setSleepMovement (D)V
+	public final fun setSleepMovementRec (Ljava/util/List;)V
+	public final fun setSleepPoint (I)V
+	public final fun setSleepPosition (Ljava/util/List;)V
+	public final fun setSleepSpindle (D)V
+	public final fun setSleepSpindleRec (Ljava/util/List;)V
+	public final fun setSleepStage (Ljava/util/List;)V
+	public final fun setTemperature (D)V
+	public final fun setTemperatureRec (Ljava/util/List;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Sleep$Companion {
+}
+
+public final class cn/entertech/affective/sdk/bean/report/TagData : java/io/Serializable {
+	public static final field Companion Lcn/entertech/affective/sdk/bean/report/TagData$Companion;
+	public static final field TAG_POSITION_LEFT Ljava/lang/String;
+	public static final field TAG_POSITION_RIGHT Ljava/lang/String;
+	public static final field TAG_POSITION_UNKNOWN Ljava/lang/String;
+	public fun <init> ()V
+	public final fun getHr_avg ()I
+	public final fun getHr_max ()I
+	public final fun getHr_min ()I
+	public final fun getHr_rec ()Ljava/util/List;
+	public final fun getHrv_avg ()D
+	public final fun getHrv_rec ()Ljava/util/List;
+	public final fun getRr_avg ()D
+	public final fun getRr_rec ()Ljava/util/List;
+	public final fun getRri_quality_rec ()Ljava/util/List;
+	public final fun getTag_position ()Ljava/lang/String;
+	public final fun setHr_avg (I)V
+	public final fun setHr_max (I)V
+	public final fun setHr_min (I)V
+	public final fun setHr_rec (Ljava/util/List;)V
+	public final fun setHrv_avg (D)V
+	public final fun setHrv_rec (Ljava/util/List;)V
+	public final fun setRr_avg (D)V
+	public final fun setRr_rec (Ljava/util/List;)V
+	public final fun setRri_quality_rec (Ljava/util/List;)V
+	public final fun setTag_position (Ljava/lang/String;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/TagData$Companion {
+}
+
+public final class cn/entertech/affective/sdk/bean/report/TimePoint : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun getStart ()Ljava/lang/String;
+	public final fun getStop ()Ljava/lang/String;
+	public final fun setStart (Ljava/lang/String;)V
+	public final fun setStop (Ljava/lang/String;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/TimePoints : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Lcn/entertech/affective/sdk/bean/report/AffectiveTimePoints;Lcn/entertech/affective/sdk/bean/report/BiodataTimePoints;)V
+	public final fun getAffective ()Lcn/entertech/affective/sdk/bean/report/AffectiveTimePoints;
+	public final fun getBiodata ()Lcn/entertech/affective/sdk/bean/report/BiodataTimePoints;
+	public final fun setAffective (Lcn/entertech/affective/sdk/bean/report/AffectiveTimePoints;)V
+	public final fun setBiodata (Lcn/entertech/affective/sdk/bean/report/BiodataTimePoints;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/report/Version : java/io/Serializable {
+	public fun <init> ()V
+	public fun <init> (Lcn/entertech/affective/sdk/bean/report/AffectiveVersion;Lcn/entertech/affective/sdk/bean/report/BiodataVersion;)V
+	public final fun getAffective ()Lcn/entertech/affective/sdk/bean/report/AffectiveVersion;
+	public final fun getBiodata ()Lcn/entertech/affective/sdk/bean/report/BiodataVersion;
+	public final fun setAffective (Lcn/entertech/affective/sdk/bean/report/AffectiveVersion;)V
+	public final fun setBiodata (Lcn/entertech/affective/sdk/bean/report/BiodataVersion;)V
+}
+
+public final class cn/entertech/affective/sdk/bean/type/BioDataCategory : java/lang/Enum, cn/entertech/affective/sdk/bean/type/IDataType {
+	public static final field BCG Lcn/entertech/affective/sdk/bean/type/BioDataCategory;
+	public static final field Companion Lcn/entertech/affective/sdk/bean/type/BioDataCategory$Companion;
+	public static final field DCEEG_SSVEP Lcn/entertech/affective/sdk/bean/type/BioDataCategory;
+	public static final field EEG Lcn/entertech/affective/sdk/bean/type/BioDataCategory;
+	public static final field GYRO Lcn/entertech/affective/sdk/bean/type/BioDataCategory;
+	public static final field HR Lcn/entertech/affective/sdk/bean/type/BioDataCategory;
+	public static final field MCEEG Lcn/entertech/affective/sdk/bean/type/BioDataCategory;
+	public static final field PEPR Lcn/entertech/affective/sdk/bean/type/BioDataCategory;
+	public static final field SCEEG Lcn/entertech/affective/sdk/bean/type/BioDataCategory;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getValue ()Ljava/lang/String;
+	public final fun setValue (Ljava/lang/String;)V
+	public static fun valueOf (Ljava/lang/String;)Lcn/entertech/affective/sdk/bean/type/BioDataCategory;
+	public static fun values ()[Lcn/entertech/affective/sdk/bean/type/BioDataCategory;
+}
+
+public final class cn/entertech/affective/sdk/bean/type/BioDataCategory$Companion {
+	public final fun getDefaultList ()Ljava/util/List;
+}
+
+public final class cn/entertech/affective/sdk/bean/type/BrainWaveDataType : java/lang/Enum, cn/entertech/affective/sdk/bean/type/IDataType {
+	public static final field BRAIN_WAVE_ALPHA Lcn/entertech/affective/sdk/bean/type/BrainWaveDataType;
+	public static final field BRAIN_WAVE_BETA Lcn/entertech/affective/sdk/bean/type/BrainWaveDataType;
+	public static final field BRAIN_WAVE_DELTA Lcn/entertech/affective/sdk/bean/type/BrainWaveDataType;
+	public static final field BRAIN_WAVE_GAMMA Lcn/entertech/affective/sdk/bean/type/BrainWaveDataType;
+	public static final field BRAIN_WAVE_THETA Lcn/entertech/affective/sdk/bean/type/BrainWaveDataType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcn/entertech/affective/sdk/bean/type/BrainWaveDataType;
+	public static fun values ()[Lcn/entertech/affective/sdk/bean/type/BrainWaveDataType;
+}
+
+public abstract interface class cn/entertech/affective/sdk/bean/type/IDataType {
+}
+
+public final class cn/entertech/affective/sdk/bean/type/PhysiologyDataCategory : java/lang/Enum, cn/entertech/affective/sdk/bean/type/IDataType {
+	public static final field AROUSAL Lcn/entertech/affective/sdk/bean/type/PhysiologyDataCategory;
+	public static final field ATTENTION Lcn/entertech/affective/sdk/bean/type/PhysiologyDataCategory;
+	public static final field COHERENCE Lcn/entertech/affective/sdk/bean/type/PhysiologyDataCategory;
+	public static final field Companion Lcn/entertech/affective/sdk/bean/type/PhysiologyDataCategory$Companion;
+	public static final field FLOW Lcn/entertech/affective/sdk/bean/type/PhysiologyDataCategory;
+	public static final field PLEASURE Lcn/entertech/affective/sdk/bean/type/PhysiologyDataCategory;
+	public static final field PRESSURE Lcn/entertech/affective/sdk/bean/type/PhysiologyDataCategory;
+	public static final field RELAXATION Lcn/entertech/affective/sdk/bean/type/PhysiologyDataCategory;
+	public static final field SLEEP Lcn/entertech/affective/sdk/bean/type/PhysiologyDataCategory;
+	public static final field SSVEP_MULTI_CLASSIFY Lcn/entertech/affective/sdk/bean/type/PhysiologyDataCategory;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getValue ()Ljava/lang/String;
+	public final fun setValue (Ljava/lang/String;)V
+	public static fun valueOf (Ljava/lang/String;)Lcn/entertech/affective/sdk/bean/type/PhysiologyDataCategory;
+	public static fun values ()[Lcn/entertech/affective/sdk/bean/type/PhysiologyDataCategory;
+}
+
+public final class cn/entertech/affective/sdk/bean/type/PhysiologyDataCategory$Companion {
+	public final fun getDefaultList ()Ljava/util/List;
+}
+
+public final class cn/entertech/affective/sdk/bean/type/RR : cn/entertech/affective/sdk/bean/type/IDataType {
+	public static final field INSTANCE Lcn/entertech/affective/sdk/bean/type/RR;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/type/SleepPosture : cn/entertech/affective/sdk/bean/type/IDataType {
+	public static final field INSTANCE Lcn/entertech/affective/sdk/bean/type/SleepPosture;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/bean/type/Temperature : cn/entertech/affective/sdk/bean/type/IDataType {
+	public static final field INSTANCE Lcn/entertech/affective/sdk/bean/type/Temperature;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/utils/AffectiveLogHelper : cn/entertech/log/api/BaseLopPrinter {
+	public static final field INSTANCE Lcn/entertech/affective/sdk/utils/AffectiveLogHelper;
+}
+
+public final class cn/entertech/affective/sdk/utils/BioDataUtils {
+	public static final field INSTANCE Lcn/entertech/affective/sdk/utils/BioDataUtils;
+	public final fun brainwave2Rate (DDDDDLkotlin/jvm/functions/Function5;)V
+}
+
+public class cn/entertech/affective/sdk/utils/CharUtil {
+	public fun <init> ()V
+	public static fun converUnchart (B)I
+}
+
+public final class cn/entertech/affective/sdk/utils/MapExtensionKt {
+	public static final fun map (Ljava/lang/Object;Ljava/util/Map;Ljava/lang/String;)Lkotlin/properties/ReadOnlyProperty;
+}
+

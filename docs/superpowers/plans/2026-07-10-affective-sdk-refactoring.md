@@ -106,7 +106,8 @@ LegacyJavaConsumer must construct EnterAffectiveConfigProxy through an existing 
 Run:
 
 ~~~bash
-./gradlew apiDump apiCheck :compatibility-tests:legacy-consumer:assembleDebug analyzeModuleDependencies --console=plain
+./gradlew apiDump --console=plain
+./gradlew apiCheck :compatibility-tests:legacy-consumer:assembleDebug analyzeModuleDependencies --console=plain
 ~~~
 
 Expected: BUILD SUCCESSFUL; only affective_sdk_api/api/affective_sdk_api.api is generated.
@@ -516,7 +517,8 @@ Add direct dependencies on Manager, Protocol, and Data Provider. AffectiveDemoPi
 Run:
 
 ~~~bash
-./gradlew apiDump apiCheck :affective_sdk_api:test :affective_sdk_manager:test :affective_local_sdk:test :demo:test --console=plain
+./gradlew apiDump --console=plain
+./gradlew apiCheck :affective_sdk_api:test :affective_sdk_manager:test :affective_local_sdk:test :demo:test --console=plain
 ~~~
 
 Inspect the ABI diff and confirm existing lines are unchanged and only new types are added.

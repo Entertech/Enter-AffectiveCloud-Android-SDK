@@ -75,6 +75,22 @@ silent regression if the effective native toolchain changes.
   Bind the existing Release signing configuration only when
   `../entertech.jks` exists; otherwise produce an unsigned Release APK for
   reproducible local/CI compatibility verification.
+- Re-enable `affective_cloud_sdk`, which is still referenced by the demo's API
+  detail screen, and migrate it to the shared Android library convention. Use
+  the local `affective_sdk_api` project instead of the stale published API so
+  every included module compiles against the same SDK 36-era interface.
+- Replace the cloud module's obsolete AutoService kapt processor with the
+  equivalent `META-INF/services` provider file. This preserves
+  `ServiceLoader` behavior while avoiding the known Kotlin 1.9/JDK 21 kapt
+  access failure exposed by the clean build.
+- Adapt `EnterAffectiveCloudService` to the current
+  `IAffectiveDataAnalysisService` signatures without changing its cloud
+  protocol behavior: tolerate a nullable connection listener, expose the
+  manager session ID, accept and ignore the local-only `isEar` arguments, and
+  provide callback-backed suspend wrappers.
+- Reconnect the demo to `affective_cloud_sdk`, replace the removed Kotlin
+  synthetic view access in `AuthActivity` with `findViewById`, and correct the
+  stale `MainActivity` R import.
 
 ### Native configuration
 
@@ -101,6 +117,15 @@ silent regression if the effective native toolchain changes.
   remove the second identical
   `connectAndStartAffectiveService(Key, EnterAffectiveConfigProxy)` method that
   was introduced by the same historical duplication as the SDK API overload.
+- `affective_cloud_sdk/build.gradle`, `settings.gradle.kts`, and
+  `affective_cloud_sdk/src/main/resources/META-INF/services/...`:
+  make the cloud implementation an SDK 36 build participant and retain its
+  runtime service-provider registration without kapt.
+- `affective_cloud_sdk/src/main/java/cn/entertech/affectivecloudsdk/EnterAffectiveCloudService.kt`:
+  implement the current local API interface while preserving its existing
+  callback and WebSocket behavior.
+- `demo/src/main/java/cn/entertech/biomoduledemo/activity/AuthActivity.kt` and
+  `MainActivity.kt`: clear the two legacy Kotlin compilation blockers.
 
 ### Release version
 
@@ -140,6 +165,8 @@ The final acceptance criteria are:
 - All active modules compile against SDK 36; the demo targets SDK 36.
 - The demo Kotlin compile tasks target JVM 1.8 and do not inherit the Gradle
   runtime JDK version.
+- The re-enabled cloud SDK compiles against the repository's current API
+  project and remains discoverable through `ServiceLoader`.
 - Both flowtime Release AARs build successfully.
 - `:affective_sdk_api:compileReleaseKotlin` succeeds without duplicate overload
   or unresolved deque API errors.
@@ -168,5 +195,5 @@ layout, or APK packaging.
 - Updating `Enter-Flowtime-Android` to consume `2.0.0-svm`.
 - Changing existing minimum SDK levels.
 - Refactoring native algorithms or Android application behavior unrelated to
-  SDK 36 or 16 KB compatibility.
+  SDK 36 or the compilation prerequisites required for 16 KB verification.
 - Resolving unrelated compiler, lint, or dependency deprecation warnings.

@@ -29,9 +29,11 @@ dependencies {
     implementation(libs.androidx.core.ktx.v1131)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.kotlinx.coroutines.core)
     api(project(":affective_sdk_api"))
 //    api(libs.affective.sdk.api)
     testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

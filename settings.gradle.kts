@@ -24,7 +24,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Enter-AffectiveCloud-Android-SDK"
 include(":demo")
-//include(":affective_cloud_sdk")
+include(":affective_cloud_sdk")
 include(":affective_sdk_api")
 include(":affective_local_sdk")
 include(":affective_sdk_manager")

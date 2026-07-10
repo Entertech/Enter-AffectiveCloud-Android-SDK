@@ -12,18 +12,19 @@ import cn.entertech.affective.sdk.api.IStartAffectiveServiceLister
 import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
+import cn.entertech.affective.sdk.bean.UploadReportEntity
 import java.util.HashMap
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.utils.AffectiveLogHelper
 import cn.entertech.base.net.NetworkUtils
-import com.google.auto.service.AutoService
 import java.io.InputStream
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * 同一个useid 不能频繁创建连接
  * 15之内未触发append方法，也就是15之内未收到源消息；或者15s之内未收到情感云数据，需要断开重连
  * */
-@AutoService(IAffectiveDataAnalysisService::class)
 class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
 
     companion object {
@@ -38,13 +39,19 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
      * 创建session
      * */
     override fun connectAffectiveServiceConnection(
-        listener: IConnectionServiceListener,
+        listener: IConnectionServiceListener?,
         configProxy: EnterAffectiveConfigProxy
     ) {
         mEnterAffectiveCloudManager =
             EnterAffectiveCloudManager(EnterAffectiveCloudConfig.proxyInstance(configProxy))
-        mEnterAffectiveCloudManager?.openWebSocket(listener)
+        mEnterAffectiveCloudManager?.openWebSocket(listener ?: object : IConnectionServiceListener {
+            override fun connectionSuccess(sessionId: String?) = Unit
+
+            override fun connectionError(error: Error?) = Unit
+        })
     }
+
+    override fun getSessionId(): String = mEnterAffectiveCloudManager?.getSessionId().orEmpty()
 
     override fun startAffectiveService(initListener: IStartAffectiveServiceLister) {
         AffectiveLogHelper.d(TAG, "startAffectiveService")
@@ -115,23 +122,23 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         throw IllegalAccessError("not support this method")
     }
 
-    override fun appendEEGData(brainData: Int) {
+    override fun appendEEGData(brainData: Int, isEar: Boolean) {
         throw IllegalAccessError("not support this method")
     }
 
-    override fun appendEEGData(brainData: List<Int>) {
+    override fun appendEEGData(brainData: List<Int>, isEar: Boolean) {
         throw IllegalAccessError("not support this method")
     }
 
-    override fun appendSCEEGData(brainData: Int) {
+    override fun appendSCEEGData(brainData: Int, isEar: Boolean) {
         throw IllegalAccessError("not support this method")
     }
 
-    override fun appendSCEEGData(brainData: List<Int>) {
+    override fun appendSCEEGData(brainData: List<Int>, isEar: Boolean) {
         throw IllegalAccessError("not support this method")
     }
 
-    override fun appendEEGData(brainData: ByteArray) {
+    override fun appendEEGData(brainData: ByteArray, isEar: Boolean) {
         mEnterAffectiveCloudManager?.appendEEGData(brainData)
     }
 
@@ -139,7 +146,7 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         mEnterAffectiveCloudManager?.appendDCEEGData(brainData)
     }
 
-    override fun appendSCEEGData(brainData: ByteArray) {
+    override fun appendSCEEGData(brainData: ByteArray, isEar: Boolean) {
         mEnterAffectiveCloudManager?.appendSCEEGData(brainData)
     }
 
@@ -168,6 +175,24 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
         if (hasConnectAffectiveService()) {
             mEnterAffectiveCloudManager?.release(listener)
         }
+    }
+
+    override suspend fun suspendFinishAffectiveService() = suspendCoroutine { continuation ->
+        val listener = object : IFinishAffectiveServiceListener {
+            override fun finishError(error: Error?) {
+                continuation.resumeWith(Result.failure(IllegalStateException(error?.toString())))
+            }
+
+            override fun finishSuccess() {
+                continuation.resume(Unit)
+            }
+
+            override fun hasFinished() {
+                super.hasFinished()
+                continuation.resume(Unit)
+            }
+        }
+        finishAffectiveService(listener)
     }
 
     override fun addServiceConnectStatueListener(
@@ -212,7 +237,9 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
      * 上传report指令，失败不做处理，成功开始释放资源
      * 释放资源之后不管成功还是失败，关闭websocket，然后http请求报表数据
      * */
-    override fun getReport(listener: IGetReportListener, needFinishService: Boolean) {
+    override fun getReport(
+        listener: IGetReportListener, isEar: Boolean, needFinishService: Boolean
+    ) {
         mEnterAffectiveCloudManager?.getBiodataReport(object : Callback2<HashMap<Any, Any?>> {
             override fun onError(error: Error?) {
                 AffectiveLogHelper.e(TAG, "getBiodataReport error $error")
@@ -278,6 +305,24 @@ class EnterAffectiveCloudService : IAffectiveDataAnalysisService {
 
         })
     }
+
+    override suspend fun suspendGetReport(needFinishService: Boolean): UploadReportEntity? =
+        suspendCoroutine { continuation ->
+            val listener = object : IGetReportListener {
+                override fun onError(error: Error?) {
+                    continuation.resumeWith(Result.failure(IllegalStateException(error?.toString())))
+                }
+
+                override fun onSuccess(entity: UploadReportEntity?) {
+                    continuation.resume(entity)
+                }
+
+                override fun getBioReportError(error: Error?) = Unit
+
+                override fun getAffectiveReportError(error: Error?) = Unit
+            }
+            getReport(listener, false, needFinishService)
+        }
 
     override fun isGoodQuality(quality: Double): Boolean {
         return quality >= 2

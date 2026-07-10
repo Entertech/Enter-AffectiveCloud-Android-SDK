@@ -58,8 +58,10 @@ dependencies {
     implementation libs.biomoduleble
     implementation libs.gson.v2101
     implementation libs.java.websocket
-//    implementation project(':affective_cloud_sdk')
+    implementation project(':affective_cloud_sdk')
     implementation project(":affective_sdk_api")
     implementation libs.crashreport
-    implementation libs.affectivealgorithmlocalsdk
+    implementation(libs.affectivealgorithmlocalsdk) {
+        exclude group: 'cn.entertech.affective_sdk_api', module: 'affective_sdk_api'
+    }
 }

@@ -12,11 +12,11 @@ android {
         }
     }
     namespace 'cn.entertech.biomoduledemo'
-    compileSdkVersion 34
+    compileSdkVersion 36
     defaultConfig {
         applicationId "cn.entertech.biomoduledemo"
         minSdkVersion 24
-        targetSdkVersion 34
+        targetSdkVersion 36
         versionCode 9
         versionName "1.8.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -32,6 +32,10 @@ android {
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 
     packagingOptions {

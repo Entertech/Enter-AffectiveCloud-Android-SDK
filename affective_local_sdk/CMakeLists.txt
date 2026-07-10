@@ -73,6 +73,15 @@ add_library( # Sets the name of the library.
         src/main/cpp/package/public/Define.h
         )
 
+if (ANDROID)
+    target_link_options(
+            affective
+            PRIVATE
+            "-Wl,-z,max-page-size=16384"
+            "-Wl,-z,common-page-size=16384"
+    )
+endif ()
+
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because system libraries are included in the search path by
 # default, you only need to specify the name of the public NDK library

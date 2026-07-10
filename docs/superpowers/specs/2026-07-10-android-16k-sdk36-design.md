@@ -132,6 +132,12 @@ silent regression if the effective native toolchain changes.
 - `affective_cloud_sdk/src/main/java/cn/entertech/affectivecloudsdk/EnterAffectiveCloudService.kt`:
   implement the current local API interface while preserving its existing
   callback and WebSocket behavior.
+- `affective_cloud_sdk/build.gradle`: keep the three historical live-network
+  cloud integration fixtures out of the default JVM unit-test source set.
+  They were dormant while the module was excluded, depend on obsolete API and
+  PowerMock code, and require external credentials/network. Retain their source
+  files for a future integration-test migration, while enabling Android stub
+  default values for the new deterministic offline service tests.
 - `demo/src/main/java/cn/entertech/biomoduledemo/activity/AuthActivity.kt` and
   `MainActivity.kt`: clear the two legacy Kotlin compilation blockers.
 
@@ -179,6 +185,8 @@ The final acceptance criteria are:
   disconnected, the manager is absent, or release reports a service-specific
   failure; concurrent duplicate terminal callbacks complete the continuation
   only once.
+- Default cloud JVM tests are deterministic and offline; historical tests that
+  require the live cloud service are not compiled or executed by `test`.
 - The demo resolves only one `affective_sdk_api` implementation and has no
   duplicate Kotlin `DefaultImpls` classes at dex merge time.
 - Both flowtime Release AARs build successfully.
@@ -210,4 +218,5 @@ layout, or APK packaging.
 - Changing existing minimum SDK levels.
 - Refactoring native algorithms or Android application behavior unrelated to
   SDK 36 or the compilation prerequisites required for 16 KB verification.
+- Modernizing or executing the historical live-cloud integration fixtures.
 - Resolving unrelated compiler, lint, or dependency deprecation warnings.

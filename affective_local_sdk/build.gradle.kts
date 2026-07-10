@@ -31,6 +31,7 @@ PublishInfo {
 
 android {
     namespace = "cn.entertech.affectivesdk"
+    ndkVersion = "28.2.13676358"
 
     buildFeatures {
         buildConfig = true

@@ -68,7 +68,7 @@ object BrainDataHelper {
         }
         result.add(eegData)
         for (i in currentSceegDataIndex until sceegData.size) {
-            sceegDataCache.addLast(sceegData[i])
+            sceegDataCache.add(sceegData[i])
         }
         val cacheSize = sceegDataCache.size
         if (cacheSize >= 9) {

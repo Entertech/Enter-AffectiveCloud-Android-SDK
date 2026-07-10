@@ -13,7 +13,7 @@ class EnterAndroidLibraryConventionPlugin : Plugin<Project> {
         pluginManager.apply("cn.entertech.publish")
 
         extensions.configure<LibraryExtension> {
-            compileSdk = 34
+            compileSdk = 36
 
             defaultConfig {
                 minSdk = 23

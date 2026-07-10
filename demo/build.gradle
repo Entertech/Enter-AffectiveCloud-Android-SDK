@@ -12,26 +12,34 @@ android {
         }
     }
     namespace 'cn.entertech.biomoduledemo'
-    compileSdkVersion 34
+    compileSdkVersion 36
     defaultConfig {
         applicationId "cn.entertech.biomoduledemo"
         minSdkVersion 24
-        targetSdkVersion 34
+        targetSdkVersion 36
         versionCode 9
         versionName "1.8.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        missingDimensionStrategy 'project', 'flowtime'
+        missingDimensionStrategy 'authentication', 'noAuth'
     }
     buildTypes {
         release {
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
+            if (file('../entertech.jks').exists()) {
+                signingConfig signingConfigs.config
+            }
         }
     }
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 
     packagingOptions {
@@ -52,8 +60,8 @@ dependencies {
     implementation libs.biomoduleble
     implementation libs.gson.v2101
     implementation libs.java.websocket
-//    implementation project(':affective_cloud_sdk')
+    implementation project(':affective_cloud_sdk')
     implementation project(":affective_sdk_api")
     implementation libs.crashreport
-    implementation libs.affectivealgorithmlocalsdk
+    implementation project(':affective_local_sdk')
 }

@@ -28,7 +28,7 @@ import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affective.sdk.bean.UploadReportEntity
 import cn.entertech.affective.sdk.bean.type.BioDataCategory
 import cn.entertech.affective.sdk.bean.type.PhysiologyDataCategory
-import cn.entertech.android.affective.demo.R
+import cn.entertech.biomoduledemo.R
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_KEY
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment

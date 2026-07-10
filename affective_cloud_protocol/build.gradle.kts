@@ -15,10 +15,10 @@ android {
 
 dependencies {
     implementation (libs.gson.v285)
-    implementation(libs.androidx.appcompat)
     api(project(":affective_sdk_api"))
 //    api(libs.affective.sdk.api)
     testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

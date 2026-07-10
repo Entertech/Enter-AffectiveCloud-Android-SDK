@@ -2,17 +2,26 @@ name: Sync Publish Branch
 
 on:
   create:
+  push:
+    branches:
+      - 'dev_*'
+      - '**/dev_*'
 
 permissions:
   contents: write
 
 concurrency:
-  group: sync-publish-${{ github.event.ref }}
+  group: sync-publish-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
   sync:
-    if: github.event.ref_type == 'branch' && contains(github.event.ref, 'dev_')
+    if: >
+      (github.event_name == 'create' &&
+        github.event.ref_type == 'branch' &&
+        (startsWith(github.ref_name, 'dev_') || contains(github.ref_name, '/dev_'))) ||
+      (github.event_name == 'push' &&
+        (startsWith(github.ref_name, 'dev_') || contains(github.ref_name, '/dev_')))
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:

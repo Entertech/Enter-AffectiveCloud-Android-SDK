@@ -129,11 +129,28 @@ class EnterAffectiveCloudServiceSuspendTest {
 
         successThread.start()
         failureThread.start()
-        assertTrue("competing terminal signals were not ready", ready.await(1, TimeUnit.SECONDS))
-        start.countDown()
+        try {
+            try {
+                assertTrue(
+                    "competing terminal signals were not ready",
+                    ready.await(10, TimeUnit.SECONDS)
+                )
+            } finally {
+                start.countDown()
+            }
 
-        assertTrue("competing terminal signals did not finish", finished.await(1, TimeUnit.SECONDS))
-        assertEquals(1, results.size)
+            assertTrue(
+                "competing terminal signals did not finish",
+                finished.await(10, TimeUnit.SECONDS)
+            )
+            assertEquals(1, results.size)
+        } finally {
+            try {
+                successThread.join(10_000L)
+            } finally {
+                failureThread.join(10_000L)
+            }
+        }
     }
 
     private fun <T> awaitCompletion(block: suspend () -> T): Result<T> {

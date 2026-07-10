@@ -103,6 +103,29 @@ for input in "$@"; do
         aar|aab|apk)
             input_index=$((input_index + 1))
             extract_dir="$TEMP_ROOT/input-$input_index"
+            if ! archive_entries="$(unzip -Z1 "$input")"; then
+                printf 'FAIL: cannot list archive entries: %s\n' "$input" >&2
+                failures=$((failures + 1))
+                continue
+            fi
+
+            if ! duplicate_native_entries="$(
+                printf '%s\n' "$archive_entries" |
+                    awk '$0 ~ /\.so$/ { parts = split($0, path_parts, "/"); if (parts >= 2 && path_parts[parts - 1] == "arm64-v8a") count[$0]++ } END { for (path in count) if (count[path] > 1) print path }' |
+                    LC_ALL=C sort
+            )"; then
+                printf 'FAIL: cannot inspect archive entries: %s\n' "$input" >&2
+                failures=$((failures + 1))
+                continue
+            fi
+            if [[ -n "$duplicate_native_entries" ]]; then
+                while IFS= read -r duplicate_entry; do
+                    printf 'FAIL: duplicate arm64-v8a native library entry in %s: %s\n' "$input" "$duplicate_entry" >&2
+                    failures=$((failures + 1))
+                done <<< "$duplicate_native_entries"
+                continue
+            fi
+
             mkdir -p "$extract_dir"
             if ! unzip -oqq "$input" -d "$extract_dir"; then
                 printf 'FAIL: cannot extract archive: %s\n' "$input" >&2

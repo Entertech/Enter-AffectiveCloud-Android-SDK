@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 abstract class BaseETCacheDataProvider<Cache, Data>(
-    initData: Cache, val interceptData: (Data) -> Boolean = { false }
+    private val initData: Cache, val interceptData: (Data) -> Boolean = { false }
 ) : IDataProvider<Cache>, IDataIntercept<Data> {
     protected val _data = MutableStateFlow(initData)
     override val data: StateFlow<Cache> = _data.asStateFlow()
@@ -21,5 +21,9 @@ abstract class BaseETCacheDataProvider<Cache, Data>(
 
     override fun intercept(data: Data): Boolean {
         return interceptData(data)
+    }
+
+    override fun clear() {
+        _data.value = initData
     }
 }

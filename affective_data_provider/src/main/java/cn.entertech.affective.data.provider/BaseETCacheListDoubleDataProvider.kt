@@ -14,7 +14,7 @@ abstract class BaseETCacheListDoubleDataProvider(
         if (!intercept(data)) {
             val currentAttentionData = _data.value.toMutableList()
             currentAttentionData.add(data)
-            _data.value = currentAttentionData
+            _data.value = limitData(currentAttentionData)
         }
     }
 

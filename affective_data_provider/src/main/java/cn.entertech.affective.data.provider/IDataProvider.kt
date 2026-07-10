@@ -25,4 +25,7 @@ interface IDataProvider<T> {
         return t
     }
 
+    fun clear() {
+    }
+
 }

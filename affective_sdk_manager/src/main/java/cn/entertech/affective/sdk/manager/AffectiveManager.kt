@@ -138,28 +138,6 @@ open class AffectiveManager<Key> {
     }
 
     fun connectAndStartAffectiveService(
-        key: Key, configProxy: EnterAffectiveConfigProxy = EnterAffectiveConfigProxy()
-    ) {
-        getAffectiveService(key)?.apply {
-            if (hasConnectAffectiveService()) {
-                if (hasStartAffectiveService()) {
-                    affectiveStartServiceLister.forEach {
-                        it.hasStarted(key)
-                    }
-                } else {
-                    startAffectiveService(key)
-                }
-            } else {
-                connectAffectiveServiceConnection(getConnectionServiceListener(key), configProxy)
-            }
-        } ?: kotlin.run {
-            affectionConnectionServiceListeners.forEach {
-                it.connectionError(key, Error(-1, "key $key affective service is null"))
-            }
-        }
-    }
-
-    fun connectAndStartAffectiveService(
         key: Key,
         authenticationInputStream: InputStream?,
         context: Context?,

@@ -87,7 +87,9 @@ silent regression if the effective native toolchain changes.
   `IAffectiveDataAnalysisService` signatures without changing its cloud
   protocol behavior: tolerate a nullable connection listener, expose the
   manager session ID, accept and ignore the local-only `isEar` arguments, and
-  provide callback-backed suspend wrappers.
+  provide callback-backed suspend wrappers. Those wrappers must terminate on
+  every callback or missing-manager path and must ignore duplicate terminal
+  callbacks after the first completion.
 - Reconnect the demo to `affective_cloud_sdk`, replace the removed Kotlin
   synthetic view access in `AuthActivity` with `findViewById`, and correct the
   stale `MainActivity` R import. Exclude the legacy published
@@ -173,6 +175,10 @@ The final acceptance criteria are:
   runtime JDK version.
 - The re-enabled cloud SDK compiles against the repository's current API
   project and remains discoverable through `ServiceLoader`.
+- Cloud suspend finish/report calls never remain suspended when the service is
+  disconnected, the manager is absent, or release reports a service-specific
+  failure; concurrent duplicate terminal callbacks complete the continuation
+  only once.
 - The demo resolves only one `affective_sdk_api` implementation and has no
   duplicate Kotlin `DefaultImpls` classes at dex merge time.
 - Both flowtime Release AARs build successfully.

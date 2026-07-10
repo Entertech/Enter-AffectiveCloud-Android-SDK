@@ -111,3 +111,30 @@ jobs:
             exit 1
           fi
           git -C affective_local_sdk/src/main merge --abort
+          git submodule update --init --recursive --force
+
+      - name: Verify SDK architecture and release artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed_files < <(git diff --name-only "origin/${parent_publish_branch}...HEAD")
+          bash scripts/verify_sdk_architecture.sh "${changed_files[@]}"
+
+          ./gradlew --no-daemon apiCheck analyzeModuleDependencies test \
+            :compatibility-tests:legacy-consumer:assembleDebug \
+            --stacktrace --console=plain
+
+          ./gradlew --no-daemon \
+            :affective_sdk_api:assembleRelease \
+            :affective_cloud_protocol:assembleRelease \
+            :affective_data_provider:assembleRelease \
+            :affective_sdk_manager:assembleRelease \
+            :affective_local_sdk:assembleRelease \
+            :affective_cloud_sdk:assembleRelease \
+            :demo:assembleDebug \
+            --stacktrace --console=plain
+
+          mapfile -t local_aars < <(find affective_local_sdk/build/outputs/aar -maxdepth 1 -type f -name '*.aar' | sort)
+          mapfile -t cloud_aars < <(find affective_cloud_sdk/build/outputs/aar -maxdepth 1 -type f -name '*.aar' | sort)
+          bash scripts/verify_service_loader_artifacts.sh "${local_aars[@]}" "${cloud_aars[@]}"
+          bash scripts/verify_android_16k.sh "${local_aars[@]}"

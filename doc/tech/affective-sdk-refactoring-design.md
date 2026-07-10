@@ -575,6 +575,21 @@ Local 和 Cloud 都通过 META-INF/services 注册 IAffectiveDataAnalysisService
 - 完成新 API 适配后，才能整体过时 IAffectiveDataAnalysisService。
 - 3.0.0 才执行旧 API 删除。
 
+### Implementation Status（实施状态）
+
+| 阶段 | 状态 | 已落地内容 | 验证入口 |
+| --- | --- | --- | --- |
+| P0 | 已完成 | `affective_sdk_api/api/affective_sdk_api.api`、`compatibility-tests/legacy-consumer` 建立 ABI、Kotlin 和 Java 源码兼容基线 | `./gradlew apiCheck :compatibility-tests:legacy-consumer:assembleDebug` |
+| P1 | 已完成 | `ModuleDependencyAnalysisPlugin`、允许依赖边和根工程 API validation 已接入 | `./gradlew analyzeModuleDependencies apiCheck` |
+| P2 | 已完成 | Manager 使用 `AlgorithmRegistry`/`AlgorithmSlot` 隔离每个 Key，支持显式注册、全算法分发、失败隔离和完成后清理 | `./gradlew :affective_sdk_manager:test` |
+| P3 | 已完成 | Local 子模块增加生命周期、订阅、批缓存和 `NativeEngine` seam，并保留 ServiceLoader 实现类和全部发布 flavor | `./gradlew :affective_local_sdk:test :affective_local_sdk:assembleRelease`、`scripts/verify_android_16k.sh` |
+| P4 | 已完成 | Data Provider 增加 selector/filter/window 组合管线；Protocol 增加版本化类型模型和 legacy golden encoder | `./gradlew :affective_data_provider:test :affective_cloud_protocol:test` |
+| P5 | 已完成 | Demo 直接依赖五个能力组件，`AffectiveDemoPipeline` 同时路由实时传输和展示数据 | `./gradlew :demo:test :demo:assembleDebug` |
+| P6 | 已完成 | `AffectiveAlgorithm`、输入/状态/事件/结果模型以及 Legacy/Local 适配器以纯新增方式落地；原 `IAffectiveDataAnalysisService` 未删除或整体过时 | `./gradlew apiCheck :affective_sdk_manager:test :affective_local_sdk:test` |
+| P7 | 未开始 | `affective_cloud_sdk` 继续冻结，通过 Legacy adapter 使用新 API；本轮不修改其源码、资源或构建配置 | `git diff --exit-code HEAD -- affective_cloud_sdk` |
+
+发布门禁由 `scripts/verify_sdk_architecture.sh`、`scripts/verify_service_loader_artifacts.sh` 和现有 `scripts/verify_android_16k.sh` 共同执行，并已接入发布 PR 与正式发布工作流。
+
 ## 15. 测试矩阵
 
 | 范围 | 必须覆盖 |

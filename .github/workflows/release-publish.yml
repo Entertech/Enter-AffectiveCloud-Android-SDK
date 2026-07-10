@@ -83,6 +83,17 @@ jobs:
             --child-repo-dir affective_local_sdk/src/main \
             --child-branch "${child_publish_branch}"
 
+      - name: Verify SDK compatibility and architecture gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${BASE_BRANCH}"
+          mapfile -t changed_files < <(git diff --name-only "origin/${BASE_BRANCH}...HEAD")
+          bash scripts/verify_sdk_architecture.sh "${changed_files[@]}"
+          ./gradlew --no-daemon apiCheck analyzeModuleDependencies test \
+            :compatibility-tests:legacy-consumer:assembleDebug \
+            --stacktrace --console=plain
+
       - name: Trigger child SO build
         shell: bash
         run: |
@@ -144,6 +155,7 @@ jobs:
           for module in "${modules[@]}"; do
             tasks+=("${module}:assembleRelease")
           done
+          tasks+=(":affective_cloud_sdk:assembleRelease")
           ./gradlew --no-daemon --stacktrace --console=plain "${tasks[@]}"
 
       - name: Publish to local Maven with PublishPlugin
@@ -179,6 +191,15 @@ jobs:
             echo "No release AARs were collected." >&2
             exit 1
           fi
+
+      - name: Verify ServiceLoader and native release artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t local_aars < <(find affective_local_sdk/build/outputs/aar -maxdepth 1 -type f -name '*.aar' | sort)
+          mapfile -t cloud_aars < <(find affective_cloud_sdk/build/outputs/aar -maxdepth 1 -type f -name '*.aar' | sort)
+          bash scripts/verify_service_loader_artifacts.sh "${local_aars[@]}" "${cloud_aars[@]}"
+          bash scripts/verify_android_16k.sh "${local_aars[@]}"
 
       - name: Upload release AAR artifacts
         uses: actions/upload-artifact@v4

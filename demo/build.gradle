@@ -1,6 +1,6 @@
-apply plugin: 'com.android.application'
-
-apply plugin: 'kotlin-android'
+plugins {
+    id 'enter.android.application'
+}
 
 android {
     signingConfigs {
@@ -12,14 +12,10 @@ android {
         }
     }
     namespace 'cn.entertech.biomoduledemo'
-    compileSdkVersion 36
     defaultConfig {
         applicationId "cn.entertech.biomoduledemo"
-        minSdkVersion 24
-        targetSdkVersion 36
         versionCode 9
         versionName "1.8.1"
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         missingDimensionStrategy 'project', 'flowtime'
         missingDimensionStrategy 'authentication', 'noAuth'
     }
@@ -33,15 +29,6 @@ android {
             }
         }
     }
-    compileOptions {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-
     packagingOptions {
         exclude 'META-INF/ble_release.kotlin_module'
     }

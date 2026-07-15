@@ -18,6 +18,10 @@ dependencies {
 
 gradlePlugin {
     plugins {
+        register("androidApplication") {
+            id = "enter.android.application"
+            implementationClass = "EnterAndroidApplicationConventionPlugin"
+        }
         register("androidLibrary") {
             id = "enter.android.library"
             implementationClass = "EnterAndroidLibraryConventionPlugin"

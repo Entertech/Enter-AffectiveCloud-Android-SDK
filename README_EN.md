@@ -11,6 +11,7 @@
   * [Maven Dependencies](#maven-dependencies)
   * [Permissions](#permissions)
 - [Using the Components](#using-the-components)
+  * [Unified API and Runtime Selection](#unified-api-and-runtime-selection)
   * [Use the Local Algorithm Directly](#use-the-local-algorithm-directly)
   * [Manage Multiple Algorithms](#manage-multiple-algorithms)
   * [Realtime Transport and Display Data](#realtime-transport-and-display-data)
@@ -42,33 +43,35 @@ In order to facilitate your rapid development of the Android platform, we provid
 
 # Architecture and Components
 
-The SDK separates its stable contract from product implementations. An application can use either the local or cloud algorithm directly, use Manager to run multiple algorithms, and opt into independent realtime transport and display-data components.
+The SDK is designed around the stable public API exposed by `affective_sdk_api`. Application code can operate on `IAffectiveDataAnalysisService`, while local and cloud algorithms are two implementations of that interface. An application can choose Local or Cloud at runtime through `AffectiveServiceWay`, use either implementation directly, or use Manager when multiple algorithm instances must run together.
 
 ```mermaid
 flowchart TD
-    App["App / Demo"] --> Local["affective_local_sdk<br/>Local algorithm"]
-    App --> Cloud["affective_cloud_sdk<br/>Cloud algorithm"]
+    App["App / Demo"] --> API["affective_sdk_api<br/>IAffectiveDataAnalysisService"]
+    API --> Way["AffectiveServiceWay<br/>Local / Cloud"]
+    Way --> Local["affective_local_sdk<br/>Local implementation"]
+    Way --> Cloud["affective_cloud_sdk<br/>Cloud implementation"]
     App --> Manager["affective_sdk_manager<br/>Multi-algorithm manager"]
     App --> Protocol["affective_cloud_protocol<br/>Realtime transport"]
     App --> Provider["affective_data_provider<br/>Display data"]
-    Local --> API["affective_sdk_api<br/>Stable public contract"]
-    Cloud --> API
-    Cloud --> Protocol
     Manager --> API
+    Local -. implements .-> API
+    Cloud -. implements .-> API
+    Cloud --> Protocol
     Protocol --> API
     Provider --> API
 ```
 
 | Module | Responsibility | Add it directly when |
 | --- | --- | --- |
-| `affective_local_sdk` | Runs algorithms on the device without requiring the cloud | You need offline analysis or reduced network dependence |
-| `affective_cloud_sdk` | Connects to Affective Cloud and runs cloud algorithms | You need cloud services, cloud reports, or the existing cloud integration |
-| `affective_sdk_manager` | Registers and isolates algorithm instances by key and broadcasts input to multiple algorithms | Local and cloud algorithms run together, or multiple devices/algorithms must be managed |
+| `affective_local_sdk` | Provides the local `IAffectiveDataAnalysisService` implementation and runs algorithms on device | You need local analysis, or the app may switch to local at runtime |
+| `affective_cloud_sdk` | Provides the cloud `IAffectiveDataAnalysisService` implementation and connects to Affective Cloud | You need cloud services, cloud reports, or the app may switch to cloud at runtime |
+| `affective_sdk_manager` | Registers and isolates `IAffectiveDataAnalysisService` instances by key and broadcasts input to multiple algorithms | Local and cloud algorithms run together, or multiple devices/algorithms must be managed |
 | `affective_cloud_protocol` | Encodes realtime biodata and affective data for Web/Socket transport | The app hosts a web service or streams realtime data to an external UI |
 | `affective_data_provider` | Selects, filters, caches, and windows data for presentation | Charts, metric cards, and other realtime displays need bounded data |
-| `affective_sdk_api` | Shared configuration, input, state, event, and report contracts | It is the shared contract of the product components and is normally exposed transitively |
+| `affective_sdk_api` | `IAffectiveDataAnalysisService`, shared configuration, input, state, event, and report contracts | Application code uses the unified API or chooses Local/Cloud dynamically |
 
-All five product components can be direct App/Demo dependencies. Manager is optional orchestration; it is not the only entry point to Local or Cloud. See the [refactoring design](doc/tech/affective-sdk-refactoring-design.md) for the complete dependency rules.
+All five product components can be direct App/Demo dependencies, but the recommended algorithm operation surface is still `IAffectiveDataAnalysisService` from `affective_sdk_api`: Local and Cloud provide implementations, and the App selects one according to configuration or runtime policy. Use Manager when instances must run in parallel or be managed by key. See the [refactoring design](doc/tech/affective-sdk-refactoring-design.md) for the complete dependency rules.
 
 # Repository Setup
 
@@ -113,7 +116,7 @@ The complete component set requires `minSdk 24`. The source build compiles again
 
 ### Source Project Dependencies
 
-The repository Demo composes all five product components directly. Add only what your application needs. If application code directly references shared contract types, explicitly adding `affective_sdk_api` is recommended.
+The repository Demo composes all five product components directly. Add only what your application needs. If application code uses `IAffectiveDataAnalysisService` to operate Local/Cloud through one API, explicitly adding `affective_sdk_api` is recommended, along with the implementation components that may be selected at runtime.
 
 ```groovy
 dependencies {
@@ -174,6 +177,31 @@ Cloud algorithms and Web realtime transport require network permissions:
 
 # Using the Components
 
+### Unified API and Runtime Selection
+
+The existing `IAffectiveDataAnalysisService` flow remains the primary entry point for connecting, starting, subscribing, appending data, and fetching reports. Both `affective_local_sdk` and `affective_cloud_sdk` provide implementations of this interface, so an app can select Local or Cloud from user settings, network state, or business policy.
+
+```kotlin
+fun createAffectiveService(useCloud: Boolean): IAffectiveDataAnalysisService? {
+    val way = if (useCloud) {
+        AffectiveServiceWay.AffectiveCloudService
+    } else {
+        AffectiveServiceWay.AffectiveLocalService
+    }
+    return IAffectiveDataAnalysisService.getService(way)
+}
+
+var affectiveService = createAffectiveService(useCloud = false)
+
+// Before switching to Cloud, finish/release the current session and then obtain a new implementation.
+affectiveService?.finishAffectiveService(finishListener)
+affectiveService?.closeAffectiveServiceConnection()
+affectiveService = createAffectiveService(useCloud = true)
+affectiveService?.connectAffectiveServiceConnection(connectionListener, cloudConfig)
+```
+
+If multiple algorithm instances must stay alive together, do not replace one variable repeatedly; register Local and Cloud services by key in `AffectiveManager`.
+
 ### Use the Local Algorithm Directly
 
 `LocalAffectiveAlgorithm` implements `AffectiveAlgorithm` and can connect, start, emit realtime events, and accept hardware data without going through Manager.
@@ -208,7 +236,7 @@ lifecycleScope.launch {
 
 ### Manage Multiple Algorithms
 
-`AffectiveManager` manages algorithm instances by explicit key. Local and cloud services can start independently and receive the same hardware input. A failure while appending to one algorithm does not stop the others.
+`AffectiveManager` manages `IAffectiveDataAnalysisService` instances by explicit key. Local and cloud services can start independently and receive the same hardware input. A failure while appending to one algorithm does not stop the others.
 
 ```kotlin
 val manager = AffectiveManager<String>()
@@ -234,7 +262,7 @@ manager.appendHeartRateDataToAll(heartRate)
 
 # How to use
 
-This section documents the compatible existing cloud API. `EnterAffectiveCloudManager` provides quick access to Affective Cloud and completes the client/cloud data flow in a few steps. New applications may also use `EnterAffectiveCloudService` directly or register it with `AffectiveManager`.
+This section documents the compatible existing cloud API. `EnterAffectiveCloudManager` provides quick access to Affective Cloud and completes the client/cloud data flow in a few steps. New applications may also obtain the cloud implementation through `IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveCloudService)` or register `EnterAffectiveCloudService` with `AffectiveManager`.
 
 ##  1.Initialization
 
@@ -479,7 +507,6 @@ If you need to use affective cloud services flexibly according to different scen
 
 # Change Notes
 [Change Notes](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/wiki/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)
-
 
 
 

@@ -1,11 +1,19 @@
-[English Readme](/README_EN.md)
-# Enter-AffectiveCloud-Andriod-SDK [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.entertech.android/affectivecloud/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.entertech.android/affectivecloud)
+[English Readme](README_EN.md)
+
+# Enter-AffectiveCloud-Android-SDK [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.entertech.android/affectivecloud/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.entertech.android/affectivecloud)
+
 - [简介](#简介)
+- [架构与组件](#架构与组件)
 - [仓库开发初始化](#仓库开发初始化)
 - [Demo](#demo)
 - [集成](#集成)
-    + [Gradle自动集成](#gradle自动集成)
-    + [权限申请](#权限申请)
+  * [源码工程依赖](#源码工程依赖)
+  * [Maven 依赖](#maven-依赖)
+  * [权限申请](#权限申请)
+- [组件化使用](#组件化使用)
+  * [直接使用本地算法](#直接使用本地算法)
+  * [同时管理多个算法](#同时管理多个算法)
+  * [实时传输与数据展示](#实时传输与数据展示)
 - [快速接入](#快速接入)
   * [1.初始化](#1初始化)
   * [2.添加实时数据监听](#2添加实时数据监听)
@@ -20,8 +28,10 @@
       - [查询](#查询)
       - [删除](#删除)
       - [Record数据说明](#Record数据说明)
+- [兼容性策略](#兼容性策略)
 - [详细API功能说明](#详细api功能说明)
 - [更新日志](#更新日志)
+
 # 简介
 
 回车情感云可以根据用户的脑波数据和心率数据来进行高级情绪情感数据分析的一个云算法平台，同时能给出包括：放松度、注意力、愉悦值，压力值、激动度（内测）在内的多种情绪情感值。详情请查看[官网](https://www.entertech.cn)。
@@ -29,6 +39,36 @@
 在开始开发前，请先查看回车情感云的[开发文档](https://docs.affectivecloud.com)，了解情感云平台的架构和所能提供的服务具体说明，确定好你的应用中所需要的服务。你还需要联系管理员注册好测试应用，然后再进行开发。
 
 为了方便你进行 Android 平台的快速开发，我们提供了情感云快速开发 SDK，通过本 SDK 你可以快速地将情感云的能力集成到你的 app 中。
+
+# 架构与组件
+
+SDK 采用稳定契约与实现组件分离的结构。应用可以直接选择本地算法、云端算法，也可以通过 Manager 同时运行多个算法；实时传输和展示数据处理则由独立组件完成。
+
+```mermaid
+flowchart TD
+    App["App / Demo"] --> Local["affective_local_sdk<br/>本地算法"]
+    App --> Cloud["affective_cloud_sdk<br/>云端算法"]
+    App --> Manager["affective_sdk_manager<br/>多算法管理"]
+    App --> Protocol["affective_cloud_protocol<br/>实时数据传输"]
+    App --> Provider["affective_data_provider<br/>展示数据处理"]
+    Local --> API["affective_sdk_api<br/>稳定公共契约"]
+    Cloud --> API
+    Cloud --> Protocol
+    Manager --> API
+    Protocol --> API
+    Provider --> API
+```
+
+| 模块 | 职责 | 何时直接依赖 |
+| --- | --- | --- |
+| `affective_local_sdk` | 在设备端运行本地算法，支持无网络分析 | 只需要本地计算或希望降低网络依赖时 |
+| `affective_cloud_sdk` | 连接情感云并运行云端算法 | 需要云端服务、云端报表或已有云端接入时 |
+| `affective_sdk_manager` | 按 key 注册、启动和隔离多个算法实例，并向多个算法广播数据 | 本地和云端并行，或同时管理多个设备/算法时 |
+| `affective_cloud_protocol` | 将实时生物和情感数据编码为 Web/Socket 可传输的数据 | App 内开启 Web 服务或向外部页面展示实时数据时 |
+| `affective_data_provider` | 选择、过滤、缓存和裁剪用于 UI 展示的数据 | 折线图、指标卡等实时展示场景 |
+| `affective_sdk_api` | 公共配置、输入、状态、实时事件和报表模型 | 作为上述组件的共享契约；通常由组件传递依赖 |
+
+五个产品组件都可以被 App/Demo 直接依赖，彼此之间不需要通过 Manager 间接访问。Manager 是可选的编排组件，不是 Local 或 Cloud 的唯一入口。完整设计见[重构设计文档](doc/tech/affective-sdk-refactoring-design.md)。
 
 # 仓库开发初始化
 
@@ -106,12 +146,29 @@ SUBMODULE_SYNC_AUTO_PARENT_COMMIT=1 git -C affective_local_sdk/src/main commit -
 
 # 集成
 
-### Gradle自动集成
-在module的build.gradle文件下添加以下依赖
+当前完整组件组合要求 `minSdk 24`。源码构建使用 Android SDK 36；使用 `affective_sdk_manager` 时请将 Java/Kotlin JVM target 配置为 17。
+
+### 源码工程依赖
+
+仓库内的 Demo 直接组合五个产品组件。只添加业务需要的组件即可；若代码会直接使用公共契约类型，建议同时显式依赖 `affective_sdk_api`。
+
 ```groovy
-implementation 'cn.entertech.android:affectivecloud:2.1.0'
+dependencies {
+    implementation project(':affective_local_sdk')
+    implementation project(':affective_cloud_sdk')
+    implementation project(':affective_sdk_manager')
+    implementation project(':affective_cloud_protocol')
+    implementation project(':affective_data_provider')
+
+    // 公共契约；只使用能够 api 传递该依赖的组件时可以省略
+    implementation project(':affective_sdk_api')
+}
 ```
-在项目根目录的build.gradle文件下添加以下依赖地址
+
+### Maven 依赖
+
+在项目仓库配置中启用 Maven Central：
+
 ```groovy
 allprojects {
     repositories {
@@ -119,16 +176,102 @@ allprojects {
     }
 }
 ```
+
+按需添加组件，并将 `<version>` 替换成发布说明中的同一版本：
+
+```groovy
+def affectiveSdkVersion = '<version>'
+
+dependencies {
+    implementation "cn.entertech.android:affective_sdk_api:$affectiveSdkVersion"
+    implementation "cn.entertech.android:sdk-affective-offline-sdk:$affectiveSdkVersion"
+    implementation "cn.entertech.android:affective_cloud_sdk:$affectiveSdkVersion"
+    implementation "cn.entertech.android:affective-sdk-manager:$affectiveSdkVersion"
+    implementation "cn.entertech.android:affective-cloud-protocol:$affectiveSdkVersion"
+    implementation "cn.entertech.android:affective-data-provider:$affectiveSdkVersion"
+}
+```
+
+本地算法还提供 `breath`、`obsession`、`flowtime`、`sdk` 项目变体，以及带 `-authentication` 后缀的鉴权变体，请选择与交付包一致的 artifact。只维护旧版云端单组件接入的项目仍可使用：
+
+```groovy
+implementation 'cn.entertech.android:affectivecloud:2.1.0'
+```
+
+下面“快速接入”章节保留了该兼容入口的使用方式；新项目建议按上面的组件职责选择依赖。
+
 ### 权限申请
+
+使用云端算法或 Web 实时传输时需要网络权限：
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 ```
 
+# 组件化使用
+
+### 直接使用本地算法
+
+`LocalAffectiveAlgorithm` 实现了 `AffectiveAlgorithm`，可以直接连接、启动、接收实时事件并追加硬件数据，不需要经过 Manager。
+
+```kotlin
+val localAlgorithm: AffectiveAlgorithm = LocalAffectiveAlgorithm(sourceKey = "local")
+
+val eventJob = lifecycleScope.launch {
+    localAlgorithm.realtimeEvents.collect { event ->
+        demoPipeline.onEvent(event)
+    }
+}
+
+lifecycleScope.launch {
+    val connected = localAlgorithm.connect(EnterAffectiveConfigProxy())
+    if (connected is AffectiveAlgorithmResult.Success) {
+        val started = localAlgorithm.start()
+        if (started is AffectiveAlgorithmResult.Success) {
+            localAlgorithm.append(AffectiveInput.EegBytes(bytes))
+            localAlgorithm.append(AffectiveInput.HeartRate(heartRate))
+        }
+    }
+}
+
+// 页面或会话结束时
+lifecycleScope.launch {
+    eventJob.cancelAndJoin()
+    localAlgorithm.finish()
+    localAlgorithm.disconnect()
+}
+```
+
+### 同时管理多个算法
+
+`AffectiveManager` 使用显式 key 管理算法实例。本地和云端服务可以独立启动，也可以接收同一份硬件数据；某个算法追加数据失败不会阻断其他算法。
+
+```kotlin
+val manager = AffectiveManager<String>()
+manager.registerAffectiveService("local", EnterAffectiveLocalService())
+manager.registerAffectiveService("cloud", EnterAffectiveCloudService())
+
+manager.connectAndStartAffectiveService("local")
+manager.connectAndStartAffectiveService("cloud", cloudConfig)
+manager.subscribeData("local")
+manager.subscribeData("cloud")
+
+// 在两个服务的启动回调成功后广播硬件数据
+manager.appendEEGDataToAll(bytes)
+manager.appendHeartRateDataToAll(heartRate)
+```
+
+### 实时传输与数据展示
+
+- `GsonRealtimeProtocolEncoder` 输出带 `version`、`type`、`timestampMillis` 和类型化 `payload` 的实时消息。
+- `LegacyCloudProtocolEncoder` 保留旧 Web 展示协议的 JSON 结构。
+- `DisplayDataProvider` 可以组合 selector、filter 和 window policy；`AttentionListCacheDataProvider`、`RelaxationListCacheDataProvider`、`HrListCacheDataProvider` 提供常用展示缓存。
+- Demo 中的 [`AffectiveDemoPipeline`](demo/src/main/java/cn/entertech/biomoduledemo/affective/AffectiveDemoPipeline.kt) 展示了如何把算法事件同时送入传输层和展示层。
+
 # 快速接入
 
-SDK提供了快速接入情感云的管理类`EnterAffectiveCloudManager`，使用该类只需要几步就可以完成客户端与情感云平台的数据交互。
+本节为既有云端 API 的兼容接入方式。SDK 提供了 `EnterAffectiveCloudManager`，使用该类只需要几步就可以完成客户端与情感云平台的数据交互。新项目也可以直接使用 `EnterAffectiveCloudService`，或将其注册到 `AffectiveManager`。
 
 ##  1.初始化
 
@@ -363,14 +506,19 @@ affectiveSourceDataApi.deleteSourceDataRecordById(recordId, fun() {
 
 
 
+# 兼容性策略
+
+- 仅 `affective_sdk_api` 模块承诺源码兼容和二进制兼容；其已有 public/protected API 在兼容周期内不会删除或修改 JVM 签名。
+- 新能力优先通过新增类型和方法提供。旧接口可以标记为 `@Deprecated`，但会继续保留，待后续明确的破坏性版本再移除。
+- `affective_local_sdk`、`affective_cloud_sdk`、`affective_sdk_manager`、`affective_cloud_protocol` 和 `affective_data_provider` 不在源码/二进制兼容承诺范围内，升级时应锁定同一发布版本并执行集成测试。
+- 本轮重构没有调整 `affective_cloud_sdk` 的实现；旧云端接入方式继续可用。
+
 # 详细API功能说明
 
 如果你需要根据不同场景灵活使用情感云服务，可以使用`EnterAffectiveCloudApi`来调用相应API，该类封装了所有情感云服务对外的接口。更加详情的情感云API可以查看[情感云详细API功能说明](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/blob/master/media/%E6%83%85%E6%84%9F%E4%BA%91%E8%AF%A6%E7%BB%86API%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E.md)
 
 # 更新日志
 [更新日志](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/wiki/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)
-
-
 
 
 

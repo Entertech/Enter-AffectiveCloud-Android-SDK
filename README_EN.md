@@ -1,9 +1,19 @@
-# Enter-AffectiveCloud-Andriod-SDK [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.entertech.android/affectivecloud/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.entertech.android/affectivecloud)
+# Enter-AffectiveCloud-Android-SDK [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.entertech.android/affectivecloud/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.entertech.android/affectivecloud)
+
+[中文说明](README.md)
+
 - [Introduction](#introduction)
+- [Architecture and Components](#architecture-and-components)
+- [Repository Setup](#repository-setup)
 - [Demo](#demo)
 - [Getting Started](#getting-started)
-    + [Gradle](#gradle)
-    + [Permissions](#permissions)
+  * [Source Project Dependencies](#source-project-dependencies)
+  * [Maven Dependencies](#maven-dependencies)
+  * [Permissions](#permissions)
+- [Using the Components](#using-the-components)
+  * [Use the Local Algorithm Directly](#use-the-local-algorithm-directly)
+  * [Manage Multiple Algorithms](#manage-multiple-algorithms)
+  * [Realtime Transport and Display Data](#realtime-transport-and-display-data)
 - [How to use](#how-to-use)
   * [1.Initialization](#1initialization)
   * [2. Add real-time data listener](#2-add-real-time-data-listener)
@@ -18,8 +28,10 @@
       - [Query](#query)
       - [Delete](#delete)
       - [Record data description](#record-data-description)
+- [Compatibility Policy](#compatibility-policy)
 - [Detailed API function description](#detailed-api-function-description)
 - [Change Notes](#change-notes)
+
 # Introduction
 
 Enter Affective Cloud is a cloud algorithm platform that can perform advanced emotional data analysis based on the user’s brainwave data and heart rate data, and can also provide: relaxation, attention, pleasure, stress, excitement (internal test ), including a variety of emotional values. For details, please see [Official Website](https://www.entertech.cn).
@@ -27,6 +39,60 @@ Enter Affective Cloud is a cloud algorithm platform that can perform advanced em
 Before starting the development, please check the [Development Documents](https://docs.affectivecloud.com) of Enter Affective Cloud to understand the structure of Affective Cloud platform and specific descriptions of the services it can provide, and determine your application The service needed. You also need to contact the administrator to register the test application, and then develop.
 
 In order to facilitate your rapid development of the Android platform, we provide the affective cloud rapid development SDK, through which you can quickly integrate the affective cloud capabilities into your app.
+
+# Architecture and Components
+
+The SDK separates its stable contract from product implementations. An application can use either the local or cloud algorithm directly, use Manager to run multiple algorithms, and opt into independent realtime transport and display-data components.
+
+```mermaid
+flowchart TD
+    App["App / Demo"] --> Local["affective_local_sdk<br/>Local algorithm"]
+    App --> Cloud["affective_cloud_sdk<br/>Cloud algorithm"]
+    App --> Manager["affective_sdk_manager<br/>Multi-algorithm manager"]
+    App --> Protocol["affective_cloud_protocol<br/>Realtime transport"]
+    App --> Provider["affective_data_provider<br/>Display data"]
+    Local --> API["affective_sdk_api<br/>Stable public contract"]
+    Cloud --> API
+    Cloud --> Protocol
+    Manager --> API
+    Protocol --> API
+    Provider --> API
+```
+
+| Module | Responsibility | Add it directly when |
+| --- | --- | --- |
+| `affective_local_sdk` | Runs algorithms on the device without requiring the cloud | You need offline analysis or reduced network dependence |
+| `affective_cloud_sdk` | Connects to Affective Cloud and runs cloud algorithms | You need cloud services, cloud reports, or the existing cloud integration |
+| `affective_sdk_manager` | Registers and isolates algorithm instances by key and broadcasts input to multiple algorithms | Local and cloud algorithms run together, or multiple devices/algorithms must be managed |
+| `affective_cloud_protocol` | Encodes realtime biodata and affective data for Web/Socket transport | The app hosts a web service or streams realtime data to an external UI |
+| `affective_data_provider` | Selects, filters, caches, and windows data for presentation | Charts, metric cards, and other realtime displays need bounded data |
+| `affective_sdk_api` | Shared configuration, input, state, event, and report contracts | It is the shared contract of the product components and is normally exposed transitively |
+
+All five product components can be direct App/Demo dependencies. Manager is optional orchestration; it is not the only entry point to Local or Cloud. See the [refactoring design](doc/tech/affective-sdk-refactoring-design.md) for the complete dependency rules.
+
+# Repository Setup
+
+`affective_local_sdk/src/main` is a Git submodule pinned to an exact algorithm repository commit. Run the bootstrap script after cloning so every workstation and CI build uses the same source revision:
+
+**macOS / Linux / Git Bash**
+
+```bash
+./scripts/bootstrap.sh
+```
+
+**Windows CMD**
+
+```bat
+scripts\bootstrap.cmd
+```
+
+**Windows PowerShell**
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\bootstrap.ps1
+```
+
+Bootstrap initializes the submodule and installs local hooks that synchronize parent and algorithm branches. For example, parent `dev_2.0` maps to child `algorithm-android-dev_2.0`. Hooks are local machine configuration, so bootstrap must be run once on every new workstation.
 
 # Demo
 
@@ -43,12 +109,29 @@ In addition, we also provide a heart flow demonstration application, which integ
 
 # Getting Started
 
-### Gradle
-Add the following dependencies under the module's build.gradle file
+The complete component set requires `minSdk 24`. The source build compiles against Android SDK 36. When using `affective_sdk_manager`, configure Java/Kotlin with JVM target 17.
+
+### Source Project Dependencies
+
+The repository Demo composes all five product components directly. Add only what your application needs. If application code directly references shared contract types, explicitly adding `affective_sdk_api` is recommended.
+
 ```groovy
-    implementation'cn.entertech.android:affectivecloud:2.1.0'
+dependencies {
+    implementation project(':affective_local_sdk')
+    implementation project(':affective_cloud_sdk')
+    implementation project(':affective_sdk_manager')
+    implementation project(':affective_cloud_protocol')
+    implementation project(':affective_data_provider')
+
+    // Shared contract; optional when it is exposed by another selected component.
+    implementation project(':affective_sdk_api')
+}
 ```
-Add the following dependency address under the build.gradle file in the project root directory
+
+### Maven Dependencies
+
+Enable Maven Central in the project repository configuration:
+
 ```groovy
 allprojects {
     repositories {
@@ -56,17 +139,102 @@ allprojects {
     }
 }
 ```
+
+Add only the required components and replace `<version>` with the common version from the release notes:
+
+```groovy
+def affectiveSdkVersion = '<version>'
+
+dependencies {
+    implementation "cn.entertech.android:affective_sdk_api:$affectiveSdkVersion"
+    implementation "cn.entertech.android:sdk-affective-offline-sdk:$affectiveSdkVersion"
+    implementation "cn.entertech.android:affective_cloud_sdk:$affectiveSdkVersion"
+    implementation "cn.entertech.android:affective-sdk-manager:$affectiveSdkVersion"
+    implementation "cn.entertech.android:affective-cloud-protocol:$affectiveSdkVersion"
+    implementation "cn.entertech.android:affective-data-provider:$affectiveSdkVersion"
+}
+```
+
+The local SDK also publishes `breath`, `obsession`, `flowtime`, and `sdk` project variants, with authentication variants using the `-authentication` suffix. Select the artifact delivered for your product. Projects that only maintain the legacy all-in-one cloud integration may continue to use:
+
+```groovy
+implementation 'cn.entertech.android:affectivecloud:2.1.0'
+```
+
+The “How to use” section below keeps this compatible cloud entry point. New applications should select dependencies using the component responsibilities above.
+
 ### Permissions
+
+Cloud algorithms and Web realtime transport require network permissions:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 ```
 
+# Using the Components
+
+### Use the Local Algorithm Directly
+
+`LocalAffectiveAlgorithm` implements `AffectiveAlgorithm` and can connect, start, emit realtime events, and accept hardware data without going through Manager.
+
+```kotlin
+val localAlgorithm: AffectiveAlgorithm = LocalAffectiveAlgorithm(sourceKey = "local")
+
+val eventJob = lifecycleScope.launch {
+    localAlgorithm.realtimeEvents.collect { event ->
+        demoPipeline.onEvent(event)
+    }
+}
+
+lifecycleScope.launch {
+    val connected = localAlgorithm.connect(EnterAffectiveConfigProxy())
+    if (connected is AffectiveAlgorithmResult.Success) {
+        val started = localAlgorithm.start()
+        if (started is AffectiveAlgorithmResult.Success) {
+            localAlgorithm.append(AffectiveInput.EegBytes(bytes))
+            localAlgorithm.append(AffectiveInput.HeartRate(heartRate))
+        }
+    }
+}
+
+// At the end of the screen or session
+lifecycleScope.launch {
+    eventJob.cancelAndJoin()
+    localAlgorithm.finish()
+    localAlgorithm.disconnect()
+}
+```
+
+### Manage Multiple Algorithms
+
+`AffectiveManager` manages algorithm instances by explicit key. Local and cloud services can start independently and receive the same hardware input. A failure while appending to one algorithm does not stop the others.
+
+```kotlin
+val manager = AffectiveManager<String>()
+manager.registerAffectiveService("local", EnterAffectiveLocalService())
+manager.registerAffectiveService("cloud", EnterAffectiveCloudService())
+
+manager.connectAndStartAffectiveService("local")
+manager.connectAndStartAffectiveService("cloud", cloudConfig)
+manager.subscribeData("local")
+manager.subscribeData("cloud")
+
+// Broadcast hardware data after both start callbacks have succeeded.
+manager.appendEEGDataToAll(bytes)
+manager.appendHeartRateDataToAll(heartRate)
+```
+
+### Realtime Transport and Display Data
+
+- `GsonRealtimeProtocolEncoder` produces a versioned message containing `version`, `type`, `timestampMillis`, and a typed `payload`.
+- `LegacyCloudProtocolEncoder` preserves the JSON shape used by the existing Web display protocol.
+- `DisplayDataProvider` composes selector, filter, and window policies. `AttentionListCacheDataProvider`, `RelaxationListCacheDataProvider`, and `HrListCacheDataProvider` provide common display caches.
+- The Demo [`AffectiveDemoPipeline`](demo/src/main/java/cn/entertech/biomoduledemo/affective/AffectiveDemoPipeline.kt) shows how an algorithm event is routed to both transport and display layers.
+
 # How to use
 
-
-The SDK provides a management class `EnterAffectiveCloudManager` for quick access to the affective cloud. Using this class only takes a few steps to complete the data interaction between the client and the affective cloud platform.
+This section documents the compatible existing cloud API. `EnterAffectiveCloudManager` provides quick access to Affective Cloud and completes the client/cloud data flow in a few steps. New applications may also use `EnterAffectiveCloudService` directly or register it with `AffectiveManager`.
 
 ##  1.Initialization
 
@@ -298,14 +466,19 @@ affectiveSourceDataApi.deleteSourceDataRecordById(recordId, fun() {
 | case       | List   | case                              |
 
 
+# Compatibility Policy
+
+- Only `affective_sdk_api` guarantees source and binary compatibility. Its existing public/protected API is not removed and its JVM signatures are not changed during the compatibility cycle.
+- New capabilities are added through new types and methods. Legacy APIs may be annotated with `@Deprecated`, but remain available until a future explicitly breaking release.
+- `affective_local_sdk`, `affective_cloud_sdk`, `affective_sdk_manager`, `affective_cloud_protocol`, and `affective_data_provider` are outside this source/binary compatibility guarantee. Keep them on the same release version and run integration tests when upgrading.
+- This refactoring phase does not change the `affective_cloud_sdk` implementation, so the existing cloud integration remains available.
+
 # Detailed API function description
 
 If you need to use affective cloud services flexibly according to different scenarios, you can use `EnterAffectiveCloudApi` to call the corresponding API, which encapsulates all the external interfaces of affective cloud services. For more detailed Affective Cloud API, please refer to [Affective Cloud Detailed API Function Description](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/blob/master/media/%E6%83%85%E6%84%9F%E4%BA%91%E8%AF%A6%E7%BB%86API%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E.md)
 
 # Change Notes
 [Change Notes](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/wiki/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)
-
-
 
 
 

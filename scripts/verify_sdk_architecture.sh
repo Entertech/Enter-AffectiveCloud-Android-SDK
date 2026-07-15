@@ -35,8 +35,8 @@ for module in \
     affective_sdk_manager \
     affective_cloud_protocol \
     affective_data_provider; do
-    require_pattern demo/build.gradle \
-        "project\\(['\"]:${module}['\"]\\)" \
+    require_pattern demo/build.gradle.kts \
+        "project\\(\"${module}\"\)|project\\(\":${module}\"\\)" \
         "Demo does not directly depend on :${module}"
 done
 
@@ -58,6 +58,8 @@ fi
 
 for file in "${changed_files[@]}"; do
     case "$file" in
+        affective_cloud_sdk/build.gradle|affective_cloud_sdk/build.gradle.kts)
+            ;;
         affective_cloud_sdk|affective_cloud_sdk/*)
             fail "frozen affective_cloud_sdk was changed: $file"
             ;;

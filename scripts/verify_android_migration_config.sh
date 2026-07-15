@@ -29,8 +29,9 @@ require_text "build-logic/convention/src/main/kotlin/EnterAndroidApplicationConv
 require_text "build-logic/convention/src/main/kotlin/EnterAndroidApplicationConventionPlugin.kt" 'targetSdk = 36'
 require_text "build-logic/convention/src/main/kotlin/EnterAndroidApplicationConventionPlugin.kt" 'minSdk = 24'
 require_text "build-logic/convention/src/main/kotlin/EnterAndroidApplicationConventionPlugin.kt" 'JvmTarget.JVM_1_8'
-require_text "demo/build.gradle" "id 'enter.android.application'"
+require_text "demo/build.gradle.kts" 'id("enter.android.application")'
 require_text "affective_local_sdk/build.gradle.kts" 'ndkVersion = "28.2.13676358"'
+require_text "affective_cloud_sdk/build.gradle.kts" 'id("enter.android.library")'
 require_text "affective_local_sdk/CMakeLists.txt" '"-Wl,-z,max-page-size=16384"'
 require_text "affective_local_sdk/CMakeLists.txt" '"-Wl,-z,common-page-size=16384"'
 require_text "version.gradle" 'libraryVersion="2.0.0-svm"'

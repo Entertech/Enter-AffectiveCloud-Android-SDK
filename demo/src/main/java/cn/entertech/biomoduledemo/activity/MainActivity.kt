@@ -16,27 +16,33 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
+import cn.entertech.affective.sdk.api.AffectiveInput
+import cn.entertech.affective.sdk.api.AffectiveServiceResult
 import cn.entertech.affective.sdk.api.IAffectiveDataAnalysisService
-import cn.entertech.affective.sdk.api.IConnectionServiceListener
 import cn.entertech.affective.sdk.api.IFinishAffectiveServiceListener
-import cn.entertech.affective.sdk.api.IGetReportListener
 import cn.entertech.affective.sdk.api.IStartAffectiveServiceLister
+import cn.entertech.affective.sdk.api.awaitConnectAffectiveService
+import cn.entertech.affective.sdk.api.awaitFinishAffectiveService
+import cn.entertech.affective.sdk.api.awaitGetReport
+import cn.entertech.affective.sdk.api.awaitStartAffectiveService
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
-import cn.entertech.affective.sdk.bean.UploadReportEntity
 import cn.entertech.affective.sdk.bean.type.BioDataCategory
 import cn.entertech.affective.sdk.bean.type.PhysiologyDataCategory
+import cn.entertech.affectivecloudsdk.EnterAffectiveCloudService
+import cn.entertech.affectivesdk.manager.EnterAffectiveLocalService
 import cn.entertech.biomoduledemo.R
 import cn.entertech.biomoduledemo.affective.AffectiveServiceFinishCallback
 import cn.entertech.biomoduledemo.affective.AffectiveServiceSwitchCallbacks
 import cn.entertech.biomoduledemo.affective.AffectiveServiceSwitchCoordinator
 import cn.entertech.biomoduledemo.affective.AffectiveServiceSwitchResult
-import cn.entertech.biomoduledemo.affective.DemoControlState
 import cn.entertech.biomoduledemo.affective.DemoAffectiveAlgorithmMode
 import cn.entertech.biomoduledemo.affective.DemoCloudCredential
+import cn.entertech.biomoduledemo.affective.DemoControlState
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_KEY
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_SELECT_CLOUD
@@ -45,11 +51,10 @@ import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.ConvertUtil
 import cn.entertech.biomoduledemo.utils.PagerSlidingTabStrip
 import cn.entertech.biomoduledemo.utils.SettingManager
-import cn.entertech.affectivesdk.manager.EnterAffectiveLocalService
-import cn.entertech.affectivecloudsdk.EnterAffectiveCloudService
 import cn.entertech.ble.single.BiomoduleBleManager
 import com.orhanobut.logger.Logger
 import java.io.InputStream
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private var appSecret: String? = null
@@ -96,20 +101,6 @@ class MainActivity : AppCompatActivity() {
         )
     private var availableBioDataCategories = listOf(BioDataCategory.EEG, BioDataCategory.HR)
 
-    private val connectionListener: () -> Unit by lazy {
-        {
-            Log.d(TAG,"connectionListener")
-        }
-    }
-
-    private val disconnectionListener: (String) -> Unit by lazy {
-        { errorMsg: String ->
-            Log.d(TAG, "disconnect:$errorMsg")
-            controlState.onAlgorithmFinished()
-            updateControlAvailability()
-        }
-    }
-
     private val startAffectiveServiceLister by lazy {
         object : IStartAffectiveServiceLister {
             override fun startSuccess() {
@@ -140,24 +131,6 @@ class MainActivity : AppCompatActivity() {
 
     private val authenticationInputStream: InputStream? by lazy {
         null
-    }
-
-    private val connectionServiceListener by lazy {
-        object : IConnectionServiceListener {
-            override fun connectionSuccess(sessionId: String?) {
-                Log.d(TAG, "connectionSuccess: $sessionId")
-                affectiveService.startAffectiveService(
-                    authenticationInputStream,
-                    this@MainActivity, startAffectiveServiceLister
-                )
-            }
-
-            override fun connectionError(error: Error?) {
-                Log.d(TAG, "connectionError: $error")
-                controlState.onAlgorithmFinished()
-                updateControlAvailability()
-            }
-        }
     }
 
     private val bdListener by lazy {
@@ -392,15 +365,35 @@ class MainActivity : AppCompatActivity() {
             appKey = appKey.orEmpty()
         )
 
-        affectiveService.addServiceConnectStatueListener(
-            connectionListener,
-            disconnectionListener
-        )
-        affectiveService.connectAffectiveServiceConnection(
-            configProxy = proxy,
-            listener = connectionServiceListener
-        )
-        affectiveService.subscribeData(bdListener, affectiveListener)
+        lifecycleScope.launch {
+            when (val connect = affectiveService.awaitConnectAffectiveService(proxy)) {
+                is AffectiveServiceResult.Success -> {
+                    Log.d(TAG, "connectSuccess")
+                }
+                is AffectiveServiceResult.Failure -> {
+                    Log.d(TAG, "connectError: ${connect.error}")
+                    controlState.onAlgorithmFinished()
+                    updateControlAvailability()
+                    return@launch
+                }
+            }
+
+            when (val start = affectiveService.awaitStartAffectiveService(
+                authenticationInputStream,
+                this@MainActivity,
+            )) {
+                is AffectiveServiceResult.Success -> {
+                    Log.d(TAG, "startSuccess")
+                    affectiveService.subscribeData(bdListener, affectiveListener)
+                    controlState.onAlgorithmInitialized()
+                }
+                is AffectiveServiceResult.Failure -> {
+                    Log.d(TAG, "startFail: ${start.error}")
+                    controlState.onAlgorithmFinished()
+                }
+            }
+            updateControlAvailability()
+        }
     }
 
     private fun initView() {
@@ -604,7 +597,7 @@ class MainActivity : AppCompatActivity() {
     private var brainDataBuffer = ArrayList<Int>()
     private var writeFileDataBuffer = ArrayList<Int>()
     private var rawListener = fun(bytes: ByteArray) {
-        affectiveService.appendEEGData(bytes, false)
+        affectiveService.append(AffectiveInput.EegBytes(bytes))
         for (byte in bytes) {
             val brainData = ConvertUtil.converUnchart(byte)
             brainDataBuffer.add(brainData)
@@ -616,7 +609,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var heartRateListener = fun(heartRate: Int) {
-        affectiveService.appendHeartRateData(heartRate)
+        affectiveService.append(AffectiveInput.HeartRate(heartRate))
     }
 
 
@@ -644,28 +637,18 @@ class MainActivity : AppCompatActivity() {
             showUnavailableAction()
             return
         }
-        affectiveService.getReport(object : IGetReportListener {
-            override fun onError(error: Error?) {
-                Log.d(TAG, "getReport: onError $error")
-                messageReceiveFragment.appendMessageToScreen("getReport onError" + error.toString())
+        lifecycleScope.launch {
+            when (val report = affectiveService.awaitGetReport(isEar = false, needFinishService = false)) {
+                is AffectiveServiceResult.Success -> {
+                    Log.d(TAG, "getReport: onSuccess ${report.value}")
+                    messageReceiveFragment.appendMessageToScreen("getReport onSuccess" + report.value.toString())
+                }
+                is AffectiveServiceResult.Failure -> {
+                    Log.d(TAG, "getReport: onError ${report.error}")
+                    messageReceiveFragment.appendMessageToScreen("getReport onError" + report.error.toString())
+                }
             }
-
-            override fun onSuccess(entity: UploadReportEntity?) {
-                Log.d(TAG, "getReport: onSuccess $entity")
-                messageReceiveFragment.appendMessageToScreen("getReport onSuccess" + entity.toString())
-            }
-
-            override fun getBioReportError(error: Error?) {
-                Log.d(TAG, "getReport: getBioReportError $error")
-                messageReceiveFragment.appendMessageToScreen("getReport getBioReportError" + error.toString())
-            }
-
-            override fun getAffectiveReportError(error: Error?) {
-                Log.d(TAG, "getReport: getAffectiveReportError $error")
-                messageReceiveFragment.appendMessageToScreen("getReport getAffectiveReportError" + error.toString())
-            }
-        }, false, false)
-
+        }
     }
 
     fun onFinish(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -678,33 +661,20 @@ class MainActivity : AppCompatActivity() {
         }
         controlState.onAlgorithmFinishing()
         updateControlAvailability()
-        affectiveService.finishAffectiveService(object : IFinishAffectiveServiceListener {
-            override fun finishBioFail(error: Error?) {
-                Log.d(TAG, "onFinish: finishBioFail $error")
-                controlState.onAlgorithmFinishFailed()
-                updateControlAvailability()
+        lifecycleScope.launch {
+            when (val finish = affectiveService.awaitFinishAffectiveService()) {
+                is AffectiveServiceResult.Success -> {
+                    Log.d(TAG, "onFinish: finishSuccess")
+                    affectiveService.closeAffectiveServiceConnection()
+                    controlState.onAlgorithmFinished()
+                }
+                is AffectiveServiceResult.Failure -> {
+                    Log.d(TAG, "onFinish: finishError ${finish.error}")
+                    controlState.onAlgorithmFinishFailed()
+                }
             }
-
-            override fun finishAffectiveFail(error: Error?) {
-                Log.d(TAG, "onFinish: finishAffectiveFail $error")
-                controlState.onAlgorithmFinishFailed()
-                updateControlAvailability()
-            }
-
-            override fun finishError(error: Error?) {
-                Log.d(TAG, "onFinish: finishError $error")
-                affectiveService.closeAffectiveServiceConnection()
-                controlState.onAlgorithmFinished()
-                updateControlAvailability()
-            }
-
-            override fun finishSuccess() {
-                Log.d(TAG, "onFinish: finishSuccess ")
-                affectiveService.closeAffectiveServiceConnection()
-                controlState.onAlgorithmFinished()
-                updateControlAvailability()
-            }
-        })
+            updateControlAvailability()
+        }
     }
 
     fun onSubmit(@Suppress("UNUSED_PARAMETER") view: View) {

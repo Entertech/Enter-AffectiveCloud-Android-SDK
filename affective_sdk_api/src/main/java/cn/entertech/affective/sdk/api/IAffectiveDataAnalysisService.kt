@@ -3,6 +3,7 @@ package cn.entertech.affective.sdk.api
 import android.content.Context
 import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
+import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affective.sdk.bean.UploadReportEntity
@@ -29,9 +30,8 @@ import java.io.InputStream
  * 5. Fetch reports if needed.
  * 6. Finish and close the connection.
  *
- * For coroutine and Flow based Android code, use the extension APIs on this
- * service instance, such as [awaitConnectAffectiveService], [realtimeEvents],
- * and [append].
+ * Coroutine and Flow helpers are available as Kotlin extension APIs in
+ * `AffectiveDataAnalysisServiceExtensions.kt`.
  */
 interface IAffectiveDataAnalysisService {
 
@@ -55,14 +55,14 @@ interface IAffectiveDataAnalysisService {
     fun hasConnectAffectiveService(): Boolean
 
     @Deprecated(
-        message = "The method name contains a typo and exposes callback-style state. Prefer awaitConnectAffectiveService() and hasConnectAffectiveService() for new code.",
+        message = "The method name contains a typo and exposes callback-style state. Use connectAffectiveServiceConnection() and hasConnectAffectiveService(). Kotlin callers can also use awaitConnectAffectiveService().",
     )
     fun addServiceConnectStatueListener(
         connectionListener: (() -> Unit)? = null, disconnectListener: ((String) -> Unit)? = null
     )
 
     @Deprecated(
-        message = "The method name contains a typo and exposes callback-style state. Prefer awaitConnectAffectiveService() and hasConnectAffectiveService() for new code.",
+        message = "The method name contains a typo and exposes callback-style state. Use closeAffectiveServiceConnection() and hasConnectAffectiveService().",
     )
     fun removeServiceConnectStatueListener(
         connectionListener: (() -> Unit)? = null, disconnectListener: ((String) -> Unit)? = null
@@ -156,7 +156,7 @@ interface IAffectiveDataAnalysisService {
      * @param appendAllData 处理所有未被消耗的数据
      * */
     @Deprecated(
-        message = "File parsing is not part of the algorithm runtime contract. Parse files in the app/data layer and append typed AffectiveInput values.",
+        message = "File parsing is not part of the algorithm runtime contract. Parse files in the app/data layer and append typed AffectiveInput values with append(AffectiveInput).",
     )
     fun <R> readFileAnalysisData(
         inputStream: InputStream,
@@ -174,7 +174,7 @@ interface IAffectiveDataAnalysisService {
 
     @Deprecated(
         message = "Use append(AffectiveInput.*) or the typed append methods.",
-        replaceWith = ReplaceWith("append(AffectiveInput.EegBytes(data))"),
+        replaceWith = ReplaceWith("append(AffectiveInput.EegBytes(data))", "cn.entertech.affective.sdk.api.AffectiveInput"),
     )
     fun appendByteArrayData(dataType: IDataType, data: ByteArray): Boolean {
         return when (dataType) {
@@ -209,7 +209,7 @@ interface IAffectiveDataAnalysisService {
 
     @Deprecated(
         message = "Use append(AffectiveInput.*) or the typed append methods.",
-        replaceWith = ReplaceWith("append(AffectiveInput.HeartRate(data))"),
+        replaceWith = ReplaceWith("append(AffectiveInput.HeartRate(data))", "cn.entertech.affective.sdk.api.AffectiveInput"),
     )
     fun appendIntData(dataType: IDataType, data: Int): Boolean {
         if (!hasStartAffectiveService()) {
@@ -237,7 +237,7 @@ interface IAffectiveDataAnalysisService {
 
     @Deprecated(
         message = "Use append(AffectiveInput.*) or the typed append methods.",
-        replaceWith = ReplaceWith("append(AffectiveInput.EegSamples(data))"),
+        replaceWith = ReplaceWith("append(AffectiveInput.EegSamples(data))", "cn.entertech.affective.sdk.api.AffectiveInput"),
     )
     fun appendIntListData(dataType: IDataType, data: List<Int>): Boolean {
         when (dataType) {
@@ -292,6 +292,25 @@ interface IAffectiveDataAnalysisService {
 
     fun appendGyroData(gyroData: ByteArray, packageCount: Int = UPLOAD_GYRO_PACKAGE_COUNT)
 
+    fun append(input: AffectiveInput): AffectiveServiceResult<Unit> = try {
+        when (input) {
+            is AffectiveInput.EegBytes -> appendEEGData(input.data, input.isEar)
+            is AffectiveInput.EegSample -> appendEEGData(input.value, input.isEar)
+            is AffectiveInput.EegSamples -> appendEEGData(input.data, input.isEar)
+            is AffectiveInput.SceegBytes -> appendSCEEGData(input.data, input.isEar)
+            is AffectiveInput.SceegSample -> appendSCEEGData(input.value, input.isEar)
+            is AffectiveInput.SceegSamples -> appendSCEEGData(input.data, input.isEar)
+            is AffectiveInput.DcEeg -> appendDCEEGData(input.data)
+            is AffectiveInput.McEeg -> appendMCEEGData(input.data)
+            is AffectiveInput.HeartRate -> appendHeartRateData(input.value)
+            is AffectiveInput.Pepr -> appendPEPRData(input.data)
+            is AffectiveInput.Bcg -> appendBCGData(input.data, input.packageCount)
+            is AffectiveInput.Gyro -> appendGyroData(input.data, input.packageCount)
+        }
+        AffectiveServiceResult.Success(Unit)
+    } catch (throwable: Throwable) {
+        AffectiveServiceResult.Failure(Error(-1, throwable.message ?: "append failed"))
+    }
 
     fun getAffectiveWay(): AffectiveServiceWay
 }

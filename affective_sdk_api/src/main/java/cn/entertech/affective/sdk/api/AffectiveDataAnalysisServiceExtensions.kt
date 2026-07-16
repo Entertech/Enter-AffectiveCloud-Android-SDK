@@ -123,24 +123,12 @@ suspend fun IAffectiveDataAnalysisService.awaitFinishAffectiveService(): Affecti
         })
     }
 
-fun IAffectiveDataAnalysisService.append(input: AffectiveInput): AffectiveServiceResult<Unit> = try {
-    when (input) {
-        is AffectiveInput.EegBytes -> appendEEGData(input.data, input.isEar)
-        is AffectiveInput.EegSample -> appendEEGData(input.value, input.isEar)
-        is AffectiveInput.EegSamples -> appendEEGData(input.data, input.isEar)
-        is AffectiveInput.SceegBytes -> appendSCEEGData(input.data, input.isEar)
-        is AffectiveInput.SceegSample -> appendSCEEGData(input.value, input.isEar)
-        is AffectiveInput.SceegSamples -> appendSCEEGData(input.data, input.isEar)
-        is AffectiveInput.DcEeg -> appendDCEEGData(input.data)
-        is AffectiveInput.McEeg -> appendMCEEGData(input.data)
-        is AffectiveInput.HeartRate -> appendHeartRateData(input.value)
-        is AffectiveInput.Pepr -> appendPEPRData(input.data)
-        is AffectiveInput.Bcg -> appendBCGData(input.data, input.packageCount)
-        is AffectiveInput.Gyro -> appendGyroData(input.data, input.packageCount)
-    }
-    AffectiveServiceResult.Success(Unit)
-} catch (throwable: Throwable) {
-    AffectiveServiceResult.Failure(Error(-1, throwable.message ?: "append failed"))
-}
+@Deprecated(
+    message = "append(AffectiveInput) is now part of IAffectiveDataAnalysisService.",
+    replaceWith = ReplaceWith("append(input)"),
+)
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+fun IAffectiveDataAnalysisService.append(input: AffectiveInput): AffectiveServiceResult<Unit> =
+    this.append(input)
 
 private fun Error?.orUnknown(message: String): Error = this ?: Error(-1, message)

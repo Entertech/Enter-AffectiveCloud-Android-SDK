@@ -251,6 +251,7 @@ public abstract interface class cn/entertech/affective/sdk/api/IAffectiveDataAna
 	public static final field UPLOAD_BCG_PACKAGE_COUNT I
 	public static final field UPLOAD_GYRO_PACKAGE_COUNT I
 	public abstract fun addServiceConnectStatueListener (Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)V
+	public abstract fun append (Lcn/entertech/affective/sdk/api/AffectiveInput;)Lcn/entertech/affective/sdk/api/AffectiveServiceResult;
 	public abstract fun appendBCGData ([BI)V
 	public abstract fun appendByteArrayData (Lcn/entertech/affective/sdk/bean/type/IDataType;[B)Z
 	public abstract fun appendDCEEGData ([B)V
@@ -298,6 +299,7 @@ public final class cn/entertech/affective/sdk/api/IAffectiveDataAnalysisService$
 
 public final class cn/entertech/affective/sdk/api/IAffectiveDataAnalysisService$DefaultImpls {
 	public static synthetic fun addServiceConnectStatueListener$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public static fun append (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/api/AffectiveInput;)Lcn/entertech/affective/sdk/api/AffectiveServiceResult;
 	public static synthetic fun appendBCGData$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;[BIILjava/lang/Object;)V
 	public static fun appendByteArrayData (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/bean/type/IDataType;[B)Z
 	public static fun appendDevicePosition (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/device/api/IDeviceType;Ljava/lang/String;)V

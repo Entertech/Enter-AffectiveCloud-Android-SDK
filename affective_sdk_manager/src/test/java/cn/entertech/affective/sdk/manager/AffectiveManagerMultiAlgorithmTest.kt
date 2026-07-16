@@ -7,10 +7,10 @@ import kotlin.test.assertSame
 
 class AffectiveManagerMultiAlgorithmTest {
     @Test
-    fun explicitRegistrationDoesNotUseServiceLoader() {
+    fun explicitRegistrationDoesNotUseDefaultDiscoveryFallback() {
         val manager = object : AffectiveManager<String>() {
             override fun initAffectiveService(serviceType: cn.entertech.affective.sdk.bean.AffectiveServiceWay) =
-                error("ServiceLoader fallback must not be called")
+                error("default discovery fallback must not be called")
         }
         val service = FakeAffectiveService()
 

@@ -60,6 +60,8 @@ for file in "${changed_files[@]}"; do
     case "$file" in
         affective_cloud_sdk/build.gradle|affective_cloud_sdk/build.gradle.kts)
             ;;
+        affective_cloud_sdk/src/main/java/cn/entertech/affectivecloudsdk/di|affective_cloud_sdk/src/main/java/cn/entertech/affectivecloudsdk/di/*)
+            ;;
         affective_cloud_sdk|affective_cloud_sdk/*)
             fail "frozen affective_cloud_sdk was changed: $file"
             ;;

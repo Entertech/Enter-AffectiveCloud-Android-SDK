@@ -10,7 +10,6 @@ import cn.entertech.affective.sdk.bean.type.BioDataCategory
 import cn.entertech.affective.sdk.bean.type.IDataType
 import cn.entertech.device.api.IDeviceType
 import java.io.InputStream
-import java.util.ServiceLoader
 
 
 /**
@@ -18,7 +17,9 @@ import java.util.ServiceLoader
  *
  * Apps should depend on the implementation component they need
  * (`affective_local_sdk` or `affective_cloud_sdk`) and operate through this API
- * contract. Use [getService] with [AffectiveServiceWay] to select Local or Cloud.
+ * contract. Service instances are created by the selected implementation module
+ * or by the app's own dependency graph; this API module only defines the public
+ * method contract.
  *
  * Recommended lifecycle:
  * 1. Connect the selected service.
@@ -28,24 +29,15 @@ import java.util.ServiceLoader
  * 5. Fetch reports if needed.
  * 6. Finish and close the connection.
  *
- * For coroutine and Flow based Android code, call [asAffectiveAlgorithm] on the
- * service instance instead of adding new implementation-specific entry points.
+ * For coroutine and Flow based Android code, use the extension APIs on this
+ * service instance, such as [awaitConnectAffectiveService], [realtimeEvents],
+ * and [append].
  */
 interface IAffectiveDataAnalysisService {
 
     companion object {
         const val UPLOAD_BCG_PACKAGE_COUNT = 10
         const val UPLOAD_GYRO_PACKAGE_COUNT = 5
-
-
-        fun getService(way: AffectiveServiceWay): IAffectiveDataAnalysisService? {
-            ServiceLoader.load(IAffectiveDataAnalysisService::class.java).forEach {
-                if (it.getAffectiveWay() == way) {
-                    return it
-                }
-            }
-            return null
-        }
     }
 
     /**
@@ -63,16 +55,14 @@ interface IAffectiveDataAnalysisService {
     fun hasConnectAffectiveService(): Boolean
 
     @Deprecated(
-        message = "The method name contains a typo and exposes callback-style state. Prefer asAffectiveAlgorithm().state for new code.",
-        replaceWith = ReplaceWith("asAffectiveAlgorithm().state"),
+        message = "The method name contains a typo and exposes callback-style state. Prefer awaitConnectAffectiveService() and hasConnectAffectiveService() for new code.",
     )
     fun addServiceConnectStatueListener(
         connectionListener: (() -> Unit)? = null, disconnectListener: ((String) -> Unit)? = null
     )
 
     @Deprecated(
-        message = "The method name contains a typo and exposes callback-style state. Prefer asAffectiveAlgorithm().state for new code.",
-        replaceWith = ReplaceWith("asAffectiveAlgorithm().state"),
+        message = "The method name contains a typo and exposes callback-style state. Prefer awaitConnectAffectiveService() and hasConnectAffectiveService() for new code.",
     )
     fun removeServiceConnectStatueListener(
         connectionListener: (() -> Unit)? = null, disconnectListener: ((String) -> Unit)? = null
@@ -183,8 +173,8 @@ interface IAffectiveDataAnalysisService {
     }
 
     @Deprecated(
-        message = "Use asAffectiveAlgorithm().append(AffectiveInput.*) or the typed append methods.",
-        replaceWith = ReplaceWith("asAffectiveAlgorithm().append(AffectiveInput.EegBytes(data))"),
+        message = "Use append(AffectiveInput.*) or the typed append methods.",
+        replaceWith = ReplaceWith("append(AffectiveInput.EegBytes(data))"),
     )
     fun appendByteArrayData(dataType: IDataType, data: ByteArray): Boolean {
         return when (dataType) {
@@ -218,8 +208,8 @@ interface IAffectiveDataAnalysisService {
     }
 
     @Deprecated(
-        message = "Use asAffectiveAlgorithm().append(AffectiveInput.*) or the typed append methods.",
-        replaceWith = ReplaceWith("asAffectiveAlgorithm().append(AffectiveInput.HeartRate(data))"),
+        message = "Use append(AffectiveInput.*) or the typed append methods.",
+        replaceWith = ReplaceWith("append(AffectiveInput.HeartRate(data))"),
     )
     fun appendIntData(dataType: IDataType, data: Int): Boolean {
         if (!hasStartAffectiveService()) {
@@ -246,8 +236,8 @@ interface IAffectiveDataAnalysisService {
     }
 
     @Deprecated(
-        message = "Use asAffectiveAlgorithm().append(AffectiveInput.*) or the typed append methods.",
-        replaceWith = ReplaceWith("asAffectiveAlgorithm().append(AffectiveInput.EegSamples(data))"),
+        message = "Use append(AffectiveInput.*) or the typed append methods.",
+        replaceWith = ReplaceWith("append(AffectiveInput.EegSamples(data))"),
     )
     fun appendIntListData(dataType: IDataType, data: List<Int>): Boolean {
         when (dataType) {

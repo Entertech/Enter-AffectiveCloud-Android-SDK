@@ -12,8 +12,8 @@ import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affective.sdk.bean.UploadReportEntity
-import cn.entertech.affective.sdk.manager.internal.AlgorithmRegistry
 import java.io.InputStream
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -28,7 +28,13 @@ import kotlin.coroutines.resumeWithException
 @Suppress("unused")
 open class AffectiveManager<Key : Any> {
 
-    private val algorithmRegistry = AlgorithmRegistry<Key>()
+    private val affectiveServices = ConcurrentHashMap<Key, IAffectiveDataAnalysisService>()
+    private val connectionListeners = ConcurrentHashMap<Key, IConnectionServiceListener>()
+    private val startListeners = ConcurrentHashMap<Key, IStartAffectiveServiceLister>()
+    private val finishListeners = ConcurrentHashMap<Key, IFinishAffectiveServiceListener>()
+    private val reportListeners = ConcurrentHashMap<Key, IGetReportListener>()
+    private val bioDataCallbacks = ConcurrentHashMap<Key, (RealtimeBioData?) -> Unit>()
+    private val affectiveDataCallbacks = ConcurrentHashMap<Key, (RealtimeAffectiveData?) -> Unit>()
 
     private val affectionConnectionServiceListeners by lazy {
         CopyOnWriteArrayList<IAffectionConnectionServiceListener<Key>>()
@@ -209,25 +215,33 @@ open class AffectiveManager<Key : Any> {
     fun getAffectiveService(
         key: Key, serviceType: AffectiveServiceWay = AffectiveServiceWay.AffectiveLocalService
     ): IAffectiveDataAnalysisService? {
-        return algorithmRegistry.getOrCreate(key) { initAffectiveService(serviceType) }?.service
+        affectiveServices[key]?.let { return it }
+        val service = initAffectiveService(serviceType) ?: return null
+        return affectiveServices.putIfAbsent(key, service) ?: service
     }
 
     fun getAffectiveService(
         key: Key, default: IAffectiveDataAnalysisService?
     ): IAffectiveDataAnalysisService? {
-        return algorithmRegistry.getOrCreate(key) { default }?.service
+        affectiveServices[key]?.let { return it }
+        val service = default ?: return null
+        return affectiveServices.putIfAbsent(key, service) ?: service
     }
 
     fun registerAffectiveService(
         key: Key,
         service: IAffectiveDataAnalysisService,
-    ): IAffectiveDataAnalysisService = algorithmRegistry.register(key, service).service
+    ): IAffectiveDataAnalysisService {
+        clearServiceState(key)
+        affectiveServices[key] = service
+        return service
+    }
 
     fun unregisterAffectiveService(key: Key): IAffectiveDataAnalysisService? =
-        algorithmRegistry.remove(key)?.service
+        removeAffectiveService(key)
 
     protected open fun initAffectiveService(serviceType: AffectiveServiceWay): IAffectiveDataAnalysisService? {
-        return IAffectiveDataAnalysisService.getService(serviceType)
+        return null
     }
 
     private fun startAffectiveService(key: Key) {
@@ -247,8 +261,8 @@ open class AffectiveManager<Key : Any> {
     }
 
     private fun getConnectionServiceListener(key: Key): IConnectionServiceListener? {
-        val slot = algorithmRegistry.get(key) ?: return null
-        slot.connectionListener?.let { return it }
+        if (!affectiveServices.containsKey(key)) return null
+        connectionListeners[key]?.let { return it }
         return object : IConnectionServiceListener {
                 override fun connectionError(error: Error?) {
                     affectionConnectionServiceListeners.forEach {
@@ -269,15 +283,15 @@ open class AffectiveManager<Key : Any> {
                         it.hasConnected(key, sessionId)
                     }
                 }
-            }.also { slot.connectionListener = it }
+            }.also { connectionListeners.putIfAbsent(key, it) }
     }
 
     private fun getConnectionServiceListener(
         key: Key, authenticationInputStream: InputStream? = null,
         context: Context? = null,
     ): IConnectionServiceListener? {
-        val slot = algorithmRegistry.get(key) ?: return null
-        slot.connectionListener?.let { return it }
+        if (!affectiveServices.containsKey(key)) return null
+        connectionListeners[key]?.let { return it }
         return object : IConnectionServiceListener {
                 override fun connectionError(error: Error?) {
                     affectionConnectionServiceListeners.forEach {
@@ -302,7 +316,7 @@ open class AffectiveManager<Key : Any> {
                         it.hasConnected(key, sessionId)
                     }
                 }
-            }.also { slot.connectionListener = it }
+            }.also { connectionListeners.putIfAbsent(key, it) }
     }
 
     fun getSessionId(
@@ -370,39 +384,38 @@ open class AffectiveManager<Key : Any> {
     }
 
     fun appendEEGDataToAll(eegData: List<Int>, isEar: Boolean = false) {
-        algorithmRegistry.values().forEach { slot ->
-            runCatching { slot.service.appendEEGData(eegData, isEar) }
+        affectiveServices.values.toList().forEach { service ->
+            runCatching { service.appendEEGData(eegData, isEar) }
         }
     }
 
     fun appendEEGDataToAll(eegData: ByteArray, isEar: Boolean = false) {
-        algorithmRegistry.values().forEach { slot ->
-            runCatching { slot.service.appendEEGData(eegData, isEar) }
+        affectiveServices.values.toList().forEach { service ->
+            runCatching { service.appendEEGData(eegData, isEar) }
         }
     }
 
     fun appendEEGDataToAll(eegData: Int, isEar: Boolean = false) {
-        algorithmRegistry.values().forEach { slot ->
-            runCatching { slot.service.appendEEGData(eegData, isEar) }
+        affectiveServices.values.toList().forEach { service ->
+            runCatching { service.appendEEGData(eegData, isEar) }
         }
     }
 
     fun appendHeartRateDataToAll(heartRateData: Int) {
-        algorithmRegistry.values().forEach { slot ->
-            runCatching { slot.service.appendHeartRateData(heartRateData) }
+        affectiveServices.values.toList().forEach { service ->
+            runCatching { service.appendHeartRateData(heartRateData) }
         }
     }
 
     fun appendHeartRateDataToAll(heartRateData: List<Int>) {
-        algorithmRegistry.values().forEach { slot ->
-            runCatching { heartRateData.forEach(slot.service::appendHeartRateData) }
+        affectiveServices.values.toList().forEach { service ->
+            runCatching { heartRateData.forEach(service::appendHeartRateData) }
         }
     }
 
     fun subscribeData(key: Key) {
         val service = getAffectiveService(key) ?: return
-        val slot = algorithmRegistry.get(key) ?: return
-        val bioDataListener: (RealtimeBioData?) -> Unit = slot.bioDataListener ?: run {
+        val bioDataListener: (RealtimeBioData?) -> Unit = bioDataCallbacks[key] ?: run {
             val listener: (RealtimeBioData?) -> Unit = { bioData ->
                 /*     var startTime= affectiveStartTimeMap[key]
                      if (startTime == null) {
@@ -414,17 +427,17 @@ open class AffectiveManager<Key : Any> {
                 }
             }
             listener
-        }.also { slot.bioDataListener = it }
+        }.also { bioDataCallbacks.putIfAbsent(key, it) }
 
         val affectiveDataListener: (RealtimeAffectiveData?) -> Unit =
-            slot.affectiveDataListener ?: run {
+            affectiveDataCallbacks[key] ?: run {
             val listener: (RealtimeAffectiveData?) -> Unit = { affectiveData ->
                 affectiveDataListeners.forEach {
                     it(key, affectiveData)
                 }
             }
             listener
-        }.also { slot.affectiveDataListener = it }
+        }.also { affectiveDataCallbacks.putIfAbsent(key, it) }
         service.subscribeData(bioDataListener, affectiveDataListener)
     }
 
@@ -433,8 +446,8 @@ open class AffectiveManager<Key : Any> {
             endTime = System.currentTimeMillis()
             affectiveStartTimeMap[key] = endTime
         }*/
-        val slot = algorithmRegistry.get(key) ?: return
-        slot.service.unSubscribeData(slot.bioDataListener, slot.affectiveDataListener)
+        val service = affectiveServices[key] ?: return
+        service.unSubscribeData(bioDataCallbacks[key], affectiveDataCallbacks[key])
     }
 
     suspend fun suspendCloseAffectiveServiceConnection(key: Key) {
@@ -446,14 +459,14 @@ open class AffectiveManager<Key : Any> {
                 closeAffectiveServiceConnection()
             }
         }
-        algorithmRegistry.remove(key)
+        removeAffectiveService(key)
     }
 
     private fun getStartAffectiveServiceLister(
         key: Key
     ): IStartAffectiveServiceLister? {
-        val slot = algorithmRegistry.get(key) ?: return null
-        slot.startListener?.let { return it }
+        if (!affectiveServices.containsKey(key)) return null
+        startListeners[key]?.let { return it }
         return object : IStartAffectiveServiceLister {
                 override fun startAffectionFail(error: Error?) {
                     super.startAffectionFail(error)
@@ -490,7 +503,7 @@ open class AffectiveManager<Key : Any> {
                         it.hasStarted(key)
                     }
                 }
-            }.also { slot.startListener = it }
+            }.also { startListeners.putIfAbsent(key, it) }
     }
 
     suspend fun suspendGetAffectiveReport(key: Key): UploadReportEntity? {
@@ -499,9 +512,8 @@ open class AffectiveManager<Key : Any> {
 
     fun getAffectiveReport(key: Key, isEar: Boolean = false, needFinishService: Boolean = false) {
         val service = getAffectiveService(key)
-        val slot = algorithmRegistry.get(key)
-        if (service != null && slot != null) {
-            val listener = slot.reportListener ?: object : IGetReportListener {
+        if (service != null) {
+            val listener = reportListeners[key] ?: object : IGetReportListener {
                     override fun getAffectiveReportError(error: Error?) {
                         affectiveIGetReportListener.forEach {
                             it.getAffectiveReportError(key, error)
@@ -525,7 +537,7 @@ open class AffectiveManager<Key : Any> {
                             it.onSuccess(key, entity)
                         }
                     }
-                }.also { slot.reportListener = it }
+                }.also { reportListeners.putIfAbsent(key, it) }
             service.getReport(listener, isEar, needFinishService)
         } else {
             affectiveIGetReportListener.forEach {
@@ -538,29 +550,28 @@ open class AffectiveManager<Key : Any> {
         try {
             getAffectiveService(key)?.suspendFinishAffectiveService()
         } finally {
-            algorithmRegistry.remove(key)
+            removeAffectiveService(key)
         }
     }
 
     fun finishService(key: Key) {
         val service = getAffectiveService(key)
-        val slot = algorithmRegistry.get(key)
-        if (service != null && slot != null) {
-            val listener = slot.finishListener ?: object : IFinishAffectiveServiceListener {
+        if (service != null) {
+            val listener = finishListeners[key] ?: object : IFinishAffectiveServiceListener {
                     override fun finishError(error: Error?) {
                         affectiveFinishServiceListener.forEach {
                             it.finishError(key, error)
                         }
-                        algorithmRegistry.remove(key)
+                        removeAffectiveService(key)
                     }
 
                     override fun finishSuccess() {
                         affectiveFinishServiceListener.forEach {
                             it.finishSuccess(key)
                         }
-                        algorithmRegistry.remove(key)
+                        removeAffectiveService(key)
                     }
-                }.also { slot.finishListener = it }
+                }.also { finishListeners.putIfAbsent(key, it) }
             service.finishAffectiveService(listener)
         } else {
             affectiveFinishServiceListener.forEach {
@@ -646,6 +657,21 @@ open class AffectiveManager<Key : Any> {
         if (!contains(t)) {
             add(t)
         }
+    }
+
+    private fun removeAffectiveService(key: Key): IAffectiveDataAnalysisService? {
+        val service = affectiveServices.remove(key)
+        clearServiceState(key)
+        return service
+    }
+
+    private fun clearServiceState(key: Key) {
+        connectionListeners.remove(key)
+        startListeners.remove(key)
+        finishListeners.remove(key)
+        reportListeners.remove(key)
+        bioDataCallbacks.remove(key)
+        affectiveDataCallbacks.remove(key)
     }
 
 }

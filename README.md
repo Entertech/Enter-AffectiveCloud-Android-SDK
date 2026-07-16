@@ -219,49 +219,45 @@ implementation 'cn.entertech.android:affectivecloud:2.1.0'
 以前通过 `IAffectiveDataAnalysisService` 实例进行连接、启动、订阅、追加数据和获取报表的方式仍然是主入口。`affective_local_sdk` 和 `affective_cloud_sdk` 都提供该接口的实现，应用可以根据用户配置、网络状态或业务策略选择本地或云端。
 
 ```kotlin
-fun createAffectiveService(useCloud: Boolean): IAffectiveDataAnalysisService? {
-    val way = if (useCloud) {
-        AffectiveServiceWay.AffectiveCloudService
+fun createAffectiveService(useCloud: Boolean): IAffectiveDataAnalysisService {
+    return if (useCloud) {
+        EnterAffectiveCloudService()
     } else {
-        AffectiveServiceWay.AffectiveLocalService
+        EnterAffectiveLocalService()
     }
-    return IAffectiveDataAnalysisService.getService(way)
 }
 
 var affectiveService = createAffectiveService(useCloud = false)
 
 // 切换到云端前，先结束/释放当前会话，再获取新的实现实例。
-affectiveService?.finishAffectiveService(finishListener)
-affectiveService?.closeAffectiveServiceConnection()
+affectiveService.finishAffectiveService(finishListener)
+affectiveService.closeAffectiveServiceConnection()
 affectiveService = createAffectiveService(useCloud = true)
-affectiveService?.connectAffectiveServiceConnection(connectionListener, cloudConfig)
+affectiveService.connectAffectiveServiceConnection(connectionListener, cloudConfig)
 ```
 
-如果需要保留多个算法实例并行运行，不要反复替换同一个变量，使用 `AffectiveManager` 按 key 注册本地和云端服务即可。
+`IAffectiveDataAnalysisService` 只限定公开方法，不负责构造或发现实现。业务可以直接构造 Local/Cloud 服务，也可以交给自己的 DI 容器管理。如果需要保留多个算法实例并行运行，不要反复替换同一个变量，使用 `AffectiveManager` 按 key 注册本地和云端服务即可。
 
 ### 直接使用本地算法
 
-业务只需要依赖 `affective_local_sdk` 和 `affective_sdk_api`，入口仍然是 `IAffectiveDataAnalysisService`。如果希望使用协程和 Flow，可以在拿到本地实现后调用 `asAffectiveAlgorithm()`，不需要经过 Manager。
+业务只需要依赖 `affective_local_sdk` 和 `affective_sdk_api`，入口仍然是 `IAffectiveDataAnalysisService`。如果希望使用协程和 Flow，可以直接使用 `IAffectiveDataAnalysisService` 的扩展方法，不需要经过 Manager，也不需要额外包装成其他入口。
 
 ```kotlin
-val localService = IAffectiveDataAnalysisService.getService(
-    AffectiveServiceWay.AffectiveLocalService
-)
-val localAlgorithm = localService?.asAffectiveAlgorithm(sourceKey = "local")
+val localService: IAffectiveDataAnalysisService = EnterAffectiveLocalService()
 
 val eventJob = lifecycleScope.launch {
-    localAlgorithm?.realtimeEvents?.collect { event ->
+    localService.realtimeEvents(sourceKey = "local").collect { event ->
         demoPipeline.onEvent(event)
     }
 }
 
 lifecycleScope.launch {
-    val connected = localAlgorithm?.connect(EnterAffectiveConfigProxy())
-    if (connected is AffectiveAlgorithmResult.Success) {
-        val started = localAlgorithm.start()
-        if (started is AffectiveAlgorithmResult.Success) {
-            localAlgorithm.append(AffectiveInput.EegBytes(bytes))
-            localAlgorithm.append(AffectiveInput.HeartRate(heartRate))
+    val connected = localService.awaitConnectAffectiveService(EnterAffectiveConfigProxy())
+    if (connected is AffectiveServiceResult.Success) {
+        val started = localService.awaitStartAffectiveService()
+        if (started is AffectiveServiceResult.Success) {
+            localService.append(AffectiveInput.EegBytes(bytes))
+            localService.append(AffectiveInput.HeartRate(heartRate))
         }
     }
 }
@@ -302,7 +298,7 @@ manager.appendHeartRateDataToAll(heartRate)
 
 # 快速接入
 
-本节为既有云端 API 的兼容接入方式。SDK 提供了 `EnterAffectiveCloudManager`，使用该类只需要几步就可以完成客户端与情感云平台的数据交互。新项目也可以通过 `IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveCloudService)` 获取云端实现，并按需调用 `asAffectiveAlgorithm()` 使用协程和 Flow，或将 `EnterAffectiveCloudService` 注册到 `AffectiveManager`。
+本节为既有云端 API 的兼容接入方式。SDK 提供了 `EnterAffectiveCloudManager`，使用该类只需要几步就可以完成客户端与情感云平台的数据交互。新项目也可以直接创建 `EnterAffectiveCloudService`，按需调用 `IAffectiveDataAnalysisService` 的协程和 Flow 扩展方法，或将 `EnterAffectiveCloudService` 注册到 `AffectiveManager`。
 
 ##  1.初始化
 
@@ -550,10 +546,6 @@ affectiveSourceDataApi.deleteSourceDataRecordById(recordId, fun() {
 
 # 更新日志
 [更新日志](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/wiki/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)
-
-
-
-
 
 
 

@@ -39,11 +39,11 @@
 
 ### 2.2 Cloud 冻结范围
 
-本轮不修改 affective_cloud_sdk：
+本轮不重构 affective_cloud_sdk 核心业务实现：
 
-- 不修改源码。
-- 不修改模块 build.gradle。
-- 不修改包名、ServiceLoader 文件和发布坐标。
+- 不修改 Cloud WebSocket、协议、会话和报表等核心实现。
+- 不修改包名和发布坐标。
+- 不为 API 入口补充服务发现或构造逻辑。
 - 不要求它实现新算法接口。
 - 不通过修改共享 convention plugin 间接改变它的构建行为。
 
@@ -154,7 +154,7 @@ ABI dump 之外增加三个最小消费工程：
 - 数据类默认值。
 - 枚举名称和序列化值。
 - Gson 字段名。
-- ServiceLoader 的 Local/Cloud 实现发现。
+- Local/Cloud 直接构造或业务 DI 管理实例。
 - 公开常量值。
 
 ### 5.4 公共依赖
@@ -165,17 +165,18 @@ ABI dump 之外增加三个最小消费工程：
 
 ### 5.5 新 API 策略
 
-第一批重构只建立兼容基线，不立即发布未经验证的新公共类型。
+第一批重构只建立兼容基线，并保持 `IAffectiveDataAnalysisService` 作为业务统一入口。
 
-内部架构稳定后，再以新增方式引入：
+业务可以直接依赖 `affective_local_sdk` 或 `affective_cloud_sdk`，运行时选择由业务层显式创建 `EnterAffectiveLocalService` / `EnterAffectiveCloudService`，或交给业务自己的 DI 容器管理。`IAffectiveDataAnalysisService` 只限定公开方法，不负责服务发现或实例构造。
 
-- AffectiveAlgorithm：一个 Local 或 Cloud 算法实例。
-- AffectiveAlgorithmState：算法生命周期状态。
+在不移除现有方法的前提下，以新增方式补充：
+
 - AffectiveInput：EEG、SCEEG、HR、PEPR、BCG、Gyro 等类型化输入。
 - AffectiveRealtimeEvent：统一实时数据事件。
-- AffectiveAlgorithmResult：操作成功或类型化失败。
+- AffectiveServiceResult：操作成功或类型化失败。
+- `IAffectiveDataAnalysisService` 扩展方法：提供 `suspend`、`Flow` 和类型化 `append(AffectiveInput)` 调用。
 
-新 Kotlin API 可以使用 suspend、Flow 和 StateFlow。旧 callback API 继续作为 Java 兼容入口，直到存在完整的 Java 替代方案。
+旧 callback API 继续作为 Java 兼容入口。命名错误或职责不清的方法可以标记 `DeprecationLevel.WARNING`，但不能破坏源码与二进制兼容。
 
 ### 5.6 过时与删除策略
 
@@ -206,52 +207,43 @@ AffectiveManager 当前使用多组 Map 分别保存：
 - Bio/Affective 实时监听器。
 - 开始和结束时间。
 
-这些状态属于同一个 Key，却由不同集合维护，容易产生部分注册、部分清理和状态漂移。
+这些状态属于同一个 Key，却由不同集合维护，容易产生部分注册、部分清理和状态漂移。当前阶段先保留直接 Map 管理，避免引入只有监听器缓存作用的过度抽象。
 
 现有 suspendCoroutine 桥接还存在重复回调、取消后仍回调和无法注销监听器的风险。
 
-### 6.2 目标模型
+### 6.2 当前模型
 
-每个 Key 对应一个聚合对象：
-
-~~~text
-AlgorithmSlot<Key>
-├── key
-├── IAffectiveDataAnalysisService
-├── lifecycleState
-├── sessionId
-├── connectionBridge
-├── subscriptionBridge
-├── operationMutex
-└── ownedResources
-~~~
-
-Manager 只维护：
+每个 Key 对应一个显式注册的 `IAffectiveDataAnalysisService`：
 
 ~~~text
-ConcurrentHashMap<Key, AlgorithmSlot<Key>>
+AffectiveManager
+├── ConcurrentHashMap<Key, IAffectiveDataAnalysisService>
+├── ConcurrentHashMap<Key, IConnectionServiceListener>
+├── ConcurrentHashMap<Key, IStartAffectiveServiceLister>
+├── ConcurrentHashMap<Key, IGetReportListener>
+├── ConcurrentHashMap<Key, IFinishAffectiveServiceListener>
+└── ConcurrentHashMap<Key, realtime callback>
 ~~~
+
+不再保留独立 Registry/Slot 抽象。只有当单个 Key 需要承载明确状态机、资源 owner 或并发控制时，再引入聚合对象。
 
 ### 6.3 新职责拆分
 
-- AlgorithmRegistry：注册、查找和移除算法实例。
-- AlgorithmSlot：一个 Key 的算法、状态和资源所有权。
-- AlgorithmLifecycleCoordinator：连接、启动、结束和关闭。
-- AlgorithmInputDispatcher：向一个、多个或全部算法分发输入。
-- AlgorithmEventRouter：将实时数据和错误转换成带 Key 的事件。
-- AlgorithmReportCoordinator：按 Key 获取报表和聚合结果。
-- LegacyManagerFacade：保留旧 Manager 方法并委托新实现。
+- AffectiveManager：注册、查找和移除算法实例。
+- 输入分发：向一个、多个或全部算法分发输入。
+- 事件转发：将实时数据和错误转换成带 Key 的事件。
+- 报表转发：按 Key 获取报表。
 
 ### 6.4 多算法行为
 
 - 支持显式 register(key, service)。
-- 保留 ServiceLoader 作为便捷默认发现方式。
+- 不在 API 层提供默认服务发现。
 - 支持 append(key, input) 和 appendAll(input)。
 - 一个算法连接或计算失败不终止其他算法。
 - 所有结果和错误携带 Key。
 - 同一 Key 的生命周期操作串行，不同 Key 可以并行。
 - 重复 connect/start/finish 必须幂等。
-- finish 或 close 完成后才移除 Slot。
+- finish 或 close 完成后才移除对应 service。
 
 ### 6.5 异步规则
 
@@ -260,7 +252,7 @@ ConcurrentHashMap<Key, AlgorithmSlot<Key>>
 - 监听器只能完成 continuation 一次。
 - 协程取消时注销监听器。
 - CancellationException 必须继续抛出。
-- 每个 Slot 使用 Mutex 保证生命周期转换顺序。
+- 后续如引入 per-key 状态机，再使用 Mutex 保证同一 Key 的生命周期转换顺序。
 
 ## 7. affective_local_sdk 重构设计
 
@@ -336,7 +328,7 @@ Manager 继续通过 IAffectiveDataAnalysisService 或显式注入管理 Cloud�
 
 允许新增的外部验证：
 
-- Cloud ServiceLoader 可发现。
+- Cloud 可以由业务直接创建。
 - Cloud 可以被 Demo 直接创建。
 - Cloud 可以被 Manager 作为一个 Key 管理。
 - Cloud 的旧实时数据可以被 Protocol 编码。
@@ -346,9 +338,9 @@ Cloud 后续解冻时再执行：
 
 1. 建立 Cloud 黑盒行为基线。
 2. 拆分 WebSocket、协议、会话和报表职责。
-3. 原生实现 AffectiveAlgorithm。
-4. 与旧 IAffectiveDataAnalysisService 双轨运行。
-5. 完成迁移后再允许整体过时旧接口。
+3. 原生适配 `IAffectiveDataAnalysisService` 的现代扩展能力。
+4. 与旧 callback 方法双轨运行。
+5. 完成迁移后再考虑过时旧 callback 方法；`IAffectiveDataAnalysisService` 本身继续作为业务入口。
 
 ## 9. affective_cloud_protocol 重构设计
 
@@ -505,17 +497,17 @@ Demo 不访问组件内部实现、不直接调用 JNI、不自行复制协议�
 - Cloud 使用的依赖兼容版本暂不随全局清理升级。
 - 2.x 保持统一 libraryVersion，不引入组件独立版本。
 
-## 13. ServiceLoader 与混淆
+## 13. 显式实例与混淆
 
-Local 和 Cloud 都通过 META-INF/services 注册 IAffectiveDataAnalysisService 实现。
+Local 和 Cloud 都提供 `IAffectiveDataAnalysisService` 实现类，由业务直接创建或纳入业务自己的 DI 容器。
 
 重构必须增加：
 
-- 未混淆 Demo 的 ServiceLoader 测试。
+- 未混淆 Demo 的直接实例化测试。
 - 开启 R8 的 release Demo smoke test。
 - Local consumer ProGuard 规则。
 - Cloud 冻结期间不修改其 consumer rules，必要保护规则暂时放在 Demo/消费者侧验证。
-- AAR 检查，确认 META-INF/services 文件存在且实现类可加载。
+- AAR/编译检查，确认 Local/Cloud 实现类可被消费者直接引用。
 
 ## 14. 实施阶段
 
@@ -523,7 +515,7 @@ Local 和 Cloud 都通过 META-INF/services 注册 IAffectiveDataAnalysisService
 
 - 生成 affective_sdk_api ABI dump。
 - 增加 Kotlin、Java 和旧二进制消费测试。
-- 固定公共模型、JSON、ServiceLoader 和默认值行为。
+- 固定公共模型、JSON、组件发现和默认值行为。
 - 不改业务实现。
 
 ### P1：构建和依赖门禁
@@ -536,8 +528,8 @@ Local 和 Cloud 都通过 META-INF/services 注册 IAffectiveDataAnalysisService
 ### P2：Manager 重构
 
 - 先使用 Fake Local/Fake Cloud 建立多算法测试。
-- 引入 AlgorithmSlot 和 Registry。
-- 迁移生命周期、输入分发、订阅、报表和释放。
+- 使用显式注册的 service map 管理多算法实例。
+- 迁移输入分发、订阅、报表和释放。
 - 旧方法委托新实现。
 
 ### P3：Local 重构
@@ -559,15 +551,15 @@ Local 和 Cloud 都通过 META-INF/services 注册 IAffectiveDataAnalysisService
 - 验证 Local/Cloud 直接使用。
 - 验证 Manager 多算法。
 - 验证 Web 实时传输和 Data Provider 展示。
-- 验证 R8 后 ServiceLoader。
+- 验证 R8 后 Local/Cloud 直接实例化。
 
-### P6：新公共 API 和过时周期
+### P6：公共 API 整理和过时周期
 
-- 评审并新增 AffectiveAlgorithm 等新契约。
-- Local 原生实现新契约。
-- Manager 同时支持新契约和旧 Service。
+- 整理 `IAffectiveDataAnalysisService` 现有方法，不移除公开接口。
+- 新增 `AffectiveInput`、`AffectiveRealtimeEvent`、`AffectiveServiceResult` 以及 `IAffectiveDataAnalysisService` 现代扩展方法。
+- Local/Cloud 提供 `IAffectiveDataAnalysisService` 实现，但不在 API 层注册或发现。
 - 旧入口增加 WARNING 级别过时注解。
-- Cloud 继续使用旧 Service。
+- Cloud 内部逻辑继续保持冻结。
 
 ### P7：Cloud 后续重构
 
@@ -581,12 +573,12 @@ Local 和 Cloud 都通过 META-INF/services 注册 IAffectiveDataAnalysisService
 | --- | --- | --- | --- |
 | P0 | 已完成 | `affective_sdk_api/api/affective_sdk_api.api`、`compatibility-tests/legacy-consumer` 建立 ABI、Kotlin 和 Java 源码兼容基线 | `./gradlew apiCheck :compatibility-tests:legacy-consumer:assembleDebug` |
 | P1 | 已完成 | `ModuleDependencyAnalysisPlugin`、允许依赖边和根工程 API validation 已接入 | `./gradlew analyzeModuleDependencies apiCheck` |
-| P2 | 已完成 | Manager 使用 `AlgorithmRegistry`/`AlgorithmSlot` 隔离每个 Key，支持显式注册、全算法分发、失败隔离和完成后清理 | `./gradlew :affective_sdk_manager:test` |
-| P3 | 已完成 | Local 子模块增加生命周期、订阅、批缓存和 `NativeEngine` seam，并保留 ServiceLoader 实现类和全部发布 flavor | `./gradlew :affective_local_sdk:test :affective_local_sdk:assembleRelease`、`scripts/verify_android_16k.sh` |
+| P2 | 已完成 | Manager 使用显式 service map 管理每个 Key，支持显式注册、全算法分发、失败隔离和完成后清理 | `./gradlew :affective_sdk_manager:test` |
+| P3 | 已完成 | Local 子模块增加生命周期、订阅、批缓存和 `NativeEngine` seam，并保留全部发布 flavor | `./gradlew :affective_local_sdk:test :affective_local_sdk:assembleRelease`、`scripts/verify_android_16k.sh` |
 | P4 | 已完成 | Data Provider 增加 selector/filter/window 组合管线；Protocol 增加版本化类型模型和 legacy golden encoder | `./gradlew :affective_data_provider:test :affective_cloud_protocol:test` |
 | P5 | 已完成 | Demo 直接依赖五个能力组件，`AffectiveDemoPipeline` 同时路由实时传输和展示数据 | `./gradlew :demo:test :demo:assembleDebug` |
-| P6 | 已完成 | `AffectiveAlgorithm`、输入/状态/事件/结果模型以及 Legacy/Local 适配器以纯新增方式落地；原 `IAffectiveDataAnalysisService` 未删除或整体过时 | `./gradlew apiCheck :affective_sdk_manager:test :affective_local_sdk:test` |
-| P7 | 未开始 | `affective_cloud_sdk` 继续冻结，通过 Legacy adapter 使用新 API；本轮不修改其源码、资源或构建配置 | `git diff --exit-code HEAD -- affective_cloud_sdk` |
+| P6 | 已完成 | 保留 `IAffectiveDataAnalysisService` 作为统一入口，新增 `AffectiveInput`、`AffectiveRealtimeEvent`、`AffectiveServiceResult` 和直接扩展方法；移除未采用的中间抽象 | `./gradlew :affective_sdk_api:testDebugUnitTest apiCheck :demo:assembleDebug` |
+| P7 | 未开始 | `affective_cloud_sdk` 内部继续冻结；后续重构单独设计 | `git diff --exit-code HEAD -- affective_cloud_sdk/src/main/java/cn/entertech/affectivecloudsdk/EnterAffectiveCloudApiImpl.kt` |
 
 发布门禁由 `scripts/verify_sdk_architecture.sh`、`scripts/verify_service_loader_artifacts.sh` 和现有 `scripts/verify_android_16k.sh` 共同执行，并已接入发布 PR 与正式发布工作流。
 
@@ -628,7 +620,7 @@ Local 和 Cloud 都通过 META-INF/services 注册 IAffectiveDataAnalysisService
 2. Kotlin/Java/旧二进制消费检查。
 3. 模块依赖分析。
 4. 各组件单元测试。
-5. R8 ServiceLoader smoke test。
+5. R8 直接实例化 smoke test。
 6. AAR/POM/metadata 检查。
 7. Native SO 和 16 KB 检查。
 
@@ -652,7 +644,7 @@ Local 和 Cloud 都通过 META-INF/services 注册 IAffectiveDataAnalysisService
 
 多个算法同时运行时可能发生重复启动、回调串 Key 或提前清理。
 
-控制方式：每个 Key 使用独立 Slot 和 Mutex，以带 Key 的事件进行断言。
+控制方式：每个 Key 使用独立 service 和监听器缓存，以带 Key 的事件进行断言；如果后续引入状态机，再补充 per-key Mutex。
 
 ### 17.3 JNI 生命周期风险
 
@@ -666,11 +658,11 @@ HandlerThread、JNI 单例和缓存当前所有权不清晰。
 
 控制方式：新 convention plugin 采用 opt-in；Protocol 旧类型只做兼容保留；验收要求 Cloud 目录无差异。
 
-### 17.5 ServiceLoader 与 R8 风险
+### 17.5 显式实例与 R8 风险
 
 实现类可能在 release 构建中被裁剪。
 
-控制方式：consumer rules、META-INF/services AAR 检查和混淆后的 Demo smoke test。
+控制方式：consumer rules、消费者编译检查和混淆后的 Demo smoke test。
 
 ### 17.6 子模块工作区风险
 
@@ -691,8 +683,8 @@ HandlerThread、JNI 单例和缓存当前所有权不清晰。
 - Protocol 旧 JSON golden tests 全部通过。
 - Data Provider 缓存始终不超过配置上限。
 - Local 的全部发布 flavor、JNI 测试和 16 KB 检查通过。
-- 混淆后的 Demo 可以通过 ServiceLoader 找到算法实现。
-- affective_cloud_sdk 目录没有源码或配置差异。
+- 混淆后的 Demo 可以直接创建算法实现。
+- affective_cloud_sdk 核心业务实现没有被重构。
 - 发布产物可以追溯到父仓库提交和 Local 子模块精确 SHA。
 - 本地 Maven 消费测试通过后才允许远端发布。
 

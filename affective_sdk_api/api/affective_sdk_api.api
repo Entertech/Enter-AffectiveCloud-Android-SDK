@@ -4,62 +4,17 @@ public final class cn/entertech/affective/sdk/BrainDataHelper {
 	public static synthetic fun sceegToEeg$default (Lcn/entertech/affective/sdk/BrainDataHelper;[BZILjava/lang/Object;)Ljava/util/List;
 }
 
-public abstract interface class cn/entertech/affective/sdk/api/AffectiveAlgorithm {
-	public abstract fun append (Lcn/entertech/affective/sdk/api/AffectiveInput;)Lcn/entertech/affective/sdk/api/AffectiveAlgorithmResult;
-	public abstract fun connect (Lcn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun disconnect ()V
-	public abstract fun finish (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun getRealtimeEvents ()Lkotlinx/coroutines/flow/Flow;
-	public abstract fun getState ()Lkotlinx/coroutines/flow/StateFlow;
-	public abstract fun getWay ()Lcn/entertech/affective/sdk/bean/AffectiveServiceWay;
-	public abstract fun report (ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun start (Ljava/io/InputStream;Landroid/content/Context;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public final class cn/entertech/affective/sdk/api/AffectiveAlgorithm$DefaultImpls {
-	public static synthetic fun connect$default (Lcn/entertech/affective/sdk/api/AffectiveAlgorithm;Lcn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static synthetic fun report$default (Lcn/entertech/affective/sdk/api/AffectiveAlgorithm;ZZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static synthetic fun start$default (Lcn/entertech/affective/sdk/api/AffectiveAlgorithm;Ljava/io/InputStream;Landroid/content/Context;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-}
-
-public abstract interface class cn/entertech/affective/sdk/api/AffectiveAlgorithmResult {
-}
-
-public final class cn/entertech/affective/sdk/api/AffectiveAlgorithmResult$Failure : cn/entertech/affective/sdk/api/AffectiveAlgorithmResult {
-	public fun <init> (Lcn/entertech/affective/sdk/bean/Error;)V
-	public final fun component1 ()Lcn/entertech/affective/sdk/bean/Error;
-	public final fun copy (Lcn/entertech/affective/sdk/bean/Error;)Lcn/entertech/affective/sdk/api/AffectiveAlgorithmResult$Failure;
-	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/api/AffectiveAlgorithmResult$Failure;Lcn/entertech/affective/sdk/bean/Error;ILjava/lang/Object;)Lcn/entertech/affective/sdk/api/AffectiveAlgorithmResult$Failure;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getError ()Lcn/entertech/affective/sdk/bean/Error;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class cn/entertech/affective/sdk/api/AffectiveAlgorithmResult$Success : cn/entertech/affective/sdk/api/AffectiveAlgorithmResult {
-	public fun <init> (Ljava/lang/Object;)V
-	public final fun component1 ()Ljava/lang/Object;
-	public final fun copy (Ljava/lang/Object;)Lcn/entertech/affective/sdk/api/AffectiveAlgorithmResult$Success;
-	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/api/AffectiveAlgorithmResult$Success;Ljava/lang/Object;ILjava/lang/Object;)Lcn/entertech/affective/sdk/api/AffectiveAlgorithmResult$Success;
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getValue ()Ljava/lang/Object;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class cn/entertech/affective/sdk/api/AffectiveAlgorithmState : java/lang/Enum {
-	public static final field Connected Lcn/entertech/affective/sdk/api/AffectiveAlgorithmState;
-	public static final field Connecting Lcn/entertech/affective/sdk/api/AffectiveAlgorithmState;
-	public static final field Disconnected Lcn/entertech/affective/sdk/api/AffectiveAlgorithmState;
-	public static final field Failed Lcn/entertech/affective/sdk/api/AffectiveAlgorithmState;
-	public static final field Finished Lcn/entertech/affective/sdk/api/AffectiveAlgorithmState;
-	public static final field Finishing Lcn/entertech/affective/sdk/api/AffectiveAlgorithmState;
-	public static final field Idle Lcn/entertech/affective/sdk/api/AffectiveAlgorithmState;
-	public static final field Running Lcn/entertech/affective/sdk/api/AffectiveAlgorithmState;
-	public static final field Starting Lcn/entertech/affective/sdk/api/AffectiveAlgorithmState;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lcn/entertech/affective/sdk/api/AffectiveAlgorithmState;
-	public static fun values ()[Lcn/entertech/affective/sdk/api/AffectiveAlgorithmState;
+public final class cn/entertech/affective/sdk/api/AffectiveDataAnalysisServiceExtensionsKt {
+	public static final fun append (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/api/AffectiveInput;)Lcn/entertech/affective/sdk/api/AffectiveServiceResult;
+	public static final fun awaitConnectAffectiveService (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun awaitConnectAffectiveService$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun awaitFinishAffectiveService (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun awaitGetReport (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun awaitGetReport$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;ZZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun awaitStartAffectiveService (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Ljava/io/InputStream;Landroid/content/Context;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun awaitStartAffectiveService$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Ljava/io/InputStream;Landroid/content/Context;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun realtimeEvents (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Ljava/lang/String;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun realtimeEvents$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Ljava/lang/String;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
 }
 
 public abstract interface class cn/entertech/affective/sdk/api/AffectiveInput {
@@ -251,24 +206,29 @@ public final class cn/entertech/affective/sdk/api/AffectiveRealtimeEvent$BioData
 	public fun toString ()Ljava/lang/String;
 }
 
-public class cn/entertech/affective/sdk/api/AffectiveServiceAlgorithmAdapter : cn/entertech/affective/sdk/api/AffectiveAlgorithm {
-	public fun <init> (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Ljava/lang/String;)V
-	public synthetic fun <init> (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun append (Lcn/entertech/affective/sdk/api/AffectiveInput;)Lcn/entertech/affective/sdk/api/AffectiveAlgorithmResult;
-	public fun connect (Lcn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun disconnect ()V
-	public fun finish (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun getRealtimeEvents ()Lkotlinx/coroutines/flow/Flow;
-	protected final fun getService ()Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;
-	public fun getState ()Lkotlinx/coroutines/flow/StateFlow;
-	public fun getWay ()Lcn/entertech/affective/sdk/bean/AffectiveServiceWay;
-	public fun report (ZZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun start (Ljava/io/InputStream;Landroid/content/Context;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+public abstract interface class cn/entertech/affective/sdk/api/AffectiveServiceResult {
 }
 
-public final class cn/entertech/affective/sdk/api/AffectiveServiceAlgorithmAdapterKt {
-	public static final fun asAffectiveAlgorithm (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Ljava/lang/String;)Lcn/entertech/affective/sdk/api/AffectiveAlgorithm;
-	public static synthetic fun asAffectiveAlgorithm$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Ljava/lang/String;ILjava/lang/Object;)Lcn/entertech/affective/sdk/api/AffectiveAlgorithm;
+public final class cn/entertech/affective/sdk/api/AffectiveServiceResult$Failure : cn/entertech/affective/sdk/api/AffectiveServiceResult {
+	public fun <init> (Lcn/entertech/affective/sdk/bean/Error;)V
+	public final fun component1 ()Lcn/entertech/affective/sdk/bean/Error;
+	public final fun copy (Lcn/entertech/affective/sdk/bean/Error;)Lcn/entertech/affective/sdk/api/AffectiveServiceResult$Failure;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/api/AffectiveServiceResult$Failure;Lcn/entertech/affective/sdk/bean/Error;ILjava/lang/Object;)Lcn/entertech/affective/sdk/api/AffectiveServiceResult$Failure;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getError ()Lcn/entertech/affective/sdk/bean/Error;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class cn/entertech/affective/sdk/api/AffectiveServiceResult$Success : cn/entertech/affective/sdk/api/AffectiveServiceResult {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/Object;)Lcn/entertech/affective/sdk/api/AffectiveServiceResult$Success;
+	public static synthetic fun copy$default (Lcn/entertech/affective/sdk/api/AffectiveServiceResult$Success;Ljava/lang/Object;ILjava/lang/Object;)Lcn/entertech/affective/sdk/api/AffectiveServiceResult$Success;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public abstract interface class cn/entertech/affective/sdk/api/Callback {
@@ -334,7 +294,6 @@ public abstract interface class cn/entertech/affective/sdk/api/IAffectiveDataAna
 public final class cn/entertech/affective/sdk/api/IAffectiveDataAnalysisService$Companion {
 	public static final field UPLOAD_BCG_PACKAGE_COUNT I
 	public static final field UPLOAD_GYRO_PACKAGE_COUNT I
-	public final fun getService (Lcn/entertech/affective/sdk/bean/AffectiveServiceWay;)Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;
 }
 
 public final class cn/entertech/affective/sdk/api/IAffectiveDataAnalysisService$DefaultImpls {

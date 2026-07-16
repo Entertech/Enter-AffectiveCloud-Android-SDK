@@ -20,7 +20,6 @@ import cn.entertech.affective.sdk.api.IConnectionServiceListener
 import cn.entertech.affective.sdk.api.IFinishAffectiveServiceListener
 import cn.entertech.affective.sdk.api.IGetReportListener
 import cn.entertech.affective.sdk.api.IStartAffectiveServiceLister
-import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
 import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
@@ -35,6 +34,7 @@ import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.ConvertUtil
 import cn.entertech.biomoduledemo.utils.PagerSlidingTabStrip
+import cn.entertech.affectivesdk.manager.EnterAffectiveLocalService
 import cn.entertech.ble.single.BiomoduleBleManager
 import com.orhanobut.logger.Logger
 import java.io.InputStream
@@ -48,8 +48,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var vpContainer: ViewPager
     private lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
     private val affectiveService by lazy {
-        IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveLocalService)
-//        IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveCloudService)
+        EnterAffectiveLocalService()
+        // Cloud 示例可以直接构造 EnterAffectiveCloudService()，或交给业务自己的 DI 容器管理。
     }
 
     //    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"

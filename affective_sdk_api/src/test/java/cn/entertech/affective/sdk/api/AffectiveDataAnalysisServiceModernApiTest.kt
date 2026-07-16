@@ -3,7 +3,6 @@ package cn.entertech.affective.sdk.api
 import android.content.Context
 import cn.entertech.affective.sdk.bean.AffectiveServiceWay
 import cn.entertech.affective.sdk.bean.EnterAffectiveConfigProxy
-import cn.entertech.affective.sdk.bean.Error
 import cn.entertech.affective.sdk.bean.RealtimeAffectiveData
 import cn.entertech.affective.sdk.bean.RealtimeBioData
 import cn.entertech.affective.sdk.bean.UploadReportEntity
@@ -14,84 +13,52 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class AffectiveServiceAlgorithmAdapterTest {
+class AffectiveDataAnalysisServiceModernApiTest {
     @Test
-    fun lifecycleCallbacksAreExposedAsCoroutineResults() = runBlocking {
+    fun coroutineAndFlowApiUsesDataAnalysisServiceDirectly() = runBlocking {
         val service = FakeAffectiveService()
-        val algorithm = service.asAffectiveAlgorithm(sourceKey = "local")
 
-        val connect = algorithm.connect(EnterAffectiveConfigProxy())
-        val start = algorithm.start()
-        val report = algorithm.report()
-        val finish = algorithm.finish()
+        val connect = service.awaitConnectAffectiveService(EnterAffectiveConfigProxy())
+        val start = service.awaitStartAffectiveService()
+        val report = service.awaitGetReport()
+        val finish = service.awaitFinishAffectiveService()
 
-        assertTrue(connect is AffectiveAlgorithmResult.Success)
-        assertTrue(start is AffectiveAlgorithmResult.Success)
-        assertTrue(report is AffectiveAlgorithmResult.Success)
-        assertTrue(finish is AffectiveAlgorithmResult.Success)
-        assertEquals(AffectiveAlgorithmState.Finished, algorithm.state.value)
+        assertTrue(connect is AffectiveServiceResult.Success)
+        assertTrue(start is AffectiveServiceResult.Success)
+        assertTrue(report is AffectiveServiceResult.Success)
+        assertTrue(finish is AffectiveServiceResult.Success)
         assertEquals(listOf("connect", "start", "report", "finish"), service.calls)
     }
 
     @Test
-    fun appendRoutesStructuredInputsToLegacyService() {
+    fun appendInputRoutesThroughDataAnalysisServiceDirectly() {
         val service = FakeAffectiveService()
-        val algorithm = service.asAffectiveAlgorithm(sourceKey = "local")
 
-        algorithm.append(AffectiveInput.EegBytes(byteArrayOf(1), isEar = true))
-        algorithm.append(AffectiveInput.EegSample(2, isEar = true))
-        algorithm.append(AffectiveInput.EegSamples(listOf(3), isEar = false))
-        algorithm.append(AffectiveInput.SceegBytes(byteArrayOf(4), isEar = true))
-        algorithm.append(AffectiveInput.SceegSample(5, isEar = false))
-        algorithm.append(AffectiveInput.SceegSamples(listOf(6), isEar = true))
-        algorithm.append(AffectiveInput.DcEeg(byteArrayOf(7)))
-        algorithm.append(AffectiveInput.McEeg(byteArrayOf(8)))
-        algorithm.append(AffectiveInput.HeartRate(72))
-        algorithm.append(AffectiveInput.Pepr(byteArrayOf(9)))
-        algorithm.append(AffectiveInput.Bcg(byteArrayOf(10), packageCount = 11))
-        algorithm.append(AffectiveInput.Gyro(byteArrayOf(12), packageCount = 13))
+        val result = service.append(AffectiveInput.HeartRate(72))
 
-        assertEquals(
-            listOf(
-                "eeg-bytes:true",
-                "eeg-int:true",
-                "eeg-list:false",
-                "sceeg-bytes:true",
-                "sceeg-int:false",
-                "sceeg-list:true",
-                "dceeg",
-                "mceeg",
-                "hr:72",
-                "pepr",
-                "bcg:11",
-                "gyro:13",
-            ),
-            service.calls,
-        )
+        assertTrue(result is AffectiveServiceResult.Success)
+        assertEquals(listOf("hr:72"), service.calls)
     }
 
     @Test
-    fun realtimeEventsSubscribeAndUnsubscribeThroughServiceCallbacks() = runBlocking {
+    fun realtimeEventsSubscribeAndUnsubscribeThroughDataAnalysisServiceDirectly() = runBlocking {
         val service = FakeAffectiveService()
-        val algorithm = service.asAffectiveAlgorithm(sourceKey = "local")
         val bioData = RealtimeBioData()
+        var event: AffectiveRealtimeEvent? = null
 
         val collectJob = launch {
-            val event = algorithm.realtimeEvents.first()
-            assertTrue(event is AffectiveRealtimeEvent.BioData)
-            assertSame(bioData, (event as AffectiveRealtimeEvent.BioData).data)
+            event = service.realtimeEvents(sourceKey = "local").first()
         }
-
         while (service.bioListener == null) {
             kotlinx.coroutines.yield()
         }
         service.bioListener?.invoke(bioData)
         collectJob.join()
 
+        assertEquals(AffectiveRealtimeEvent.BioData("local", bioData), event)
         assertEquals(listOf("subscribe", "unsubscribe"), service.calls)
     }
 
@@ -194,54 +161,22 @@ class AffectiveServiceAlgorithmAdapterTest {
 
         override fun isGoodQuality(quality: Double): Boolean = true
         override fun appendDevicePosition(device: IDeviceType, position: String) = Unit
-        override fun appendEEGData(brainData: ByteArray, isEar: Boolean) {
-            calls += "eeg-bytes:$isEar"
-        }
-
-        override fun appendEEGData(brainData: Int, isEar: Boolean) {
-            calls += "eeg-int:$isEar"
-        }
-
-        override fun appendEEGData(brainData: List<Int>, isEar: Boolean) {
-            calls += "eeg-list:$isEar"
-        }
-
-        override fun appendDCEEGData(brainData: ByteArray) {
-            calls += "dceeg"
-        }
-
-        override fun appendSCEEGData(brainData: ByteArray, isEar: Boolean) {
-            calls += "sceeg-bytes:$isEar"
-        }
-
-        override fun appendSCEEGData(brainData: Int, isEar: Boolean) {
-            calls += "sceeg-int:$isEar"
-        }
-
-        override fun appendSCEEGData(brainData: List<Int>, isEar: Boolean) {
-            calls += "sceeg-list:$isEar"
-        }
+        override fun appendEEGData(brainData: ByteArray, isEar: Boolean) = Unit
+        override fun appendEEGData(brainData: Int, isEar: Boolean) = Unit
+        override fun appendEEGData(brainData: List<Int>, isEar: Boolean) = Unit
+        override fun appendDCEEGData(brainData: ByteArray) = Unit
+        override fun appendSCEEGData(brainData: ByteArray, isEar: Boolean) = Unit
+        override fun appendSCEEGData(brainData: Int, isEar: Boolean) = Unit
+        override fun appendSCEEGData(brainData: List<Int>, isEar: Boolean) = Unit
 
         override fun appendHeartRateData(heartRateData: Int) {
             calls += "hr:$heartRateData"
         }
 
-        override fun appendMCEEGData(mceegData: ByteArray) {
-            calls += "mceeg"
-        }
-
-        override fun appendPEPRData(peprData: ByteArray) {
-            calls += "pepr"
-        }
-
-        override fun appendBCGData(bcgData: ByteArray, packageCount: Int) {
-            calls += "bcg:$packageCount"
-        }
-
-        override fun appendGyroData(gyroData: ByteArray, packageCount: Int) {
-            calls += "gyro:$packageCount"
-        }
-
+        override fun appendMCEEGData(mceegData: ByteArray) = Unit
+        override fun appendPEPRData(peprData: ByteArray) = Unit
+        override fun appendBCGData(bcgData: ByteArray, packageCount: Int) = Unit
+        override fun appendGyroData(gyroData: ByteArray, packageCount: Int) = Unit
         override fun getAffectiveWay(): AffectiveServiceWay = AffectiveServiceWay.AffectiveLocalService
     }
 }

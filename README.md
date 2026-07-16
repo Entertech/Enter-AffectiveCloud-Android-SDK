@@ -43,14 +43,13 @@
 
 # 架构与组件
 
-SDK 的核心设计是由 `affective_sdk_api` 对外暴露稳定操作面，应用主要面向 `IAffectiveDataAnalysisService` 编程；本地算法和云端算法只是这个接口的两个实现。应用可以在运行时按 `AffectiveServiceWay` 选择本地或云端实现，也可以直接使用本地/云端组件；Manager 用于多算法实例并行、隔离和广播输入。
+SDK 的核心设计是由 `affective_sdk_api` 对外暴露稳定操作面，应用主要面向 `IAffectiveDataAnalysisService` 编程；本地算法和云端算法只是这个接口的两个实现。业务需要引用具体能力组件，例如 `affective_local_sdk` 或 `affective_cloud_sdk`，但入口变量、生命周期调用、数据追加和报表获取都保持为 `IAffectiveDataAnalysisService`。运行时切换本地/云端由 App 自己创建或注入对应实现完成，`affective_sdk_api` 不负责服务发现或实例构造。
 
 ```mermaid
 flowchart TD
-    App["App / Demo"] --> API["affective_sdk_api<br/>IAffectiveDataAnalysisService"]
-    API --> Way["AffectiveServiceWay<br/>Local / Cloud"]
-    Way --> Local["affective_local_sdk<br/>本地实现"]
-    Way --> Cloud["affective_cloud_sdk<br/>云端实现"]
+    App["App / Demo<br/>组合根 / DI"] --> API["affective_sdk_api<br/>IAffectiveDataAnalysisService"]
+    App --> Local["affective_local_sdk<br/>本地实现"]
+    App --> Cloud["affective_cloud_sdk<br/>云端实现"]
     App --> Manager["affective_sdk_manager<br/>多算法管理"]
     App --> Protocol["affective_cloud_protocol<br/>实时数据传输"]
     App --> Provider["affective_data_provider<br/>展示数据处理"]
@@ -64,14 +63,14 @@ flowchart TD
 
 | 模块 | 职责 | 何时直接依赖 |
 | --- | --- | --- |
-| `affective_local_sdk` | 提供 `IAffectiveDataAnalysisService` 的本地算法实现，支持无网络分析 | 需要本地实现，或需要在运行时切到本地算法时 |
-| `affective_cloud_sdk` | 提供 `IAffectiveDataAnalysisService` 的云端算法实现，连接情感云服务 | 需要云端实现、云端报表，或需要在运行时切到云端算法时 |
+| `affective_local_sdk` | 提供 `IAffectiveDataAnalysisService` 的本地算法实现，支持无网络分析 | 需要直接使用本地算法，或业务需要在运行时切到本地算法时 |
+| `affective_cloud_sdk` | 提供 `IAffectiveDataAnalysisService` 的云端算法实现，连接情感云服务 | 需要直接使用云端算法、云端报表，或业务需要在运行时切到云端算法时 |
 | `affective_sdk_manager` | 按 key 注册、启动和隔离多个 `IAffectiveDataAnalysisService` 实例，并向多个算法广播数据 | 本地和云端并行，或同时管理多个设备/算法时 |
 | `affective_cloud_protocol` | 将实时生物和情感数据编码为 Web/Socket 可传输的数据 | App 内开启 Web 服务或向外部页面展示实时数据时 |
 | `affective_data_provider` | 选择、过滤、缓存和裁剪用于 UI 展示的数据 | 折线图、指标卡等实时展示场景 |
-| `affective_sdk_api` | `IAffectiveDataAnalysisService`、公共配置、输入、状态、实时事件和报表模型 | 应用代码需要面向统一接口编程，或需要动态选择本地/云端实现时 |
+| `affective_sdk_api` | `IAffectiveDataAnalysisService`、公共配置、输入、状态、实时事件和报表模型 | 应用代码需要面向统一接口编程，或需要把本地/云端实现隐藏在同一个接口变量后面时 |
 
-五个产品组件都可以被 App/Demo 直接依赖，但推荐的算法调用面仍是 `affective_sdk_api` 中的 `IAffectiveDataAnalysisService`：Local 和 Cloud 负责提供实现，App 根据配置选择其中一个；需要并行运行或同时管理多个实例时再使用 Manager。完整设计见[重构设计文档](doc/tech/affective-sdk-refactoring-design.md)。
+五个产品组件都可以被 App/Demo 直接依赖，但推荐的算法调用面仍是 `affective_sdk_api` 中的 `IAffectiveDataAnalysisService`：Local 和 Cloud 负责提供实现，App 根据配置、网络状态或用户选择决定当前使用哪个实现；需要并行运行或同时管理多个实例时再使用 Manager。`AffectiveServiceWay` 只是服务类型标识，不是 API 层的工厂入口。完整设计见[重构设计文档](doc/tech/affective-sdk-refactoring-design.md)。
 
 # 仓库开发初始化
 
@@ -218,25 +217,39 @@ implementation 'cn.entertech.android:affectivecloud:2.1.0'
 
 以前通过 `IAffectiveDataAnalysisService` 实例进行连接、启动、订阅、追加数据和获取报表的方式仍然是主入口。`affective_local_sdk` 和 `affective_cloud_sdk` 都提供该接口的实现，应用可以根据用户配置、网络状态或业务策略选择本地或云端。
 
+关键点：
+
+- 业务代码依赖的是具体能力组件：只用本地就依赖 `affective_local_sdk`，只用云端就依赖 `affective_cloud_sdk`，需要动态切换就同时依赖两者。
+- 业务层持有的入口类型仍然是 `IAffectiveDataAnalysisService`，因此连接、启动、追加数据、订阅和报表获取的调用面一致。
+- `affective_sdk_api` 不提供 `getService` 或任何服务发现逻辑；实现实例由 App 自己创建，或由业务自己的 DI 容器提供。
+
 ```kotlin
-fun createAffectiveService(useCloud: Boolean): IAffectiveDataAnalysisService {
-    return if (useCloud) {
-        EnterAffectiveCloudService()
-    } else {
-        EnterAffectiveLocalService()
-    }
+enum class AlgorithmMode {
+    Local,
+    Cloud,
 }
 
-var affectiveService = createAffectiveService(useCloud = false)
+fun createAffectiveService(mode: AlgorithmMode): IAffectiveDataAnalysisService =
+    when (mode) {
+        AlgorithmMode.Local -> EnterAffectiveLocalService()
+        AlgorithmMode.Cloud -> EnterAffectiveCloudService()
+    }
 
-// 切换到云端前，先结束/释放当前会话，再获取新的实现实例。
-affectiveService.finishAffectiveService(finishListener)
-affectiveService.closeAffectiveServiceConnection()
-affectiveService = createAffectiveService(useCloud = true)
-affectiveService.connectAffectiveServiceConnection(connectionListener, cloudConfig)
+var affectiveService: IAffectiveDataAnalysisService =
+    createAffectiveService(AlgorithmMode.Local)
+
+// 切换到云端前，先结束/释放当前会话，再替换成新的实现实例。
+lifecycleScope.launch {
+    affectiveService.awaitFinishAffectiveService()
+    affectiveService.closeAffectiveServiceConnection()
+
+    affectiveService = createAffectiveService(AlgorithmMode.Cloud)
+    affectiveService.awaitConnectAffectiveService(cloudConfig)
+    affectiveService.awaitStartAffectiveService()
+}
 ```
 
-`IAffectiveDataAnalysisService` 只限定公开方法，不负责构造或发现实现。业务可以直接构造 Local/Cloud 服务，也可以交给自己的 DI 容器管理。如果需要保留多个算法实例并行运行，不要反复替换同一个变量，使用 `AffectiveManager` 按 key 注册本地和云端服务即可。
+如果只需要单一算法，直接持有一个 `IAffectiveDataAnalysisService` 变量即可。需要动态切换时，切换的是变量背后的实现实例，不是调用方式；需要本地和云端同时运行时，不要反复替换同一个变量，使用 `AffectiveManager` 按 key 注册本地和云端服务即可。
 
 ### 直接使用本地算法
 
@@ -265,8 +278,8 @@ lifecycleScope.launch {
 // 页面或会话结束时
 lifecycleScope.launch {
     eventJob.cancelAndJoin()
-    localAlgorithm?.finish()
-    localAlgorithm?.disconnect()
+    localService.awaitFinishAffectiveService()
+    localService.closeAffectiveServiceConnection()
 }
 ```
 
@@ -546,8 +559,6 @@ affectiveSourceDataApi.deleteSourceDataRecordById(recordId, fun() {
 
 # 更新日志
 [更新日志](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/wiki/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)
-
-
 
 
 

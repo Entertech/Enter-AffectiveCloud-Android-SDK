@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -33,6 +34,7 @@ import cn.entertech.biomoduledemo.affective.AffectiveServiceFinishCallback
 import cn.entertech.biomoduledemo.affective.AffectiveServiceSwitchCallbacks
 import cn.entertech.biomoduledemo.affective.AffectiveServiceSwitchCoordinator
 import cn.entertech.biomoduledemo.affective.AffectiveServiceSwitchResult
+import cn.entertech.biomoduledemo.affective.DemoControlState
 import cn.entertech.biomoduledemo.affective.DemoAffectiveAlgorithmMode
 import cn.entertech.biomoduledemo.affective.DemoCloudCredential
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_KEY
@@ -58,9 +60,19 @@ class MainActivity : AppCompatActivity() {
     private lateinit var vpContainer: ViewPager
     private lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
     private lateinit var algorithmModeGroup: RadioGroup
+    private lateinit var connectBleButton: Button
+    private lateinit var disconnectBleButton: Button
+    private lateinit var pauseUploadButton: Button
+    private lateinit var initAlgorithmButton: Button
+    private lateinit var startUploadButton: Button
+    private lateinit var getReportButton: Button
+    private lateinit var finishAlgorithmButton: Button
+    private lateinit var submitCommentButton: Button
+    private lateinit var restoreAlgorithmButton: Button
     private lateinit var affectiveSwitchCoordinator:
         AffectiveServiceSwitchCoordinator<IAffectiveDataAnalysisService>
     private var suppressAlgorithmModeChange = false
+    private val controlState = DemoControlState()
 
     private val affectiveService: IAffectiveDataAnalysisService
         get() = affectiveSwitchCoordinator.currentService
@@ -84,15 +96,17 @@ class MainActivity : AppCompatActivity() {
         )
     private var availableBioDataCategories = listOf(BioDataCategory.EEG, BioDataCategory.HR)
 
-    private val connectionListener by lazy {
+    private val connectionListener: () -> Unit by lazy {
         {
-            val i = Log.d(TAG,"connectionListener")
+            Log.d(TAG,"connectionListener")
         }
     }
 
-    private val disconnectionListener by lazy {
+    private val disconnectionListener: (String) -> Unit by lazy {
         { errorMsg: String ->
-            val i = Log.d(TAG, "disconnect:$errorMsg")
+            Log.d(TAG, "disconnect:$errorMsg")
+            controlState.onAlgorithmFinished()
+            updateControlAvailability()
         }
     }
 
@@ -100,18 +114,26 @@ class MainActivity : AppCompatActivity() {
         object : IStartAffectiveServiceLister {
             override fun startSuccess() {
                 Log.d(TAG, "startAffectiveServiceLister:startSuccess")
+                controlState.onAlgorithmInitialized()
+                updateControlAvailability()
             }
 
             override fun startBioFail(error: Error?) {
                 Log.d(TAG, "startAffectiveServiceLister:startBioFail $error")
+                controlState.onAlgorithmFinished()
+                updateControlAvailability()
             }
 
             override fun startAffectionFail(error: Error?) {
                 Log.d(TAG, "startAffectiveServiceLister:startAffectionFail $error")
+                controlState.onAlgorithmFinished()
+                updateControlAvailability()
             }
 
             override fun startFail(error: Error?) {
                 Log.d(TAG, "startAffectiveServiceLister:startFail $error")
+                controlState.onAlgorithmFinished()
+                updateControlAvailability()
             }
         }
     }
@@ -132,6 +154,8 @@ class MainActivity : AppCompatActivity() {
 
             override fun connectionError(error: Error?) {
                 Log.d(TAG, "connectionError: $error")
+                controlState.onAlgorithmFinished()
+                updateControlAvailability()
             }
         }
     }
@@ -155,10 +179,14 @@ class MainActivity : AppCompatActivity() {
         refreshCloudCredential(intent)
         affectiveSwitchCoordinator = createAffectiveSwitchCoordinator()
         biomoduleBleManager = BiomoduleBleManager.getInstance(applicationContext)
+        if (biomoduleBleManager.isConnected()) {
+            controlState.onBleConnected()
+        }
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
         initView()
         initAlgorithmModeSwitch()
+        updateControlAvailability()
         initPermission()
         handleIntentAlgorithmSelection(intent)
     }
@@ -252,6 +280,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestAlgorithmMode(mode: DemoAffectiveAlgorithmMode) {
+        if (!controlState.controls.canSwitchAlgorithm) {
+            updateAlgorithmModeChecked(affectiveSwitchCoordinator.currentMode)
+            showUnavailableAction()
+            return
+        }
         val previousMode = affectiveSwitchCoordinator.currentMode
         var resultReceived = false
         affectiveSwitchCoordinator.switchTo(
@@ -349,6 +382,8 @@ class MainActivity : AppCompatActivity() {
             handleAlgorithmSwitchResult(AffectiveServiceSwitchResult.CloudConfigRequired)
             return
         }
+        controlState.onAlgorithmInitializing()
+        updateControlAvailability()
         val proxy = EnterAffectiveConfigProxy(
             availableBioDataCategories,
             availableAffectiveDataCategories,
@@ -372,6 +407,15 @@ class MainActivity : AppCompatActivity() {
         vpContainer = findViewById(R.id.vp_contain)
         pagerSlidingTabStrip = findViewById(R.id.message_tabs)
         algorithmModeGroup = findViewById(R.id.algorithm_mode_group)
+        connectBleButton = findViewById(R.id.btn_connect_ble)
+        disconnectBleButton = findViewById(R.id.btn_disconnect_ble)
+        pauseUploadButton = findViewById(R.id.btn_pause_upload)
+        initAlgorithmButton = findViewById(R.id.btn_init_algorithm)
+        startUploadButton = findViewById(R.id.btn_start_upload)
+        getReportButton = findViewById(R.id.btn_get_report)
+        finishAlgorithmButton = findViewById(R.id.btn_finish_algorithm)
+        submitCommentButton = findViewById(R.id.btn_submit_comment)
+        restoreAlgorithmButton = findViewById(R.id.btn_restore_algorithm)
         val listFragment = mutableListOf<Fragment>()
         messageReceiveFragment = MessageReceiveFragment()
         messageSendFragment = MessageSendFragment()
@@ -385,6 +429,31 @@ class MainActivity : AppCompatActivity() {
         )
         vpContainer.adapter = adapter
         pagerSlidingTabStrip.setViewPager(vpContainer)
+    }
+
+    private fun updateControlAvailability() {
+        val controls = controlState.controls
+        connectBleButton.isEnabled = controls.canConnectBle
+        disconnectBleButton.isEnabled = controls.canDisconnectBle
+        pauseUploadButton.isEnabled = controls.canPauseUpload
+        initAlgorithmButton.isEnabled = controls.canInitializeAlgorithm
+        startUploadButton.isEnabled = controls.canStartUpload
+        getReportButton.isEnabled = controls.canGetReport
+        finishAlgorithmButton.isEnabled = controls.canFinishAlgorithm
+        restoreAlgorithmButton.isEnabled = controls.canRestoreAlgorithm
+        submitCommentButton.isEnabled = false
+        setAlgorithmModeGroupEnabled(controls.canSwitchAlgorithm)
+    }
+
+    private fun setAlgorithmModeGroupEnabled(enabled: Boolean) {
+        algorithmModeGroup.isEnabled = enabled
+        for (index in 0 until algorithmModeGroup.childCount) {
+            algorithmModeGroup.getChildAt(index).isEnabled = enabled
+        }
+    }
+
+    private fun showUnavailableAction() {
+        Toast.makeText(this, getString(R.string.main_action_not_available), Toast.LENGTH_SHORT).show()
     }
 
     class MessageAdapter(
@@ -473,30 +542,48 @@ class MainActivity : AppCompatActivity() {
 
 
     fun onConnectDevice(@Suppress("UNUSED_PARAMETER") view: View) {
+        if (!controlState.controls.canConnectBle) {
+            showUnavailableAction()
+            return
+        }
+        controlState.onBleConnecting()
+        updateControlAvailability()
         messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_scaning))
         biomoduleBleManager.scanNearDeviceAndConnect(fun() {
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_scan_success))
             Logger.d("扫描设备成功")
-        }, fun(_: Exception) {
-
+        }, fun(exception: Exception) {
+            controlState.onBleDisconnected()
+            updateControlAvailability()
+            messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_connect_failed) + exception.message)
         }, fun(mac: String) {
+            controlState.onBleConnected()
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_connect_to_ble_success))
             Logger.d("连接成功$mac")
             runOnUiThread {
+                updateControlAvailability()
                 Toast.makeText(this@MainActivity, "设备连接成功", Toast.LENGTH_SHORT).show()
             }
         },{msg->
             Logger.d("连接失败")
+            controlState.onBleDisconnected()
             messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_connect_failed) + msg)
             runOnUiThread {
+                updateControlAvailability()
                 Toast.makeText(this@MainActivity, "设备连接失败：$msg", Toast.LENGTH_SHORT).show()
             }
         },0,)
     }
 
     fun onDisconnectDevice(@Suppress("UNUSED_PARAMETER") view: View) {
-        messageReceiveFragment.appendMessageToScreen(getString(R.string.main_ble_connect_failed))
+        if (!controlState.controls.canDisconnectBle) {
+            showUnavailableAction()
+            return
+        }
+        messageReceiveFragment.appendMessageToScreen(getString(R.string.main_disconnect_ble))
         biomoduleBleManager.disConnect()
+        controlState.onBleDisconnected()
+        updateControlAvailability()
     }
 
     fun onClear(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -505,7 +592,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onPause(@Suppress("UNUSED_PARAMETER") view: View) {
+        if (!controlState.controls.canPauseUpload) {
+            showUnavailableAction()
+            return
+        }
         biomoduleBleManager.stopHeartAndBrainCollection()
+        controlState.onUploadStopped()
+        updateControlAvailability()
     }
 
     private var brainDataBuffer = ArrayList<Int>()
@@ -528,15 +621,29 @@ class MainActivity : AppCompatActivity() {
 
 
     fun onInit(@Suppress("UNUSED_PARAMETER") view: View) {
+        if (!controlState.controls.canInitializeAlgorithm) {
+            showUnavailableAction()
+            return
+        }
         initEnterAffectiveService()
     }
 
     fun onStartUpload(@Suppress("UNUSED_PARAMETER") view: View) {
+        if (!controlState.controls.canStartUpload) {
+            showUnavailableAction()
+            return
+        }
         biomoduleBleManager.startHeartAndBrainCollection()
+        controlState.onUploadStarted()
+        updateControlAvailability()
         messageReceiveFragment.appendMessageToScreen(getString(R.string.main_start_uploading))
     }
 
     fun onReport(@Suppress("UNUSED_PARAMETER") view: View) {
+        if (!controlState.controls.canGetReport) {
+            showUnavailableAction()
+            return
+        }
         affectiveService.getReport(object : IGetReportListener {
             override fun onError(error: Error?) {
                 Log.d(TAG, "getReport: onError $error")
@@ -562,23 +669,40 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onFinish(@Suppress("UNUSED_PARAMETER") view: View) {
+        if (!controlState.controls.canFinishAlgorithm) {
+            showUnavailableAction()
+            return
+        }
+        if (controlState.controls.canPauseUpload) {
+            biomoduleBleManager.stopHeartAndBrainCollection()
+        }
+        controlState.onAlgorithmFinishing()
+        updateControlAvailability()
         affectiveService.finishAffectiveService(object : IFinishAffectiveServiceListener {
             override fun finishBioFail(error: Error?) {
                 Log.d(TAG, "onFinish: finishBioFail $error")
+                controlState.onAlgorithmFinishFailed()
+                updateControlAvailability()
             }
 
             override fun finishAffectiveFail(error: Error?) {
                 Log.d(TAG, "onFinish: finishAffectiveFail $error")
+                controlState.onAlgorithmFinishFailed()
+                updateControlAvailability()
             }
 
             override fun finishError(error: Error?) {
                 Log.d(TAG, "onFinish: finishError $error")
                 affectiveService.closeAffectiveServiceConnection()
+                controlState.onAlgorithmFinished()
+                updateControlAvailability()
             }
 
             override fun finishSuccess() {
                 Log.d(TAG, "onFinish: finishSuccess ")
                 affectiveService.closeAffectiveServiceConnection()
+                controlState.onAlgorithmFinished()
+                updateControlAvailability()
             }
         })
     }
@@ -588,6 +712,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onRestore(@Suppress("UNUSED_PARAMETER") view: View) {
+        if (!controlState.controls.canRestoreAlgorithm) {
+            showUnavailableAction()
+            return
+        }
         affectiveService.restoreAffectiveService(startAffectiveServiceLister)
     }
 

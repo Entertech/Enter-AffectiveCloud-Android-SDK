@@ -14,6 +14,7 @@
     <string name="main_algorithm_switching">Switching algorithm, please wait</string>
     <string name="main_algorithm_finish_failed">Current algorithm is not fully finished, cannot switch: %s</string>
     <string name="main_cloud_config_required">Please configure APP_KEY and APP_SECRET before switching to cloud algorithm</string>
+    <string name="main_action_not_available">This action is not available in the current state</string>
     <string name="main_disconnect_ble">Disconnect</string>
     <string name="main_clear">Clear</string>
     <string name="main_pause">Pause</string>

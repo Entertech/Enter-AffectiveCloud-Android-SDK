@@ -16,6 +16,7 @@
     <string name="main_algorithm_switching">正在切换算法，请稍候</string>
     <string name="main_algorithm_finish_failed">当前算法未完全结束，暂不能切换：%s</string>
     <string name="main_cloud_config_required">切换云端算法前需要先配置 APP_KEY 和 APP_SECRET</string>
+    <string name="main_action_not_available">当前状态下不能执行该操作</string>
     <string name="main_disconnect_ble">断开蓝牙设备</string>
     <string name="main_clear">清屏</string>
     <string name="main_pause">暂停</string>

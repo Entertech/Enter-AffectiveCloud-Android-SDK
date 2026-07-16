@@ -71,6 +71,7 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/btn_connect_ble"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -79,6 +80,7 @@
             android:textAllCaps="false" />
 
         <Button
+            android:id="@+id/btn_disconnect_ble"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -88,6 +90,7 @@
 
 
         <Button
+            android:id="@+id/btn_clear"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -97,6 +100,7 @@
 
 
         <Button
+            android:id="@+id/btn_pause_upload"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -113,6 +117,7 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/btn_init_algorithm"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -121,6 +126,7 @@
             android:textAllCaps="false" />
 
         <Button
+            android:id="@+id/btn_start_upload"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -129,6 +135,7 @@
             android:textAllCaps="false" />
 
         <Button
+            android:id="@+id/btn_get_report"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -145,6 +152,7 @@
 
 
         <Button
+            android:id="@+id/btn_finish_algorithm"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -153,6 +161,7 @@
             android:textAllCaps="false" />
 
         <Button
+            android:id="@+id/btn_submit_comment"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -161,6 +170,7 @@
             android:textAllCaps="false" />
 
         <Button
+            android:id="@+id/btn_restore_algorithm"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

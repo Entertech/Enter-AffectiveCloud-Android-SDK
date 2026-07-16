@@ -7,6 +7,13 @@
     <string name="brainwave">Brainwave</string>
     <string name="heart_rate">Heart rate</string>
     <string name="main_connect_to_ble">Connect to Ble</string>
+    <string name="main_algorithm_mode">Algorithm</string>
+    <string name="main_algorithm_local">Local</string>
+    <string name="main_algorithm_cloud">Cloud</string>
+    <string name="main_algorithm_switched">Switched to %s algorithm</string>
+    <string name="main_algorithm_switching">Switching algorithm, please wait</string>
+    <string name="main_algorithm_finish_failed">Current algorithm is not fully finished, cannot switch: %s</string>
+    <string name="main_cloud_config_required">Please configure APP_KEY and APP_SECRET before switching to cloud algorithm</string>
     <string name="main_disconnect_ble">Disconnect</string>
     <string name="main_clear">Clear</string>
     <string name="main_pause">Pause</string>

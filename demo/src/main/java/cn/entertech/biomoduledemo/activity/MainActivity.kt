@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -28,13 +29,22 @@ import cn.entertech.affective.sdk.bean.UploadReportEntity
 import cn.entertech.affective.sdk.bean.type.BioDataCategory
 import cn.entertech.affective.sdk.bean.type.PhysiologyDataCategory
 import cn.entertech.biomoduledemo.R
+import cn.entertech.biomoduledemo.affective.AffectiveServiceFinishCallback
+import cn.entertech.biomoduledemo.affective.AffectiveServiceSwitchCallbacks
+import cn.entertech.biomoduledemo.affective.AffectiveServiceSwitchCoordinator
+import cn.entertech.biomoduledemo.affective.AffectiveServiceSwitchResult
+import cn.entertech.biomoduledemo.affective.DemoAffectiveAlgorithmMode
+import cn.entertech.biomoduledemo.affective.DemoCloudCredential
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_KEY
 import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
+import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_SELECT_CLOUD
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.ConvertUtil
 import cn.entertech.biomoduledemo.utils.PagerSlidingTabStrip
+import cn.entertech.biomoduledemo.utils.SettingManager
 import cn.entertech.affectivesdk.manager.EnterAffectiveLocalService
+import cn.entertech.affectivecloudsdk.EnterAffectiveCloudService
 import cn.entertech.ble.single.BiomoduleBleManager
 import com.orhanobut.logger.Logger
 import java.io.InputStream
@@ -47,10 +57,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var messageSendFragment: MessageSendFragment
     private lateinit var vpContainer: ViewPager
     private lateinit var pagerSlidingTabStrip: PagerSlidingTabStrip
-    private val affectiveService by lazy {
-        EnterAffectiveLocalService()
-        // Cloud 示例可以直接构造 EnterAffectiveCloudService()，或交给业务自己的 DI 容器管理。
-    }
+    private lateinit var algorithmModeGroup: RadioGroup
+    private lateinit var affectiveSwitchCoordinator:
+        AffectiveServiceSwitchCoordinator<IAffectiveDataAnalysisService>
+    private var suppressAlgorithmModeChange = false
+
+    private val affectiveService: IAffectiveDataAnalysisService
+        get() = affectiveSwitchCoordinator.currentService
 
     //    var websocketAddress = "wss://server.affectivecloud.cn/ws/algorithm/v2/"
     var websocketAddress = "wss://server-test.affectivecloud.cn/ws/algorithm/v2/"
@@ -111,7 +124,7 @@ class MainActivity : AppCompatActivity() {
         object : IConnectionServiceListener {
             override fun connectionSuccess(sessionId: String?) {
                 Log.d(TAG, "connectionSuccess: $sessionId")
-                affectiveService?.startAffectiveService(
+                affectiveService.startAffectiveService(
                     authenticationInputStream,
                     this@MainActivity, startAffectiveServiceLister
                 )
@@ -139,52 +152,226 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        verifyAppKeyAndSecret()
+        refreshCloudCredential(intent)
+        affectiveSwitchCoordinator = createAffectiveSwitchCoordinator()
         biomoduleBleManager = BiomoduleBleManager.getInstance(applicationContext)
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
         initView()
+        initAlgorithmModeSwitch()
         initPermission()
+        handleIntentAlgorithmSelection(intent)
     }
 
-    private fun verifyAppKeyAndSecret() {
-        appKey = intent.getStringExtra(INTENT_APP_KEY)
-        appSecret = intent.getStringExtra(INTENT_APP_SECRET)
-        if (appKey == null || appSecret == null) {
-            Toast.makeText(
-                this@MainActivity,
-                getString(R.string.auth_page_title),
-                Toast.LENGTH_LONG
-            ).show()
-            finish()
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        refreshCloudCredential(intent)
+        handleIntentAlgorithmSelection(intent)
+    }
+
+    private fun refreshCloudCredential(intent: Intent?) {
+        val setting = SettingManager.getInstance()
+        appKey = intent?.getStringExtra(INTENT_APP_KEY).takeUnless { it.isNullOrBlank() }
+            ?: setting.appKey
+        appSecret = intent?.getStringExtra(INTENT_APP_SECRET).takeUnless { it.isNullOrBlank() }
+            ?: setting.appSecret
+    }
+
+    private fun currentCloudCredential(): DemoCloudCredential {
+        refreshCloudCredential(intent)
+        return DemoCloudCredential(appKey = appKey, appSecret = appSecret)
+    }
+
+    private fun handleIntentAlgorithmSelection(intent: Intent?) {
+        if (intent?.getBooleanExtra(INTENT_SELECT_CLOUD, false) == true) {
+            requestAlgorithmMode(DemoAffectiveAlgorithmMode.Cloud)
         }
     }
 
-    private fun initEnterAffectiveCloudManager() {
+    private fun createAffectiveSwitchCoordinator():
+        AffectiveServiceSwitchCoordinator<IAffectiveDataAnalysisService> {
+        return AffectiveServiceSwitchCoordinator(
+            initialMode = DemoAffectiveAlgorithmMode.Local,
+            initialService = EnterAffectiveLocalService(),
+            callbacks = object : AffectiveServiceSwitchCallbacks<IAffectiveDataAnalysisService> {
+                override fun createService(
+                    mode: DemoAffectiveAlgorithmMode
+                ): IAffectiveDataAnalysisService {
+                    return when (mode) {
+                        DemoAffectiveAlgorithmMode.Local -> EnterAffectiveLocalService()
+                        DemoAffectiveAlgorithmMode.Cloud -> EnterAffectiveCloudService()
+                    }
+                }
+
+                override fun hasStarted(service: IAffectiveDataAnalysisService): Boolean =
+                    service.hasStartAffectiveService()
+
+                override fun hasConnected(service: IAffectiveDataAnalysisService): Boolean =
+                    service.hasConnectAffectiveService()
+
+                override fun finishService(
+                    service: IAffectiveDataAnalysisService,
+                    callback: AffectiveServiceFinishCallback
+                ) {
+                    service.finishAffectiveService(object : IFinishAffectiveServiceListener {
+                        override fun finishBioFail(error: Error?) {
+                            callback.finishFailed(error?.toString())
+                        }
+
+                        override fun finishAffectiveFail(error: Error?) {
+                            callback.finishFailed(error?.toString())
+                        }
+
+                        override fun finishError(error: Error?) {
+                            callback.finishFailed(error?.toString())
+                        }
+
+                        override fun finishSuccess() {
+                            callback.finishSuccess()
+                        }
+                    })
+                }
+
+                override fun closeService(service: IAffectiveDataAnalysisService) {
+                    service.closeAffectiveServiceConnection()
+                }
+            },
+        )
+    }
+
+    private fun initAlgorithmModeSwitch() {
+        updateAlgorithmModeChecked(affectiveSwitchCoordinator.currentMode)
+        algorithmModeGroup.setOnCheckedChangeListener { _, checkedId ->
+            if (suppressAlgorithmModeChange) return@setOnCheckedChangeListener
+            when (checkedId) {
+                R.id.algorithm_mode_local -> requestAlgorithmMode(DemoAffectiveAlgorithmMode.Local)
+                R.id.algorithm_mode_cloud -> requestAlgorithmMode(DemoAffectiveAlgorithmMode.Cloud)
+            }
+        }
+    }
+
+    private fun requestAlgorithmMode(mode: DemoAffectiveAlgorithmMode) {
+        val previousMode = affectiveSwitchCoordinator.currentMode
+        var resultReceived = false
+        affectiveSwitchCoordinator.switchTo(
+            targetMode = mode,
+            cloudCredential = currentCloudCredential(),
+        ) { result ->
+            resultReceived = true
+            runOnUiThread {
+                handleAlgorithmSwitchResult(result)
+            }
+        }
+        if (!resultReceived && previousMode != mode && affectiveSwitchCoordinator.currentMode == previousMode) {
+            updateAlgorithmModeChecked(previousMode)
+            Toast.makeText(
+                this,
+                getString(R.string.main_algorithm_switching),
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
+    }
+
+    private fun handleAlgorithmSwitchResult(result: AffectiveServiceSwitchResult) {
+        when (result) {
+            is AffectiveServiceSwitchResult.Switched -> {
+                updateAlgorithmModeChecked(result.mode)
+                messageReceiveFragment.appendMessageToScreen(
+                    getString(
+                        R.string.main_algorithm_switched,
+                        algorithmModeText(result.mode),
+                    ),
+                )
+            }
+
+            is AffectiveServiceSwitchResult.AlreadySelected -> {
+                updateAlgorithmModeChecked(result.mode)
+            }
+
+            AffectiveServiceSwitchResult.CloudConfigRequired -> {
+                updateAlgorithmModeChecked(affectiveSwitchCoordinator.currentMode)
+                Toast.makeText(
+                    this,
+                    getString(R.string.main_cloud_config_required),
+                    Toast.LENGTH_LONG,
+                ).show()
+                startActivity(Intent(this, AuthActivity::class.java))
+            }
+
+            is AffectiveServiceSwitchResult.FinishFailed -> {
+                updateAlgorithmModeChecked(affectiveSwitchCoordinator.currentMode)
+                Toast.makeText(
+                    this,
+                    getString(
+                        R.string.main_algorithm_finish_failed,
+                        result.reason ?: "",
+                    ),
+                    Toast.LENGTH_LONG,
+                ).show()
+            }
+
+            AffectiveServiceSwitchResult.SwitchingInProgress -> {
+                updateAlgorithmModeChecked(affectiveSwitchCoordinator.currentMode)
+                Toast.makeText(
+                    this,
+                    getString(R.string.main_algorithm_switching),
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
+        }
+    }
+
+    private fun updateAlgorithmModeChecked(mode: DemoAffectiveAlgorithmMode) {
+        suppressAlgorithmModeChange = true
+        algorithmModeGroup.check(
+            when (mode) {
+                DemoAffectiveAlgorithmMode.Local -> R.id.algorithm_mode_local
+                DemoAffectiveAlgorithmMode.Cloud -> R.id.algorithm_mode_cloud
+            },
+        )
+        suppressAlgorithmModeChange = false
+    }
+
+    private fun algorithmModeText(mode: DemoAffectiveAlgorithmMode): String {
+        return when (mode) {
+            DemoAffectiveAlgorithmMode.Local -> getString(R.string.main_algorithm_local)
+            DemoAffectiveAlgorithmMode.Cloud -> getString(R.string.main_algorithm_cloud)
+        }
+    }
+
+    private fun initEnterAffectiveService() {
+        val credential = currentCloudCredential()
+        if (
+            affectiveSwitchCoordinator.currentMode == DemoAffectiveAlgorithmMode.Cloud &&
+            !credential.isConfigured
+        ) {
+            handleAlgorithmSwitchResult(AffectiveServiceSwitchResult.CloudConfigRequired)
+            return
+        }
         val proxy = EnterAffectiveConfigProxy(
             availableBioDataCategories,
             availableAffectiveDataCategories,
             userId = "-1",
-            appSecret = appSecret!!,
-            appKey = appKey!!
+            appSecret = appSecret.orEmpty(),
+            appKey = appKey.orEmpty()
         )
 
-        affectiveService?.addServiceConnectStatueListener(
+        affectiveService.addServiceConnectStatueListener(
             connectionListener,
             disconnectionListener
-        )?: kotlin.run {
-            Log.d(TAG,"affectiveService is null")
-        }
-        affectiveService?.connectAffectiveServiceConnection(
+        )
+        affectiveService.connectAffectiveServiceConnection(
             configProxy = proxy,
             listener = connectionServiceListener
         )
-        affectiveService?.subscribeData(bdListener, affectiveListener)
+        affectiveService.subscribeData(bdListener, affectiveListener)
     }
 
     private fun initView() {
         vpContainer = findViewById(R.id.vp_contain)
         pagerSlidingTabStrip = findViewById(R.id.message_tabs)
+        algorithmModeGroup = findViewById(R.id.algorithm_mode_group)
         val listFragment = mutableListOf<Fragment>()
         messageReceiveFragment = MessageReceiveFragment()
         messageSendFragment = MessageSendFragment()
@@ -324,7 +511,7 @@ class MainActivity : AppCompatActivity() {
     private var brainDataBuffer = ArrayList<Int>()
     private var writeFileDataBuffer = ArrayList<Int>()
     private var rawListener = fun(bytes: ByteArray) {
-        affectiveService?.appendEEGData(bytes, false)
+        affectiveService.appendEEGData(bytes, false)
         for (byte in bytes) {
             val brainData = ConvertUtil.converUnchart(byte)
             brainDataBuffer.add(brainData)
@@ -336,12 +523,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var heartRateListener = fun(heartRate: Int) {
-        affectiveService?.appendHeartRateData(heartRate)
+        affectiveService.appendHeartRateData(heartRate)
     }
 
 
     fun onInit(@Suppress("UNUSED_PARAMETER") view: View) {
-        initEnterAffectiveCloudManager()
+        initEnterAffectiveService()
     }
 
     fun onStartUpload(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -350,7 +537,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onReport(@Suppress("UNUSED_PARAMETER") view: View) {
-        affectiveService?.getReport(object : IGetReportListener {
+        affectiveService.getReport(object : IGetReportListener {
             override fun onError(error: Error?) {
                 Log.d(TAG, "getReport: onError $error")
                 messageReceiveFragment.appendMessageToScreen("getReport onError" + error.toString())
@@ -375,7 +562,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onFinish(@Suppress("UNUSED_PARAMETER") view: View) {
-        affectiveService?.finishAffectiveService(object : IFinishAffectiveServiceListener {
+        affectiveService.finishAffectiveService(object : IFinishAffectiveServiceListener {
             override fun finishBioFail(error: Error?) {
                 Log.d(TAG, "onFinish: finishBioFail $error")
             }
@@ -386,12 +573,12 @@ class MainActivity : AppCompatActivity() {
 
             override fun finishError(error: Error?) {
                 Log.d(TAG, "onFinish: finishError $error")
-                affectiveService?.closeAffectiveServiceConnection()
+                affectiveService.closeAffectiveServiceConnection()
             }
 
             override fun finishSuccess() {
                 Log.d(TAG, "onFinish: finishSuccess ")
-                affectiveService?.closeAffectiveServiceConnection()
+                affectiveService.closeAffectiveServiceConnection()
             }
         })
     }
@@ -401,7 +588,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onRestore(@Suppress("UNUSED_PARAMETER") view: View) {
-        affectiveService?.restoreAffectiveService(startAffectiveServiceLister)
+        affectiveService.restoreAffectiveService(startAffectiveServiceLister)
     }
 
     fun toApiDetail(@Suppress("UNUSED_PARAMETER") view: View) {

@@ -41,7 +41,10 @@ class AuthActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra(Constant.INTENT_APP_KEY, setting?.appKey)
             intent.putExtra(Constant.INTENT_APP_SECRET, setting?.appSecret)
+            intent.putExtra(Constant.INTENT_SELECT_CLOUD, true)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             startActivity(intent)
+            finish()
         } else {
             Toast.makeText(this, getString(R.string.auth_page_title), Toast.LENGTH_SHORT).show()
         }

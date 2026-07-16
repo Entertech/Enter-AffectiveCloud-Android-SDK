@@ -11,5 +11,6 @@ class Constant {
 
         const val INTENT_APP_KEY = "appKey"
         const val INTENT_APP_SECRET = "appSecret"
+        const val INTENT_SELECT_CLOUD = "selectCloud"
     }
 }

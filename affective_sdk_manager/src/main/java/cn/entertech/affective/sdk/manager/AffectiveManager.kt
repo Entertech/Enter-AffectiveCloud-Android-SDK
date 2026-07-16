@@ -241,7 +241,11 @@ open class AffectiveManager<Key : Any> {
         removeAffectiveService(key)
 
     protected open fun initAffectiveService(serviceType: AffectiveServiceWay): IAffectiveDataAnalysisService? {
-        return null
+        throw IllegalStateException(
+            "No affective service registered for $serviceType. " +
+                "Register an IAffectiveDataAnalysisService with registerAffectiveService(), " +
+                "pass a default service to getAffectiveService(key, default), or override initAffectiveService().",
+        )
     }
 
     private fun startAffectiveService(key: Key) {

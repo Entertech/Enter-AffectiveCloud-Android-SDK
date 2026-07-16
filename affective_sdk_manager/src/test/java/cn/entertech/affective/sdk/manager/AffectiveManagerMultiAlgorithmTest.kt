@@ -2,6 +2,7 @@ package cn.entertech.affective.sdk.manager
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.test.assertSame
 
@@ -17,6 +18,15 @@ class AffectiveManagerMultiAlgorithmTest {
         manager.registerAffectiveService("local", service)
 
         assertSame(service, manager.getAffectiveService("local"))
+    }
+
+    @Test
+    fun defaultServiceInitializationRequiresBusinessRegistration() {
+        val manager = AffectiveManager<String>()
+
+        assertFailsWith<IllegalStateException> {
+            manager.getAffectiveService("local")
+        }
     }
 
     @Test

@@ -72,7 +72,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var startUploadButton: Button
     private lateinit var getReportButton: Button
     private lateinit var finishAlgorithmButton: Button
-    private lateinit var submitCommentButton: Button
     private lateinit var restoreAlgorithmButton: Button
     private lateinit var affectiveSwitchCoordinator:
         AffectiveServiceSwitchCoordinator<IAffectiveDataAnalysisService>
@@ -407,7 +406,6 @@ class MainActivity : AppCompatActivity() {
         startUploadButton = findViewById(R.id.btn_start_upload)
         getReportButton = findViewById(R.id.btn_get_report)
         finishAlgorithmButton = findViewById(R.id.btn_finish_algorithm)
-        submitCommentButton = findViewById(R.id.btn_submit_comment)
         restoreAlgorithmButton = findViewById(R.id.btn_restore_algorithm)
         val listFragment = mutableListOf<Fragment>()
         messageReceiveFragment = MessageReceiveFragment()
@@ -434,7 +432,6 @@ class MainActivity : AppCompatActivity() {
         getReportButton.isEnabled = controls.canGetReport
         finishAlgorithmButton.isEnabled = controls.canFinishAlgorithm
         restoreAlgorithmButton.isEnabled = controls.canRestoreAlgorithm
-        submitCommentButton.isEnabled = false
         setAlgorithmModeGroupEnabled(controls.canSwitchAlgorithm)
     }
 

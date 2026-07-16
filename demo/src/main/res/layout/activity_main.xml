@@ -160,14 +160,6 @@
             android:text="@string/main_finish"
             android:textAllCaps="false" />
 
-        <Button
-            android:id="@+id/btn_submit_comment"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="onSubmit"
-            android:text="@string/main_submit_comment"
-            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/btn_restore_algorithm"

@@ -241,19 +241,22 @@ affectiveService?.connectAffectiveServiceConnection(connectionListener, cloudCon
 
 ### 直接使用本地算法
 
-`LocalAffectiveAlgorithm` 实现了 `AffectiveAlgorithm`，可以直接连接、启动、接收实时事件并追加硬件数据，不需要经过 Manager。
+业务只需要依赖 `affective_local_sdk` 和 `affective_sdk_api`，入口仍然是 `IAffectiveDataAnalysisService`。如果希望使用协程和 Flow，可以在拿到本地实现后调用 `asAffectiveAlgorithm()`，不需要经过 Manager。
 
 ```kotlin
-val localAlgorithm: AffectiveAlgorithm = LocalAffectiveAlgorithm(sourceKey = "local")
+val localService = IAffectiveDataAnalysisService.getService(
+    AffectiveServiceWay.AffectiveLocalService
+)
+val localAlgorithm = localService?.asAffectiveAlgorithm(sourceKey = "local")
 
 val eventJob = lifecycleScope.launch {
-    localAlgorithm.realtimeEvents.collect { event ->
+    localAlgorithm?.realtimeEvents?.collect { event ->
         demoPipeline.onEvent(event)
     }
 }
 
 lifecycleScope.launch {
-    val connected = localAlgorithm.connect(EnterAffectiveConfigProxy())
+    val connected = localAlgorithm?.connect(EnterAffectiveConfigProxy())
     if (connected is AffectiveAlgorithmResult.Success) {
         val started = localAlgorithm.start()
         if (started is AffectiveAlgorithmResult.Success) {
@@ -266,8 +269,8 @@ lifecycleScope.launch {
 // 页面或会话结束时
 lifecycleScope.launch {
     eventJob.cancelAndJoin()
-    localAlgorithm.finish()
-    localAlgorithm.disconnect()
+    localAlgorithm?.finish()
+    localAlgorithm?.disconnect()
 }
 ```
 
@@ -299,7 +302,7 @@ manager.appendHeartRateDataToAll(heartRate)
 
 # 快速接入
 
-本节为既有云端 API 的兼容接入方式。SDK 提供了 `EnterAffectiveCloudManager`，使用该类只需要几步就可以完成客户端与情感云平台的数据交互。新项目也可以通过 `IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveCloudService)` 获取云端实现，或将 `EnterAffectiveCloudService` 注册到 `AffectiveManager`。
+本节为既有云端 API 的兼容接入方式。SDK 提供了 `EnterAffectiveCloudManager`，使用该类只需要几步就可以完成客户端与情感云平台的数据交互。新项目也可以通过 `IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveCloudService)` 获取云端实现，并按需调用 `asAffectiveAlgorithm()` 使用协程和 Flow，或将 `EnterAffectiveCloudService` 注册到 `AffectiveManager`。
 
 ##  1.初始化
 
@@ -547,7 +550,6 @@ affectiveSourceDataApi.deleteSourceDataRecordById(recordId, fun() {
 
 # 更新日志
 [更新日志](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/wiki/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)
-
 
 
 

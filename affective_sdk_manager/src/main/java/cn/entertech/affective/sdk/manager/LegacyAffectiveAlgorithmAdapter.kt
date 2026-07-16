@@ -166,7 +166,13 @@ open class LegacyAffectiveAlgorithmAdapter(
     override fun append(input: AffectiveInput): AffectiveAlgorithmResult<Unit> = try {
         when (input) {
             is AffectiveInput.EegBytes -> service.appendEEGData(input.data, input.isEar)
+            is AffectiveInput.EegSample -> service.appendEEGData(input.value, input.isEar)
             is AffectiveInput.EegSamples -> service.appendEEGData(input.data, input.isEar)
+            is AffectiveInput.SceegBytes -> service.appendSCEEGData(input.data, input.isEar)
+            is AffectiveInput.SceegSample -> service.appendSCEEGData(input.value, input.isEar)
+            is AffectiveInput.SceegSamples -> service.appendSCEEGData(input.data, input.isEar)
+            is AffectiveInput.DcEeg -> service.appendDCEEGData(input.data)
+            is AffectiveInput.McEeg -> service.appendMCEEGData(input.data)
             is AffectiveInput.HeartRate -> service.appendHeartRateData(input.value)
             is AffectiveInput.Pepr -> service.appendPEPRData(input.data)
             is AffectiveInput.Bcg -> service.appendBCGData(input.data, input.packageCount)

@@ -14,14 +14,23 @@ import java.util.ServiceLoader
 
 
 /**
- * 步骤：
- * 1.建立情感云连接
- * 2.启动、初始化生物数据基础分析服务&& 若配置感云计算服务，则启动情感云计算服务
- * 3.启动服务成功后，各自订阅自己的数据
- * 4.取消订阅
- * 5.结束服务
- * 6.关闭情感云连接
- * */
+ * Stable business entry point for affective data analysis.
+ *
+ * Apps should depend on the implementation component they need
+ * (`affective_local_sdk` or `affective_cloud_sdk`) and operate through this API
+ * contract. Use [getService] with [AffectiveServiceWay] to select Local or Cloud.
+ *
+ * Recommended lifecycle:
+ * 1. Connect the selected service.
+ * 2. Start biodata and affective analysis services.
+ * 3. Subscribe realtime data.
+ * 4. Append hardware data.
+ * 5. Fetch reports if needed.
+ * 6. Finish and close the connection.
+ *
+ * For coroutine and Flow based Android code, call [asAffectiveAlgorithm] on the
+ * service instance instead of adding new implementation-specific entry points.
+ */
 interface IAffectiveDataAnalysisService {
 
     companion object {
@@ -53,10 +62,18 @@ interface IAffectiveDataAnalysisService {
 
     fun hasConnectAffectiveService(): Boolean
 
+    @Deprecated(
+        message = "The method name contains a typo and exposes callback-style state. Prefer asAffectiveAlgorithm().state for new code.",
+        replaceWith = ReplaceWith("asAffectiveAlgorithm().state"),
+    )
     fun addServiceConnectStatueListener(
         connectionListener: (() -> Unit)? = null, disconnectListener: ((String) -> Unit)? = null
     )
 
+    @Deprecated(
+        message = "The method name contains a typo and exposes callback-style state. Prefer asAffectiveAlgorithm().state for new code.",
+        replaceWith = ReplaceWith("asAffectiveAlgorithm().state"),
+    )
     fun removeServiceConnectStatueListener(
         connectionListener: (() -> Unit)? = null, disconnectListener: ((String) -> Unit)? = null
     )
@@ -111,6 +128,10 @@ interface IAffectiveDataAnalysisService {
      * 检查一次初始化状态
      * @see [hasStartAffectiveService]
      * */
+    @Deprecated(
+        message = "This method is a no-op and its name contains a typo. Use hasStartAffectiveService().",
+        replaceWith = ReplaceWith("hasStartAffectiveService()"),
+    )
     fun checkInitStatue() {
 
     }
@@ -144,6 +165,9 @@ interface IAffectiveDataAnalysisService {
      * @param case 数据流读取出来的字符串转成需要的类型R
      * @param appendAllData 处理所有未被消耗的数据
      * */
+    @Deprecated(
+        message = "File parsing is not part of the algorithm runtime contract. Parse files in the app/data layer and append typed AffectiveInput values.",
+    )
     fun <R> readFileAnalysisData(
         inputStream: InputStream,
         appSingleData: ((R) -> Boolean)? = null,
@@ -158,6 +182,10 @@ interface IAffectiveDataAnalysisService {
 
     }
 
+    @Deprecated(
+        message = "Use asAffectiveAlgorithm().append(AffectiveInput.*) or the typed append methods.",
+        replaceWith = ReplaceWith("asAffectiveAlgorithm().append(AffectiveInput.EegBytes(data))"),
+    )
     fun appendByteArrayData(dataType: IDataType, data: ByteArray): Boolean {
         return when (dataType) {
             BioDataCategory.EEG -> {
@@ -182,10 +210,17 @@ interface IAffectiveDataAnalysisService {
         }
     }
 
+    @Deprecated(
+        message = "No built-in IDataType mapping currently consumes Double. Keep data conversion in the caller.",
+    )
     fun appendDoubleData(dataType: IDataType, data: Double): Boolean {
         return false
     }
 
+    @Deprecated(
+        message = "Use asAffectiveAlgorithm().append(AffectiveInput.*) or the typed append methods.",
+        replaceWith = ReplaceWith("asAffectiveAlgorithm().append(AffectiveInput.HeartRate(data))"),
+    )
     fun appendIntData(dataType: IDataType, data: Int): Boolean {
         if (!hasStartAffectiveService()) {
             return false
@@ -210,6 +245,10 @@ interface IAffectiveDataAnalysisService {
         return true
     }
 
+    @Deprecated(
+        message = "Use asAffectiveAlgorithm().append(AffectiveInput.*) or the typed append methods.",
+        replaceWith = ReplaceWith("asAffectiveAlgorithm().append(AffectiveInput.EegSamples(data))"),
+    )
     fun appendIntListData(dataType: IDataType, data: List<Int>): Boolean {
         when (dataType) {
             BioDataCategory.EEG -> {
@@ -227,6 +266,9 @@ interface IAffectiveDataAnalysisService {
         return true
     }
 
+    @Deprecated(
+        message = "No built-in IDataType mapping currently consumes Float. Keep data conversion in the caller.",
+    )
     fun appendFloatData(dataType: IDataType, data: Float): Boolean {
         return false
     }

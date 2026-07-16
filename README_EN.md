@@ -204,19 +204,22 @@ If multiple algorithm instances must stay alive together, do not replace one var
 
 ### Use the Local Algorithm Directly
 
-`LocalAffectiveAlgorithm` implements `AffectiveAlgorithm` and can connect, start, emit realtime events, and accept hardware data without going through Manager.
+Business code only needs `affective_local_sdk` and `affective_sdk_api`; the entry point remains `IAffectiveDataAnalysisService`. If coroutine and Flow APIs are preferred, obtain the local implementation and call `asAffectiveAlgorithm()` without going through Manager.
 
 ```kotlin
-val localAlgorithm: AffectiveAlgorithm = LocalAffectiveAlgorithm(sourceKey = "local")
+val localService = IAffectiveDataAnalysisService.getService(
+    AffectiveServiceWay.AffectiveLocalService
+)
+val localAlgorithm = localService?.asAffectiveAlgorithm(sourceKey = "local")
 
 val eventJob = lifecycleScope.launch {
-    localAlgorithm.realtimeEvents.collect { event ->
+    localAlgorithm?.realtimeEvents?.collect { event ->
         demoPipeline.onEvent(event)
     }
 }
 
 lifecycleScope.launch {
-    val connected = localAlgorithm.connect(EnterAffectiveConfigProxy())
+    val connected = localAlgorithm?.connect(EnterAffectiveConfigProxy())
     if (connected is AffectiveAlgorithmResult.Success) {
         val started = localAlgorithm.start()
         if (started is AffectiveAlgorithmResult.Success) {
@@ -229,8 +232,8 @@ lifecycleScope.launch {
 // At the end of the screen or session
 lifecycleScope.launch {
     eventJob.cancelAndJoin()
-    localAlgorithm.finish()
-    localAlgorithm.disconnect()
+    localAlgorithm?.finish()
+    localAlgorithm?.disconnect()
 }
 ```
 
@@ -262,7 +265,7 @@ manager.appendHeartRateDataToAll(heartRate)
 
 # How to use
 
-This section documents the compatible existing cloud API. `EnterAffectiveCloudManager` provides quick access to Affective Cloud and completes the client/cloud data flow in a few steps. New applications may also obtain the cloud implementation through `IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveCloudService)` or register `EnterAffectiveCloudService` with `AffectiveManager`.
+This section documents the compatible existing cloud API. `EnterAffectiveCloudManager` provides quick access to Affective Cloud and completes the client/cloud data flow in a few steps. New applications may also obtain the cloud implementation through `IAffectiveDataAnalysisService.getService(AffectiveServiceWay.AffectiveCloudService)`, call `asAffectiveAlgorithm()` when coroutine and Flow APIs are preferred, or register `EnterAffectiveCloudService` with `AffectiveManager`.
 
 ##  1.Initialization
 
@@ -507,7 +510,6 @@ If you need to use affective cloud services flexibly according to different scen
 
 # Change Notes
 [Change Notes](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/wiki/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)
-
 
 
 

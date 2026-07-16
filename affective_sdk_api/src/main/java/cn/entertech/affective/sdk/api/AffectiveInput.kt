@@ -6,11 +6,33 @@ sealed interface AffectiveInput {
         val isEar: Boolean = false,
     ) : AffectiveInput
 
+    data class EegSample(
+        val value: Int,
+        val isEar: Boolean = false,
+    ) : AffectiveInput
+
     data class EegSamples(
         val data: List<Int>,
         val isEar: Boolean = false,
     ) : AffectiveInput
 
+    data class SceegBytes(
+        val data: ByteArray,
+        val isEar: Boolean = false,
+    ) : AffectiveInput
+
+    data class SceegSample(
+        val value: Int,
+        val isEar: Boolean = false,
+    ) : AffectiveInput
+
+    data class SceegSamples(
+        val data: List<Int>,
+        val isEar: Boolean = false,
+    ) : AffectiveInput
+
+    data class DcEeg(val data: ByteArray) : AffectiveInput
+    data class McEeg(val data: ByteArray) : AffectiveInput
     data class HeartRate(val value: Int) : AffectiveInput
     data class Pepr(val data: ByteArray) : AffectiveInput
     data class Bcg(

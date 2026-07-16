@@ -25,7 +25,7 @@ jobs:
       MAVEN_LOCAL_DIR: ${{ github.workspace }}/.ci-maven-local
       GRADLE_OPTS: -Dfile.encoding=UTF-8 -Dmaven.repo.local=${{ github.workspace }}/.ci-maven-local
       GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN || github.token }}
-      PUBLISH_MODULES: >-
+      ASSEMBLE_MODULES: >-
         :affective_sdk_api
         :affective_cloud_protocol
         :affective_data_provider
@@ -72,6 +72,21 @@ jobs:
             echo "child_publish_branch=${child_publish_branch}"
             echo "child_sha=${child_sha}"
           } >> "${GITHUB_ENV}"
+
+      - name: Resolve components to publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${BASE_BRANCH}"
+          publish_modules="$(python3 scripts/release_flow.py publish-modules \
+            --base-ref "origin/${BASE_BRANCH}" \
+            --head-ref WORKTREE)"
+          if [[ -z "${publish_modules}" ]]; then
+            echo "No component version is greater than ${BASE_BRANCH}; nothing to publish." >&2
+            exit 1
+          fi
+          echo "PUBLISH_MODULES=${publish_modules}" >> "${GITHUB_ENV}"
+          echo "Publishing modules: ${publish_modules}"
 
       - name: Initialize submodule and verify child branch
         shell: bash
@@ -150,7 +165,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          read -r -a modules <<< "${PUBLISH_MODULES}"
+          read -r -a modules <<< "${ASSEMBLE_MODULES}"
           tasks=()
           for module in "${modules[@]}"; do
             tasks+=("${module}:assembleRelease")
@@ -222,7 +237,11 @@ jobs:
           done < release-artifacts/tags.txt
           git push origin --tags
 
-          source_version="$(sed -nE 's/^[[:space:]]*libraryVersion[[:space:]]*=[[:space:]]*"([^"]+)".*$/\1/p' version.gradle | head -n 1)"
+          source_version="$(sed -nE 's/^[[:space:]]*affectiveLocalSdkVersion[[:space:]]*=[[:space:]]*"([^"]+)".*$/\1/p' version.gradle | head -n 1)"
+          if [[ -z "${source_version}" ]]; then
+            echo "affectiveLocalSdkVersion was not found in version.gradle." >&2
+            exit 1
+          fi
           child_tag="affective-algorithm-sdk-${source_version}"
           git -C affective_local_sdk/src/main fetch origin "${child_publish_branch}"
           git -C affective_local_sdk/src/main tag -a "${child_tag}" "${child_sha}" -m "Release ${child_tag}"

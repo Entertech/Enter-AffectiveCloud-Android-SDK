@@ -1,4 +1,10 @@
 rootProject.ext {
    groupId = "cn.entertech.android"
-   libraryVersion="2.0.0-svm"
+
+   affectiveSdkApiVersion = "2.0.0-svm"
+   affectiveLocalSdkVersion = "2.0.0-svm"
+   affectiveCloudSdkVersion = "2.0.0-svm"
+   affectiveSdkManagerVersion = "2.0.0-svm"
+   affectiveCloudProtocolVersion = "2.0.0-svm"
+   affectiveDataProviderVersion = "2.0.0-svm"
 }

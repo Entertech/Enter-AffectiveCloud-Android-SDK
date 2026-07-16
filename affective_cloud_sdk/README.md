@@ -4,7 +4,13 @@
 
 回车情感云可以根据脑波、心率等数据进行云端情绪情感分析，返回放松度、注意力、愉悦值、压力值、睡眠、心流等结果。正式接入前请先阅读[回车情感云开发文档](https://docs.affectivecloud.com)，确认需要开通的基础服务和情感服务，并联系管理员申请 `APP_KEY`、`APP_SECRET`。
 
-## 依赖
+## 版本
+
+- groupId: `cn.entertech.android`
+- artifactId: `affective_cloud_sdk`
+- version: 来自根目录 [`version.gradle`](../version.gradle) 的 `affectiveCloudSdkVersion`
+
+## 使用方式
 
 源码工程接入时按需依赖：
 
@@ -146,4 +152,4 @@ val config = EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
     .build()
 ```
 
-如需查询或删除云端原始数据，请使用 `AffectiveCloudSourceDataApi`，详细接口见[情感云详细 API 功能说明](../media/%E6%83%85%E6%84%9F%E4%BA%91%E8%AF%A6%E7%BB%86API%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E.md)。
+如需查询或删除云端原始数据，请使用 `AffectiveCloudSourceDataApi`，详细接口见[情感云详细 API 功能说明](../media/情感云详细API功能说明.md)。

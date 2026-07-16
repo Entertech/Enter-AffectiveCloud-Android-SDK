@@ -2,13 +2,13 @@ plugins {
     id("enter.android.library")
 }
 
-val libraryVersion = (rootProject.ext.get("libraryVersion") as? String) ?: "1.0.0"
+val affectiveCloudSdkVersion = (rootProject.ext.get("affectiveCloudSdkVersion") as? String) ?: "1.0.0"
 val groupIdString = (rootProject.ext.get("groupId") as? String) ?: ""
 
 PublishInfo {
     groupId = groupIdString // 库的组织，使用域名表示
     artifactId = "affective_cloud_sdk" // 库名称
-    version = libraryVersion // 库版本
+    version = affectiveCloudSdkVersion // 库版本
 }
 
 android {

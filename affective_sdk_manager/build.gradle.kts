@@ -1,12 +1,12 @@
 plugins {
     id("enter.android.library")
 }
-val libraryVersion = (rootProject.ext.get("libraryVersion") as? String) ?: "1.0.0"
+val affectiveSdkManagerVersion = (rootProject.ext.get("affectiveSdkManagerVersion") as? String) ?: "1.0.0"
 val managerGroupId = "cn.entertech.android"
 PublishInfo {
     groupId = managerGroupId // 库的组织，使用域名表示
     artifactId = "affective-sdk-manager" // 库名称
-    version = libraryVersion // 库版本
+    version = affectiveSdkManagerVersion // 库版本
 }
 
 android {

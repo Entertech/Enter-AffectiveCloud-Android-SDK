@@ -1,7 +1,7 @@
 plugins {
     id("enter.android.library")
 }
-val libraryVersion = (rootProject.ext.get("libraryVersion") as? String) ?: "1.0.0"
+val affectiveLocalSdkVersion = (rootProject.ext.get("affectiveLocalSdkVersion") as? String) ?: "1.0.0"
 val localSdkGroupId = "cn.entertech.android"
 val baseArtifactId = "affective-offline-sdk"
 val projectFlavors = listOf("breath", "obsession", "flowtime", "sdk")
@@ -19,7 +19,7 @@ fun buildLocalSdkArtifactId(
 PublishInfo {
     groupId = localSdkGroupId // 库的组织，使用域名表示
     artifactId = baseArtifactId // 库名称，作为单 publication 或动态规则缺省值
-    version = libraryVersion  // 库版本
+    version = affectiveLocalSdkVersion  // 库版本
 
     artifactIdForVariant { variant ->
         buildLocalSdkArtifactId(

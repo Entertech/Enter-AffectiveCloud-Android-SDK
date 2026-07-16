@@ -1,12 +1,12 @@
 plugins {
     id("enter.android.library")
 }
-val libraryVersion = (rootProject.ext.get("libraryVersion") as? String) ?: "1.0.0"
+val affectiveCloudProtocolVersion = (rootProject.ext.get("affectiveCloudProtocolVersion") as? String) ?: "1.0.0"
 val protocolGroupId = "cn.entertech.android"
 PublishInfo {
     groupId = protocolGroupId // 库的组织，使用域名表示
     artifactId = "affective-cloud-protocol" // 库名称
-    version = libraryVersion // 库版本
+    version = affectiveCloudProtocolVersion // 库版本
 }
 
 android {

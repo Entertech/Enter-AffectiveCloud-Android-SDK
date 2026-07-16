@@ -47,6 +47,10 @@ require_pattern .github/workflows/release-publish.yml \
     'apiCheck analyzeModuleDependencies test' \
     'release workflow does not run ABI, dependency, and unit gates'
 
+if [[ -x scripts/verify_submodule_prs.sh ]]; then
+    scripts/verify_submodule_prs.sh --base-ref "${BASE_REF:-${GITHUB_BASE_REF:-dev_2.0}}"
+fi
+
 changed_files=()
 if (( $# > 0 )); then
     changed_files=("$@")

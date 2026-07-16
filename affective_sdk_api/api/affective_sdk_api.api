@@ -4,6 +4,12 @@ public final class cn/entertech/affective/sdk/BrainDataHelper {
 	public static synthetic fun sceegToEeg$default (Lcn/entertech/affective/sdk/BrainDataHelper;[BZILjava/lang/Object;)Ljava/util/List;
 }
 
+public final class cn/entertech/affective/sdk/VariableEegPacketAdapter {
+	public fun <init> ()V
+	public final fun append ([B)Ljava/util/List;
+	public final fun clear ()V
+}
+
 public final class cn/entertech/affective/sdk/api/AffectiveDataAnalysisServiceExtensionsKt {
 	public static final fun append (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/api/AffectiveInput;)Lcn/entertech/affective/sdk/api/AffectiveServiceResult;
 	public static final fun awaitConnectAffectiveService (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;Lcn/entertech/affective/sdk/bean/EnterAffectiveConfigProxy;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -374,6 +380,11 @@ public final class cn/entertech/affective/sdk/api/IStartAffectiveServiceLister$D
 	public static fun startBioFail (Lcn/entertech/affective/sdk/api/IStartAffectiveServiceLister;Lcn/entertech/affective/sdk/bean/Error;)V
 	public static fun startFail (Lcn/entertech/affective/sdk/api/IStartAffectiveServiceLister;Lcn/entertech/affective/sdk/bean/Error;)V
 	public static fun startSuccess (Lcn/entertech/affective/sdk/api/IStartAffectiveServiceLister;)V
+}
+
+public final class cn/entertech/affective/sdk/api/VariableEegPacketExtensionsKt {
+	public static final fun appendVariableEEGPacket (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;[BLcn/entertech/affective/sdk/VariableEegPacketAdapter;Z)V
+	public static synthetic fun appendVariableEEGPacket$default (Lcn/entertech/affective/sdk/api/IAffectiveDataAnalysisService;[BLcn/entertech/affective/sdk/VariableEegPacketAdapter;ZILjava/lang/Object;)V
 }
 
 public final class cn/entertech/affective/sdk/bean/AffectiveServiceWay : java/lang/Enum {

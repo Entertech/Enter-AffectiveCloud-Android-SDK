@@ -53,6 +53,13 @@ lifecycleScope.launch {
 }
 ```
 
+可变长度双通道 EEG 包先转换成兼容的 20 字节包，再复用现有追加入口：
+
+```kotlin
+val variableEegAdapter = VariableEegPacketAdapter()
+service.appendVariableEEGPacket(packet, variableEegAdapter)
+```
+
 实时订阅：
 
 ```kotlin

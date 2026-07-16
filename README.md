@@ -222,6 +222,7 @@ implementation 'cn.entertech.android:affectivecloud:2.1.0'
 - 业务代码依赖的是具体能力组件：只用本地就依赖 `affective_local_sdk`，只用云端就依赖 `affective_cloud_sdk`，需要动态切换就同时依赖两者。
 - 业务层持有的入口类型仍然是 `IAffectiveDataAnalysisService`，因此连接、启动、追加数据、订阅和报表获取的调用面一致。
 - `affective_sdk_api` 不提供 `getService` 或任何服务发现逻辑；实现实例由 App 自己创建，或由业务自己的 DI 容器提供。
+- `AffectiveManager` 的默认初始化不会自动发现服务；业务必须先 `registerAffectiveService(...)`、调用带默认实例的 `getAffectiveService(key, default)`，或在子类中重写 `initAffectiveService(...)`。
 
 ```kotlin
 enum class AlgorithmMode {
@@ -253,7 +254,7 @@ lifecycleScope.launch {
 
 ### 直接使用本地算法
 
-业务只需要依赖 `affective_local_sdk` 和 `affective_sdk_api`，入口仍然是 `IAffectiveDataAnalysisService`。如果希望使用协程和 Flow，可以直接使用 `IAffectiveDataAnalysisService` 的扩展方法，不需要经过 Manager，也不需要额外包装成其他入口。
+业务只需要依赖 `affective_local_sdk` 和 `affective_sdk_api`，入口仍然是 `IAffectiveDataAnalysisService`。如果希望使用协程和 Flow，可以直接使用 `IAffectiveDataAnalysisService` 的扩展方法，不需要经过 Manager，也不需要额外包装成其他入口。硬件数据建议通过 `append(AffectiveInput)` 追加，旧的 `appendByteArrayData`、`appendIntData`、`appendIntListData` 仅保留兼容。
 
 ```kotlin
 val localService: IAffectiveDataAnalysisService = EnterAffectiveLocalService()
@@ -559,7 +560,6 @@ affectiveSourceDataApi.deleteSourceDataRecordById(recordId, fun() {
 
 # 更新日志
 [更新日志](https://github.com/Entertech/Enter-AffectiveCloud-Android-SDK/wiki/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)
-
 
 
 

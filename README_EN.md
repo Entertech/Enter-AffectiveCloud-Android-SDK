@@ -41,6 +41,16 @@ For more demo operation instructions, please see [Enter Bioelectric Acquisition 
 
 In addition, we also provide a heart flow demonstration application, which integrates Bluetooth SDK, Bluetooth device management SDK, affective cloud SDK and other functions. For details, please see [Heart Flow Demo Application](https://github.com/Entertech/Enter-Affective-Cloud-Demo-Android)
 
+## Demo, integration tests, and signing
+
+Enter your `APP_KEY`, `APP_SECRET`, and user ID on the Demo sign-in screen. The Demo saves these values in the device's app settings and uses them on both the main and API detail screens.
+
+The SDK API integration tests read `AFFECTIVECLOUD_API_TEST_APP_KEY`, `AFFECTIVECLOUD_API_TEST_APP_SECRET`, and `AFFECTIVECLOUD_API_TEST_USER_ID`. Both Manager suites read the matching `AFFECTIVECLOUD_MANAGER_TEST_*` environment variables. Each suite skips when its entire set is absent and fails when only some values are supplied.
+
+Demo release signing reads `DEMO_KEYSTORE_PATH`, `DEMO_KEYSTORE_PASSWORD`, `DEMO_KEY_ALIAS`, and `DEMO_KEY_PASSWORD` from the environment or the root `local.properties` file, with environment variables taking precedence. An absent set produces an unsigned release APK. A partial set fails the build and reports the missing variable names. Relative paths resolve from the repository root.
+
+In GitHub Actions, map GitHub Secrets to these environment variables in the step that invokes Gradle. For signing, write the keystore to the runner's temporary directory and point `DEMO_KEYSTORE_PATH` to it.
+
 # Getting Started
 
 ### Gradle

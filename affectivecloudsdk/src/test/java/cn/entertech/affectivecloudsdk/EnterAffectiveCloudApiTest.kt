@@ -33,10 +33,7 @@ import java.lang.Exception
 class EnterAffectiveCloudApiTest {
 
     companion object {
-        var APP_KEY = "REDACTED"
-        var APP_SECRET = "REDACTED"
         /*自己的用户ID：邮箱或者手机号码*/
-        var USER_ID = "REDACTED"
         var EEG_TEST_FILE_PATH =
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
         var HR_TEST_FILE_PATH =
@@ -55,6 +52,7 @@ class EnterAffectiveCloudApiTest {
         @BeforeClass
         @JvmStatic
         fun init() {
+            val credentials = CloudTestCredentials.fromEnvironment("AFFECTIVECLOUD_API_TEST")
             PowerMockito.mockStatic(Log::class.java)
             availableAffectiveServices.add(Service.ATTENTION)
             availableAffectiveServices.add(Service.PRESSURE)
@@ -75,8 +73,9 @@ class EnterAffectiveCloudApiTest {
                 .requestPleasure()
                 .requestArousal()
                 .build()
-            mEnterAffectiveCloudApi =
-                EnterAffectiveCloudApiFactory.createApi(websocketAddress, APP_KEY, APP_SECRET, USER_ID)
+            mEnterAffectiveCloudApi = EnterAffectiveCloudApiFactory.createApi(
+                websocketAddress, credentials.appKey, credentials.appSecret, credentials.userId
+            )
 
             rawJsonResponseFunction = fun(s: String): Unit {
                 println(s)
@@ -93,6 +92,7 @@ class EnterAffectiveCloudApiTest {
         @AfterClass
         @JvmStatic
         fun release() {
+            if (mEnterAffectiveCloudApi == null) return
             PowerMockito.mockStatic(Log::class.java)
             val results = BooleanArray(2)
             val countDownLatch = CountDownLatch(2)

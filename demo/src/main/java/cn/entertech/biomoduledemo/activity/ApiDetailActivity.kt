@@ -15,6 +15,7 @@ import cn.entertech.affectivecloudsdk.interfaces.Callback2
 import cn.entertech.affectivecloudsdk.interfaces.WebSocketCallback
 import cn.entertech.biomoduledemo.R
 import cn.entertech.biomoduledemo.utils.FileHelper
+import cn.entertech.biomoduledemo.utils.SettingManager
 import cn.entertech.ble.single.BiomoduleBleManager
 import com.orhanobut.logger.Logger
 import org.java_websocket.handshake.ServerHandshake
@@ -29,12 +30,8 @@ class ApiDetailActivity : AppCompatActivity() {
 
     private var affectiveSubscribeParams: AffectiveSubscribeParams? = null
     private var biodataSubscribeParams: BiodataSubscribeParams? = null
-    /* Need to apply  :APP_KEY、APP_SECRET、USER_NAME*/
-    val APP_KEY: String = "REDACTED"
-    val APP_SECRET: String = "REDACTED"
     val USER_NAME: String = "test1"
     /*userId:your email or phone num;自己的用户ID：邮箱或者手机号码*/
-    val USER_ID: String = "REDACTED"
     var saveRootPath: String = Environment.getExternalStorageDirectory().path + File.separator + "biorawdata"
     var saveEEGPath: String =
         Environment.getExternalStorageDirectory().path + File.separator + "biorawdata" + File.separator + "eeg" + File.separator
@@ -48,11 +45,21 @@ class ApiDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_api_detail)
 
+        val settings = SettingManager.getInstance()
+        val appKey = settings.appKey.orEmpty()
+        val appSecret = settings.appSecret.orEmpty()
+        val userId = settings.userId.orEmpty()
+        if (appKey.isBlank() || appSecret.isBlank() || userId.isBlank()) {
+            Toast.makeText(this, getString(R.string.auth_page_title), Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+
         biomoduleBleManager = BiomoduleBleManager.getInstance(this)
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
         mEnterAffectiveCloudApi =
-            EnterAffectiveCloudApiFactory.createApi(websocketAddress, APP_KEY, APP_SECRET, USER_ID)
+            EnterAffectiveCloudApiFactory.createApi(websocketAddress, appKey, appSecret, userId)
 
         biodataSubscribeParams = BiodataSubscribeParams.Builder()
             .requestHR()

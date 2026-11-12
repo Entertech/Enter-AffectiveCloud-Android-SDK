@@ -208,11 +208,8 @@ class EnterAffectiveCloudManagerTestMultichannel {
 
     companion object {
 
-        var APP_KEY = "REDACTED"
-        var APP_SECRET = "REDACTED"
 
         /*自己的用户ID：邮箱或者手机号码*/
-        var USER_ID = "REDACTED"
         var EEG_TEST_FILE_PATH =
             "/Users/daiwanli/Code/Android/Entertech/Enter-AffectiveCloud-Android-SDK/affectivecloudsdk/src/test/java/cn/entertech/affectivecloudsdk/testfiles/flowtime_eegdata.txt"
         var HR_TEST_FILE_PATH =
@@ -239,6 +236,7 @@ class EnterAffectiveCloudManagerTestMultichannel {
         @BeforeClass
         @JvmStatic
         fun init() {
+            val credentials = CloudTestCredentials.fromEnvironment("AFFECTIVECLOUD_MANAGER_TEST")
             PowerMockito.mockStatic(Log::class.java)
             availableBioServices.add(Service.PEPR)
 
@@ -258,7 +256,9 @@ class EnterAffectiveCloudManagerTestMultichannel {
                 StorageSettings.Builder().channelNum(AlgorithmParams.ChannelNum.CHANNEL_NUM_8)
                     .build()
             enterAffectiveCloudConfig =
-                EnterAffectiveCloudConfig.Builder(APP_KEY, APP_SECRET, USER_ID)
+                EnterAffectiveCloudConfig.Builder(
+                    credentials.appKey, credentials.appSecret, credentials.userId
+                )
                     .url(websocketAddress)
                     .availableBiodataServices(availableBioServices)
                     .availableAffectiveServices(availableAffectiveServices)
@@ -300,6 +300,7 @@ class EnterAffectiveCloudManagerTestMultichannel {
         @AfterClass
         @JvmStatic
         fun release() {
+            if (enterAffectiveCloudManager == null) return
             PowerMockito.mockStatic(Log::class.java)
             val results = BooleanArray(1)
             val countDownLatch = CountDownLatch(1)

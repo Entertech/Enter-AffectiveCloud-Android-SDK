@@ -50,11 +50,20 @@
 
         <EditText
                 android:id="@+id/et_app_secret"
+                android:inputType="textPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 />
 
     </LinearLayout>
+
+    <EditText
+            android:id="@+id/et_user_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/auth_user_id"
+            android:inputType="text"
+            />
 
     <Button
             android:id="@+id/btn_continue"

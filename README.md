@@ -43,6 +43,16 @@
 
 另外我们还提供了一个心流演示应用，其集成了蓝牙SDK，蓝牙设备管理SDK，情感云SDK等功能，详细请查看[心流演示应用](https://github.com/Entertech/Enter-Affective-Cloud-Demo-Android)
 
+## Demo、集成测试与签名配置
+
+启动 Demo 后，在登录页输入 `APP_KEY`、`APP_SECRET` 和用户 ID。Demo 会把这三项保存在设备的应用设置中，主页面和 API 详情页共用这份配置。
+
+SDK 的 API 集成测试读取 `AFFECTIVECLOUD_API_TEST_APP_KEY`、`AFFECTIVECLOUD_API_TEST_APP_SECRET` 和 `AFFECTIVECLOUD_API_TEST_USER_ID`。两个 Manager 集成测试读取相同后缀的 `AFFECTIVECLOUD_MANAGER_TEST_*` 环境变量。整组未配置时跳过对应测试，配置不完整时测试失败。
+
+Demo 的 release 签名读取 `DEMO_KEYSTORE_PATH`、`DEMO_KEYSTORE_PASSWORD`、`DEMO_KEY_ALIAS` 和 `DEMO_KEY_PASSWORD`。可在仓库根目录的 `local.properties` 中配置，环境变量优先。相对路径以仓库根目录为基准。整组未配置时构建未签名的 release APK，配置不完整时构建会提示缺少的变量名。
+
+GitHub Actions 可将同名 GitHub Secrets 映射到执行 Gradle 的步骤环境变量。签名步骤需要先把 keystore 文件写到 runner 的临时目录，再用 `DEMO_KEYSTORE_PATH` 指向它。
+
 # 集成
 
 ### Gradle自动集成

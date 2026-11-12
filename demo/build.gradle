@@ -4,17 +4,32 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
-def releaseKeystoreFile = rootProject.file('entertech.jks')
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.isFile()) {
+    localPropertiesFile.withInputStream { localProperties.load(it) }
+}
+
+def signingValues = [
+    'DEMO_KEYSTORE_PATH', 'DEMO_KEYSTORE_PASSWORD', 'DEMO_KEY_ALIAS', 'DEMO_KEY_PASSWORD'
+].collectEntries { name ->
+    [(name): System.getenv(name) ?: localProperties.getProperty(name)]
+}
+def missingSigningValues = signingValues.findAll { name, value -> !value?.trim() }.keySet()
+def signingConfigured = missingSigningValues.isEmpty()
+if (!signingConfigured && missingSigningValues.size() != signingValues.size()) {
+    throw new GradleException("Missing Demo release signing settings: ${missingSigningValues.join(', ')}")
+}
 
 android {
-    signingConfigs {
-        config {
-            keyAlias 'entertech'
-            keyPassword 'REDACTED'
-            if (releaseKeystoreFile.exists()) {
-                storeFile releaseKeystoreFile
+    if (signingConfigured) {
+        signingConfigs {
+            config {
+                keyAlias signingValues.DEMO_KEY_ALIAS
+                keyPassword signingValues.DEMO_KEY_PASSWORD
+                storeFile rootProject.file(signingValues.DEMO_KEYSTORE_PATH)
+                storePassword signingValues.DEMO_KEYSTORE_PASSWORD
             }
-            storePassword 'REDACTED'
         }
     }
     compileSdkVersion 28
@@ -32,7 +47,7 @@ android {
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            if (releaseKeystoreFile.exists()) {
+            if (signingConfigured) {
                 signingConfig signingConfigs.config
             }
         }

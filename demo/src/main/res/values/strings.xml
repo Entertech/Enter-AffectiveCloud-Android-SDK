@@ -4,7 +4,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="auth_page_title">请输入情感云 APP_KEY 和 APP_SECRET</string>
+    <string name="auth_page_title">请输入情感云 APP_KEY、APP_SECRET 和用户 ID</string>
+    <string name="auth_user_id">用户 ID</string>
     <string name="auth_start">继续</string>
     <string name="brainwave">脑波</string>
     <string name="heart_rate">心率</string>

@@ -18,8 +18,6 @@ import cn.entertech.affectivecloudsdk.*
 import cn.entertech.affectivecloudsdk.entity.*
 import cn.entertech.affectivecloudsdk.interfaces.*
 import cn.entertech.biomoduledemo.R
-import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_KEY
-import cn.entertech.biomoduledemo.app.Constant.Companion.INTENT_APP_SECRET
 import cn.entertech.biomoduledemo.fragment.MessageReceiveFragment
 import cn.entertech.biomoduledemo.fragment.MessageSendFragment
 import cn.entertech.biomoduledemo.utils.*
@@ -32,15 +30,15 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity() {
-    private var appSecret: String? = null
-    private var appKey: String? = null
+    private lateinit var appSecret: String
+    private lateinit var appKey: String
+    private lateinit var userId: String
     private var enterAffectiveCloudManager: EnterAffectiveCloudManager? = null
     private var affectiveSubscribeParams: AffectiveSubscribeParams? = null
     private var biodataSubscribeParams: BiodataSubscribeParams? = null
     private lateinit var biomoduleBleManager: BiomoduleBleManager
 
     /*userId:your email or phone num;自己的用户ID：邮箱或者手机号码*/
-    val USER_ID: String = "REDACTED"
     private lateinit var messageReceiveFragment: MessageReceiveFragment
     private lateinit var messageSendFragment: MessageSendFragment
     lateinit var vpContainer: ViewPager
@@ -85,26 +83,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        verifyAppKeyAndSecret()
+        val settings = SettingManager.getInstance()
+        appKey = settings.appKey.orEmpty()
+        appSecret = settings.appSecret.orEmpty()
+        userId = settings.userId.orEmpty()
+        if (appKey.isBlank() || appSecret.isBlank() || userId.isBlank()) {
+            Toast.makeText(this, getString(R.string.auth_page_title), Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+
         biomoduleBleManager = BiomoduleBleManager.getInstance(this)
         biomoduleBleManager.addRawDataListener(rawListener)
         biomoduleBleManager.addHeartRateListener(heartRateListener)
         initView()
         initEnterAffectiveCloudManager()
         initPermission()
-    }
-
-    fun verifyAppKeyAndSecret() {
-        appKey = intent.getStringExtra(INTENT_APP_KEY)
-        appSecret = intent.getStringExtra(INTENT_APP_SECRET)
-        if (appKey == null || appSecret == null) {
-            Toast.makeText(
-                this@MainActivity,
-                getString(R.string.auth_page_title),
-                Toast.LENGTH_LONG
-            ).show()
-            finish()
-        }
     }
 
     fun initEnterAffectiveCloudManager() {
@@ -139,7 +133,7 @@ class MainActivity : AppCompatActivity() {
 //        var biodataTolerance = BiodataTolerance.Builder()
 //            .eeg(2).build()
         var enterAffectiveCloudConfig =
-            EnterAffectiveCloudConfig.Builder(appKey!!, appSecret!!, USER_ID)
+            EnterAffectiveCloudConfig.Builder(appKey, appSecret, userId)
                 .url(websocketAddress)
                 .availableBiodataServices(availableBioServices)
                 .availableAffectiveServices(availableAffectiveServices)

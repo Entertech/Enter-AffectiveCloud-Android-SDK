@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import static cn.entertech.biomoduledemo.app.Constant.SP_APP_KEY;
 import static cn.entertech.biomoduledemo.app.Constant.SP_APP_SECRET;
 import static cn.entertech.biomoduledemo.app.Constant.SP_SETTING;
+import static cn.entertech.biomoduledemo.app.Constant.SP_USER_ID;
 
 
 /**
@@ -36,23 +37,23 @@ public class SettingManager {
         return mApplication.getSharedPreferences(SP_SETTING, Context.MODE_PRIVATE);
     }
 
-    private SharedPreferences.Editor getEditor() {
-        return getSharedPreferences().edit();
+    public void saveCredentials(String appKey, String appSecret, String userId) {
+        getSharedPreferences().edit()
+                .putString(SP_APP_KEY, appKey)
+                .putString(SP_APP_SECRET, appSecret)
+                .putString(SP_USER_ID, userId)
+                .apply();
     }
 
-    public synchronized void setAppKey(String appKey) {
-        getEditor().putString(SP_APP_KEY,appKey).apply();
-    }
-
-    public synchronized String getAppKey() {
+    public String getAppKey() {
         return getSharedPreferences().getString(SP_APP_KEY, "");
     }
 
-    public synchronized void setAppSecret(String appSecret) {
-        getEditor().putString(SP_APP_SECRET, appSecret).apply();
+    public String getAppSecret() {
+        return getSharedPreferences().getString(SP_APP_SECRET, "");
     }
 
-    public synchronized String getAppSecret() {
-        return getSharedPreferences().getString(SP_APP_SECRET, "");
+    public String getUserId() {
+        return getSharedPreferences().getString(SP_USER_ID, "");
     }
 }

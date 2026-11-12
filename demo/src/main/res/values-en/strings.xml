@@ -2,7 +2,8 @@
 <resources>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="auth_page_title">Please enter affective cloud APP_KEY and APP_SECRET</string>
+    <string name="auth_page_title">Enter your Affective Cloud APP_KEY, APP_SECRET, and user ID</string>
+    <string name="auth_user_id">User ID</string>
     <string name="auth_start">Next</string>
     <string name="brainwave">Brainwave</string>
     <string name="heart_rate">Heart rate</string>
